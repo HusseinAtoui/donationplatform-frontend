@@ -1,41 +1,73 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './NavBar.css';
 
 export default function NavBar() {
+    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const toggleMobileMenu = () => setMobileMenuOpen(!isMobileMenuOpen);
+
     return (
-        <header className="navbar">
-            <div className="navbar__logo">WarmHands</div>
+        <>
+            <header className="navbar">
+                <div className="navbar__logo">WarmHands</div>
 
-            <nav className="navbar__menu">
-                <a href="/" className="navbar__menu-item active">Home</a>
-                <a href="/guide" className="navbar__menu-item">Guide</a>
-                <a href="/donations" className="navbar__menu-item">Donations</a>
-                <a href="/partners" className="navbar__menu-item">Our Partners</a>
-            </nav>
+                <nav className={`navbar__menu ${isMobileMenuOpen ? 'navbar__menu--open' : ''}`}>
+                    <a href="/" className="navbar__menu-item active">Home</a>
+                    <a href="/guide" className="navbar__menu-item">Guide</a>
+                    <a href="/donations" className="navbar__menu-item">Donations</a>
+                    <a href="/partners" className="navbar__menu-item">Our Partners</a>
+                </nav>
 
-            <div className="navbar__actions">
-                <div className="navbar__search-wrapper">
-                    <input type="text" placeholder="Search Donations..." />
-                    <button className="navbar__search-btn" aria-label="Search">
+                <div className="navbar__actions">
+                    <div className="navbar__search-wrapper">
+                        <input type="text" placeholder="Search Donations..." />
+                        <button className="navbar__search-btn" aria-label="Search">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="16"
+                                width="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <circle cx="11" cy="11" r="7" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <button className="navbar__login-icon" aria-label="Login">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            height="16"
-                            width="16"
+                            height="24"
+                            width="24"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="3"
+                            strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                         >
-                            <circle cx="11" cy="11" r="7" />
-                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            <circle cx="12" cy="7" r="4" />
+                            <path d="M5.5 21a8.38 8.38 0 0 1 13 0" />
                         </svg>
                     </button>
+                    <button
+                        className="navbar__hamburger"
+                        onClick={toggleMobileMenu}
+                        aria-label="Toggle navigation menu"
+                    >
+                        <span className="hamburger__line"></span>
+                        <span className="hamburger__line"></span>
+                        <span className="hamburger__line"></span>
+                    </button>
                 </div>
+            </header>
 
-                <button className="navbar__login-btn">Login</button>
-            </div>
-        </header>
+            {isMobileMenuOpen && <div className="navbar__overlay" onClick={toggleMobileMenu}></div>}
+        </>
     );
 }
