@@ -55,6 +55,7 @@ export default function NavBar() {
                             <path d="M5.5 21a8.38 8.38 0 0 1 13 0" />
                         </svg>
                     </button>
+
                     <button
                         className="navbar__hamburger"
                         onClick={toggleMobileMenu}
