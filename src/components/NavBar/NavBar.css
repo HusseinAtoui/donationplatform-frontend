@@ -126,23 +126,30 @@
   background: #4a8b5a;
 }
 
-/* Login button */
-.navbar__login-btn {
-  padding: 10px 24px;
+/* Login Icon Button */
+.navbar__login-icon {
+  width: 40px;
+  height: 40px;
   background-color: #5FAB7D;
-  color: white;
+  border-radius: 50%;
   border: none;
-  border-radius: 10px;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500;
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  white-space: nowrap;
+  padding: 0;
 }
 
-.navbar__login-btn:hover {
+.navbar__login-icon:hover {
   background-color: #4a8b5a;
+}
+
+.navbar__login-icon svg {
+  stroke: white;
+  width: 20px;
+  height: 20px;
 }
 
 /* Hamburger button - hidden on desktop */
@@ -166,8 +173,6 @@
 }
 
 /* MOBILE RESPONSIVE */
-
-
 @media (max-width: 600px) {
   .navbar {
     padding: 16px 20px;
@@ -183,12 +188,14 @@
     display: none;
   }
 
-  /* Show login and hamburger on mobile */
-   .navbar__login-btn {
-    display: inline-block;
-    padding: 6px 16px;
-    font-size: 16px;
-    border-radius: 8px;
+  /* Show login icon and hamburger on mobile */
+  .navbar__login-icon {
+    display: flex;
+    width: 36px;
+    height: 36px;
+    order: 1;
+    border-radius: 50%;
+    padding: 0;
   }
 
   .navbar__hamburger {
@@ -198,18 +205,8 @@
 
   .navbar__actions {
     gap: 12px;
-    /* rearrange order so login and hamburger aligned right */
     display: flex;
     align-items: center;
-  }
-
-  /* Put login button before hamburger */
-  .navbar__login-btn {
-    order: 1;
-  }
-
-  .navbar__search-wrapper {
-    display: none;
   }
 
   /* Sidebar menu remains same */
