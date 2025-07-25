@@ -1,0 +1,83 @@
+/* ------------------- WHAT WE DO ------------------- */
+
+.whatwedo {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    padding: 100px 40px 180px;
+    background-color: #6fc792;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    overflow: visible;
+    box-sizing: border-box;
+}
+
+.whatwedo__title {
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 48px;
+    margin-bottom: 10px;
+}
+
+.whatwedo__subtitle {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 48px;
+    margin-bottom: 70px;
+    text-align: center;
+}
+
+.whatwedo__line {
+    position: relative;
+    width: 100%;
+    height: 87px;
+    z-index: 1;
+}
+
+.whatwedo__step-circle {
+    position: absolute;
+    width: 79px;
+    height: 78px;
+    cursor: default;
+    z-index: 10;
+    user-select: none;
+}
+
+.whatwedo__circle-svg {
+    width: 79px;
+    height: 78px;
+    display: block;
+}
+
+.whatwedo__step-number {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 900;
+    font-size: 48px;
+    line-height: 48px;
+    color: #32bf56;
+    pointer-events: none;
+    user-select: none;
+    z-index: 11;
+}
+
+/* ------------------- WHAT WE DO ------------------- */
+
+.whatwedo__step-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+    color: #fff;
+    user-select: none;
+    cursor: default;
+    position: absolute;
+    /* keep this in style prop or here */
+    width: 180px;
+}

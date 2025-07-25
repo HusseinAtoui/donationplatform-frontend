@@ -1,0 +1,63 @@
+/* ------------------- HERO CONTAINER ------------------- */
+.hero {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 80px 80px;
+    background-color: #ffffff;
+    color: #333;
+    max-width: 1400px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* ------------------- HERO CONTENT ------------------- */
+.hero-content {
+    flex: 1;
+    padding-right: 40px;
+    max-width: 600px;
+}
+
+/* ------------------- HERO TITLE ------------------- */
+.hero-title {
+    font-size: 3rem;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 20px;
+}
+
+/* ------------------- HERO SUBTITLE ------------------- */
+.hero-subtitle {
+    font-size: 1.25rem;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 30px;
+}
+
+/* ------------------- HERO BUTTON ------------------- */
+.hero-button {
+    background-color: #5FAB7D;
+    color: #fff;
+    padding: 14px 40px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 600;
+}
+
+.hero-button:hover {
+    background-color: #4a8b5a;
+}
+
+/* ------------------- HERO IMAGE ------------------- */
+.hero-image {
+    flex: 1;
+    max-width: 500px;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+}

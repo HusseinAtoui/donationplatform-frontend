@@ -1,13 +1,17 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar/NavBar';
+import HomePage from './pages/HomePage';
 
 function App() {
   return (
-    <div>
+    <Router>
       <NavBar />
-      <h1>Donation Platform</h1>
-      {/* Your components will go here */}
-    </div>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        {/* Add more routes as you create new pages */}
+      </Routes>
+    </Router>
   );
 }
 
