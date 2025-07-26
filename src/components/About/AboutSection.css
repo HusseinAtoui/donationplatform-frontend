@@ -1,0 +1,50 @@
+/* ------------------- ABOUT SECTION ------------------- */
+.about-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 0;
+  background-color: #f9f9f9;
+  text-align: center;
+  gap: 2rem;
+  overflow: hidden;
+  z-index: 1;
+  /* lower than nav menu */
+}
+
+.about-text {
+  max-width: 1000px;
+  padding: 0 2rem;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.about-text h2 {
+  color: #5FAB7D;
+  font-weight: 600;
+  font-size: 48px;
+  margin-bottom: 1.7rem;
+}
+
+.about__description {
+  font-size: 1.2rem;
+  line-height: 1.7;
+  color: #444;
+}
+
+/* Make the image span the full screen width */
+.about-image {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -60px;
+  overflow: hidden;
+}
+
+.about-image svg {
+  width: 100%;
+  max-width: 1600px;
+  height: auto;
+  display: block;
+}

@@ -5,6 +5,12 @@
     padding: 0;
 }
 
+html, body {
+    height: 100%;
+    position: relative;
+    overflow-x: hidden; /* prevent horizontal scroll */
+}
+
 .navbar {
     width: 100%;
     padding: 24px 32px;
@@ -32,6 +38,11 @@
     gap: 24px;
     align-items: center;
     transition: transform 0.3s ease;
+}
+
+/* Always show menu if open (fallback) */
+.navbar__menu.navbar__menu--open {
+    display: flex !important;
 }
 
 .navbar__menu-item {
@@ -155,18 +166,19 @@
     flex-direction: column;
     padding: 80px 24px 24px;
     gap: 24px;
-    z-index: 120;
+    z-index: 10000; /* above overlay */
     transform: translateX(0);
 }
 
+/* Overlay covers entire viewport */
 .navbar__overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: calc(100% - 250px);
+    width: calc(100vw - 250px); /* exclude sidebar width */
     height: 100vh;
     background: rgba(0, 0, 0, 0.3);
-    z-index: 110;
+    z-index: 9999;
 }
 
 /* ------------------- RESPONSIVE ------------------- */

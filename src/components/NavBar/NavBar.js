@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './NavBar.css';
 
 export default function NavBar() {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const toggleMobileMenu = () => setMobileMenuOpen(!isMobileMenuOpen);
+
+    // Prevent page scroll when menu is open
+    useEffect(() => {
+        document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'auto';
+
+        // Clean up when component unmounts
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [isMobileMenuOpen]);
 
     return (
         <>
