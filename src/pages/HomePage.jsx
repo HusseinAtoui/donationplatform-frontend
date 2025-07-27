@@ -2,6 +2,7 @@ import React from 'react';
 import Hero from '../components/Hero/Hero';
 import WhatWeDo from '../components/WhatWeDo/WhatWeDo';
 import AboutSection from '../components/About/AboutSection';
+import ContactSection from '../components/ContactSection/ContactSection';
 import heroImage from '../assets/hero-image.jpg';
 
 const HomePage = () => {
@@ -16,6 +17,7 @@ const HomePage = () => {
             />
             <WhatWeDo />
             <AboutSection />
+            <ContactSection />
         </div>
     );
 };

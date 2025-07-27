@@ -1,0 +1,132 @@
+/* ======= Container ======= */
+.contact-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  gap: 40px;
+  /* space between form and info */
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ======= Form Section ======= */
+.contact-form-wrapper {
+  width: 550px;
+  /* fixed width */
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 40px;
+  gap: 40px;
+  background: #F8F9FA;
+  border-radius: 20px;
+  width: 100%;
+}
+
+.form-group-row {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 9px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #FFFFFF;
+  font-size: 16px;
+  color: #6C757D;
+  font-family: 'Poppins', sans-serif;
+}
+
+.form-group textarea {
+  height: 152px;
+  resize: none;
+}
+
+label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+}
+
+button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px 20px;
+  background: #5FAB7D;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: capitalize;
+  cursor: pointer;
+  width: 248px;
+}
+
+/* ======= Info Section ======= */
+.contact-info-wrapper {
+  width: 636px;
+  /* fixed width */
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.contact-info-text h2 {
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 48px;
+  color: #000000;
+  margin: 0;
+}
+
+.contact-info-text p {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 160%;
+  color: rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+/* Contact info items */
+.contact-info-items {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 475px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-weight: 600;
+  font-size: 20px;
+  color: #000000;
+}
+
+.icon-bg {
+  width: 40px;
+  height: 40px;
+  background: #5FAB7D;
+  border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 24px;
+  /* size icons nicely */
+}
