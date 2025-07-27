@@ -1,26 +1,55 @@
-/* ====== Footer Container ====== */
 .footer-container {
+    position: relative;
     background-color: #5FAB7D;
     padding: 72px 76px 72px 76px;
     color: white;
     font-family: 'Poppins', sans-serif;
-    position: relative;
-    /* Remove absolute positioning for responsiveness unless needed */
-    /* width: 100%; */
-    /* height: auto; */
     isolation: isolate;
     box-sizing: border-box;
+    border-top-left-radius: 80px;
+    border-top-right-radius: 80px;
+    overflow: hidden;
+    width: 100%; 
+    max-width: none; 
 }
 
-/* Inner wrapper to center & space items */
+/* Soft white circles background */
+.footer-container::before,
+.footer-container::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    filter: blur(100px);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.footer-container::before {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    left: -100px;
+}
+
+.footer-container::after {
+    width: 250px;
+    height: 250px;
+    bottom: -100px;
+    right: -100px;
+}
+
 .footer-inner {
+    position: relative;
     max-width: 1512px;
     margin: 0 auto;
     display: flex;
     gap: 140px;
     justify-content: flex-start;
     flex-wrap: wrap;
-    /* allows wrapping on smaller screens */
+    z-index: 1;
+    box-sizing: border-box;
+    padding-left: 70px; 
 }
 
 /* === Logo + Description Section === */
@@ -36,6 +65,7 @@
     font-size: 32px;
     line-height: 48px;
     color: #FFFFFF;
+    user-select: none;
 }
 
 /* Paragraph text uses Inter font, fallback to sans-serif */
@@ -44,7 +74,7 @@
     font-weight: 400;
     font-size: 15px;
     line-height: 160%;
-    color: #FFFFFF;
+    color: rgba(255, 255, 255, 0.85);
     margin: 0;
 }
 
@@ -73,8 +103,6 @@
     gap: 16px;
 }
 
-.footer-links-group ul li {}
-
 .footer-links-group ul li a {
     font-weight: 400;
     font-size: 16px;
@@ -88,7 +116,6 @@
 .footer-links-group ul li a:hover,
 .footer-links-group ul li a:focus {
     color: #FBA81F;
-    /* subtle warm accent hover */
     text-decoration: underline;
 }
 
@@ -97,11 +124,13 @@
     .footer-inner {
         justify-content: center;
         gap: 60px;
+        padding-left: 20px; /* reduce padding on small screens */
     }
 
     .footer-logo-desc,
     .footer-links-group {
         max-width: 100%;
         flex: 1 1 300px;
+        text-align: center;
     }
 }
