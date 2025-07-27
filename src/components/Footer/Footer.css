@@ -1,0 +1,107 @@
+/* ====== Footer Container ====== */
+.footer-container {
+    background-color: #5FAB7D;
+    padding: 72px 76px 72px 76px;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+    /* Remove absolute positioning for responsiveness unless needed */
+    /* width: 100%; */
+    /* height: auto; */
+    isolation: isolate;
+    box-sizing: border-box;
+}
+
+/* Inner wrapper to center & space items */
+.footer-inner {
+    max-width: 1512px;
+    margin: 0 auto;
+    display: flex;
+    gap: 140px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    /* allows wrapping on smaller screens */
+}
+
+/* === Logo + Description Section === */
+.footer-logo-desc {
+    max-width: 349px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-logo {
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 48px;
+    color: #FFFFFF;
+}
+
+/* Paragraph text uses Inter font, fallback to sans-serif */
+.footer-logo-desc p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 160%;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+/* === Links Section === */
+.footer-links-group {
+    max-width: 181px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-links-group h3 {
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 30px;
+    margin: 0;
+    color: #FFFFFF;
+}
+
+.footer-links-group ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.footer-links-group ul li {}
+
+.footer-links-group ul li a {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    color: #FFFFFF;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    cursor: pointer;
+}
+
+.footer-links-group ul li a:hover,
+.footer-links-group ul li a:focus {
+    color: #FBA81F;
+    /* subtle warm accent hover */
+    text-decoration: underline;
+}
+
+/* === Responsive tweaks === */
+@media (max-width: 960px) {
+    .footer-inner {
+        justify-content: center;
+        gap: 60px;
+    }
+
+    .footer-logo-desc,
+    .footer-links-group {
+        max-width: 100%;
+        flex: 1 1 300px;
+    }
+}

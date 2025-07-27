@@ -3,6 +3,7 @@ import Hero from '../components/Hero/Hero';
 import WhatWeDo from '../components/WhatWeDo/WhatWeDo';
 import AboutSection from '../components/About/AboutSection';
 import ContactSection from '../components/ContactSection/ContactSection';
+import Footer from '../components/Footer/Footer';
 import heroImage from '../assets/hero-image.jpg';
 
 const HomePage = () => {
@@ -18,6 +19,7 @@ const HomePage = () => {
             <WhatWeDo />
             <AboutSection />
             <ContactSection />
+            <Footer />
         </div>
     );
 };
