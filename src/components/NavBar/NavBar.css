@@ -5,10 +5,12 @@
     padding: 0;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     position: relative;
-    overflow-x: hidden; /* prevent horizontal scroll */
+    overflow-x: hidden;
+    /* prevent horizontal scroll */
 }
 
 .navbar {
@@ -87,10 +89,11 @@ html, body {
 .navbar__search-btn {
     position: absolute;
     right: 6px;
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     background: #5FAB7D;
     border-radius: 50%;
+    /* this ensures it's a circle */
     border: none;
     display: flex;
     justify-content: center;
@@ -98,6 +101,8 @@ html, body {
     color: white;
     cursor: pointer;
     transition: background 0.3s ease;
+    padding: 0;
+    /* prevent shrinking the icon */
 }
 
 .navbar__search-btn:hover {
@@ -105,8 +110,10 @@ html, body {
 }
 
 /* ------------------- LOGIN ICON ------------------- */
+
 .navbar__login-icon {
     width: 40px;
+    /* Slightly larger for better visibility */
     height: 40px;
     background: #5FAB7D;
     border-radius: 50%;
@@ -117,16 +124,12 @@ html, body {
     color: white;
     cursor: pointer;
     transition: background 0.3s ease;
+    padding: 0;
+    /* prevent shrinking the SVG */
 }
 
 .navbar__login-icon:hover {
     background-color: #4a8b5a;
-}
-
-.navbar__login-icon svg {
-    stroke: white;
-    width: 20px;
-    height: 20px;
 }
 
 /* ------------------- HAMBURGER ------------------- */
@@ -166,7 +169,8 @@ html, body {
     flex-direction: column;
     padding: 80px 24px 24px;
     gap: 24px;
-    z-index: 10000; /* above overlay */
+    z-index: 10000;
+    /* above overlay */
     transform: translateX(0);
 }
 
@@ -175,7 +179,8 @@ html, body {
     position: fixed;
     top: 0;
     left: 0;
-    width: calc(100vw - 250px); /* exclude sidebar width */
+    width: calc(100vw - 250px);
+    /* exclude sidebar width */
     height: 100vh;
     background: rgba(0, 0, 0, 0.3);
     z-index: 9999;
