@@ -5,16 +5,19 @@
     display: flex;
     height: 100vh;
     font-family: 'Inter', sans-serif;
+    overflow: hidden; /* prevent any overflow */
 }
 
 /* Left Section */
 .login-left {
-    flex: 1;
+    flex: 1; /* half width */
+    max-width: 50%; /* explicitly limit to half */
     padding: 60px 80px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     background-color: #ffffff;
+    box-sizing: border-box;
 }
 
 .return-text {
@@ -145,7 +148,24 @@
 
 /* Right Section */
 .login-image {
-    flex: 1;
+    flex: 1; /* half width */
+    max-width: 50%; /* explicitly limit to half */
+    height: 100%;
     background-image: url('../../assets/login-illustration.jpg');
     background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-left, .login-image {
+        max-width: 100%;
+        flex: none;
+        height: 50vh;
+    }
 }
