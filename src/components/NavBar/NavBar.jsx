@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './NavBar.css';
 
 export default function NavBar() {
@@ -49,7 +50,7 @@ export default function NavBar() {
                         </button>
                     </div>
 
-                    <button className="navbar__login-icon" aria-label="Login">
+                    <Link to="/login" className="navbar__login-icon" aria-label="Login">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             height="24"
@@ -64,7 +65,7 @@ export default function NavBar() {
                             <circle cx="12" cy="7" r="4" />
                             <path d="M5.5 21a8.38 8.38 0 0 1 13 0" />
                         </svg>
-                    </button>
+                    </Link>
 
                     <button
                         className="navbar__hamburger"
