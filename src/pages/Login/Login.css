@@ -134,8 +134,11 @@
     background-color: #ddd;
 }
 
-/* Google Login */
 .google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* space between icon and text */
     width: 100%;
     padding: 12px;
     font-size: 14px;
@@ -143,7 +146,8 @@
     border-radius: 10px;
     background-color: white;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 800;
+    color: #4285F4; 
 }
 
 /* Right Section */
