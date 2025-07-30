@@ -152,13 +152,35 @@
 
 /* Right Section */
 .login-image {
-    flex: 1; /* half width */
-    max-width: 50%; /* explicitly limit to half */
+    flex: 1; 
+    max-width: 50%; 
     height: 100%;
     background-image: url('../../assets/login-illustration.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+/* sign up */
+.signup-prompt {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 24px;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;  
+}
+
+.signup-link {
+    color: #5FAB7D;
+    font-weight: 600;
+    text-decoration: none;
+    outline: none;
+}
+
+.signup-link:hover,
+.signup-link:focus {
+    color: #4a9468;
+    cursor: pointer;
 }
 
 /* Responsive adjustments */

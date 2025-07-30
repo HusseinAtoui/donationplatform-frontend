@@ -65,6 +65,14 @@ export default function Login() {
 
                 <button className="login-btn">LOGIN</button>
 
+                {/* Sign Up Prompt */}
+                <p className="signup-prompt">
+                    Don't have an account?{' '}
+                    <span className="signup-link" onClick={() => navigate('/signup')} role="button" tabIndex={0} style={{ cursor: 'pointer' }}>
+                        Sign Up
+                    </span>
+                </p>
+
                 <div className="login-divider">
                     <div className="line" />
                     <span>Or Login with</span>
