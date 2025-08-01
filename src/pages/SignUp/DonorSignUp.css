@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@500;700&display=swap');
+
+.signup-container {
+    display: flex;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+}
+
+/* Left Section */
+.signup-left {
+    flex: 1;
+    max-width: 50%;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+/* Return text */
+.return-text {
+    color: #5FAB7D;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 30px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Heading */
+.signup-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1C1C1C;
+    margin-bottom: 30px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Form styling */
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-family: 'Inter', sans-serif;
+}
+
+.signup-form input {
+    padding: 12px 16px;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.signup-form input:focus {
+    border-color: #5FAB7D;
+}
+
+/* Submit button */
+.signup-form button {
+    padding: 14px;
+    background-color: #5FAB7D;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.signup-form button:hover {
+    background-color: #4a9468;
+}
+
+/* Login prompt */
+.login-prompt {
+    font-size: 14px;
+    color: #333;
+    margin-top: 24px;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+
+.login-link {
+    color: #5FAB7D;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.login-link:hover,
+.login-link:focus {
+    color: #4a9468;
+}
+
+/* Right Section */
+.login-image {
+    flex: 1;
+    max-width: 50%;
+    background-image: url('../../assets/login-illustration.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .signup-container {
+        flex-direction: column;
+    }
+
+    .signup-left,
+    .login-image {
+        max-width: 100%;
+        flex: none;
+        height: 50vh;
+        padding: 40px 30px;
+    }
+}

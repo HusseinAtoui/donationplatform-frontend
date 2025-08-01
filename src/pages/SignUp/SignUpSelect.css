@@ -11,6 +11,7 @@
 /* Left Section */
 .signup-select-left {
     flex: 1;
+    max-width: 50%; /* ✅ Add this line */
     padding: 60px 80px;
     display: flex;
     flex-direction: column;
@@ -27,6 +28,7 @@
     font-weight: 500;
     cursor: pointer;
     margin-bottom: 30px;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Heading */
@@ -35,6 +37,7 @@
     font-weight: 700;
     color: #1C1C1C;
     margin-bottom: 30px;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Buttons */
@@ -53,6 +56,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
 }
 
 .user-type-btn.active,
@@ -84,6 +88,7 @@
 /* Right Section (image stays the same) */
 .login-image {
     flex: 1;
+    max-width: 50%; /* ✅ Add this line */
     background-image: url('../../assets/login-illustration.jpg');
     background-size: cover;
     background-position: center;
@@ -101,5 +106,6 @@
         max-width: 100%;
         flex: none;
         height: 50vh;
+        padding: 40px 30px;
     }
 }
