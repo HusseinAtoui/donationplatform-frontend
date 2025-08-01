@@ -3,12 +3,15 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import NavBar from './components/NavBar/NavBar';
 import HomePage from './pages/HomePage';
 import Login from './pages/Login/Login';
+import SignUpSelect from './pages/SignUp/SignUpSelect';
+import DonorSignUp from './pages/SignUp/DonorSignUp';
+import NgoSignUp from './pages/SignUp/NgoSignUp';
 
 function AppContent() {
   const location = useLocation();
 
   // Define paths where NavBar should NOT appear
-  const hideNavPaths = ['/login'];
+  const hideNavPaths = ['/login', '/signup', '/signup/donor', '/signup/dngo'];
 
   return (
     <>
@@ -16,6 +19,9 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUpSelect />} />
+        <Route path="/signup/donor" element={<DonorSignUp />} />
+        <Route path="/signup/ngo" element={<NgoSignUp />} />
       </Routes>
     </>
   );

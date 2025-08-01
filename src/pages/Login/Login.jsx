@@ -26,7 +26,7 @@ export default function Login() {
     return (
         <div className="login-container">
             <div className="login-left">
-                <p className="return-text" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>← Return</p>
+                <p className="return-text" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>← Return Home</p>
                 <h1 className="welcome-title">Welcome Back to WarmHands!</h1>
 
                 <p className="login-as-label">Login in as:</p>
