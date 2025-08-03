@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@500;700&display=swap');
+
+.signup-container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+}
+
+/* Left Section */
+.signup-left {
+  flex: 1;
+  max-width: 50%;
+  padding: 60px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+/* Return text */
+.return-text {
+  color: #5FAB7D;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 30px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Heading */
+.signup-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1C1C1C;
+  margin-bottom: 30px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Form */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Input group wrapper for spacing and full width */
+.input-group {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Inputs and textareas */
+.signup-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+  resize: vertical;
+}
+
+.signup-input:focus {
+  border-color: #5FAB7D;
+}
+
+/* Error message styling */
+.error-msg {
+  color: #d9534f;
+  font-size: 13px;
+  margin-top: 4px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Hide inactive pages */
+.form-page.hidden {
+  display: none;
+}
+
+/* Navigation buttons container */
+.nav-buttons {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Small arrow buttons only — no big backgrounds */
+.nav-arrow {
+  background: none;
+  border: none;
+  color: #5FAB7D;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-arrow:hover,
+.nav-arrow:focus {
+  background-color: #e6f1eb;
+  outline: none;
+}
+
+/* Position Next arrow to left */
+.next-arrow {
+  margin-left: 0;
+}
+
+/* Position Back arrow to right */
+.back-arrow {
+  margin-left: auto;
+}
+
+/* Submit button stays wide */
+.submit-btn {
+  padding: 14px;
+  background-color: #5FAB7D;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-grow: 1;
+}
+
+.submit-btn:hover {
+  background-color: #4a9468;
+}
+
+/* Right Section */
+.login-image {
+  flex: 1;
+  max-width: 50%;
+  background-image: url('../../assets/login-illustration.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Phone input adjustments for react-phone-input-2 */
+
+/* Container for the phone input to ensure relative positioning */
+.phone-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Style the input itself */
+.phone-input {
+  width: 100% !important;
+  padding: 12px 60px 12px 60px !important; /* add left padding for flag + spacing */
+  min-height: 40px !important;
+  font-size: 14px !important;
+  font-family: 'Inter', sans-serif !important;
+  border-radius: 8px !important;
+  border: 1.5px solid #ccc !important;
+  outline: none !important;
+  transition: border-color 0.2s ease !important;
+  box-sizing: border-box !important;
+}
+
+/* On focus, highlight border */
+.phone-input:focus {
+  border-color: #5FAB7D !important;
+}
+
+/* Position the country flag dropdown button */
+.phone-button {
+  position: absolute !important;
+  left: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 32px !important;
+  width: 48px !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Remove white background on dropdown toggle and focus */
+.phone-button:focus,
+.phone-button:hover,
+.phone-button:active {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Fix dropdown menu z-index so it appears over everything */
+.country-list {
+  z-index: 1000 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .signup-container {
+    flex-direction: column;
+  }
+
+  .signup-left,
+  .login-image {
+    max-width: 100%;
+    flex: none;
+    height: 50vh;
+    padding: 40px 30px;
+  }
+}
