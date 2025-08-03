@@ -209,22 +209,6 @@ export default function NGOSignUp() {
               />
             </div>
             <div className="input-group">
-              <label htmlFor="logoUrl" className="logo-upload-label">Upload Logo (optional)</label>
-              <input
-                className="signup-input"
-                id="logoUrl"
-                name="logoUrl"
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setFormData({ ...formData, logoUrl: URL.createObjectURL(file) });
-                  }
-                }}
-              />
-            </div>
-            <div className="input-group">
               <textarea
                 className="signup-input"
                 name="bio"
@@ -243,6 +227,26 @@ export default function NGOSignUp() {
                 onChange={handleChange}
                 rows="3"
               />
+            </div>
+            <div className="input-group logo-upload-row">
+              <label htmlFor="logoUrl" className="custom-file-label">
+                Choose Logo
+              </label>
+              <input
+                id="logoUrl"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setFormData({ ...formData, logoUrl: file.name }); // just the name
+                  }
+                }}
+                className="real-file-input"
+              />
+              <span className="file-name-display">
+                {formData.logoUrl || 'No file selected'}
+              </span>
             </div>
           </div>
 
