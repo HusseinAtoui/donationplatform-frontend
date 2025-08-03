@@ -38,7 +38,7 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* Form styling */
+/* Form */
 .signup-form {
     display: flex;
     flex-direction: column;
@@ -46,11 +46,23 @@
     font-family: 'Inter', sans-serif;
 }
 
+/* First + Last Name side by side */
+.name-row {
+    display: flex;
+    gap: 16px;
+}
+
+.name-row input {
+    flex: 1;
+}
+
+/* Input fields */
 .signup-form input {
     padding: 12px 16px;
     border: 1.5px solid #ccc;
     border-radius: 8px;
     font-size: 14px;
+    font-family: 'Inter', sans-serif;
     outline: none;
     transition: border-color 0.2s ease;
 }
@@ -59,8 +71,29 @@
     border-color: #5FAB7D;
 }
 
+/* Password with toggle icon */
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #5FAB7D;
+}
+
 /* Submit button */
 .signup-form button {
+    width: 100%;
+    /* ← Add this line */
     padding: 14px;
     background-color: #5FAB7D;
     color: white;
@@ -119,5 +152,9 @@
         flex: none;
         height: 50vh;
         padding: 40px 30px;
+    }
+
+    .name-row {
+        flex-direction: column;
     }
 }
