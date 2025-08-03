@@ -126,6 +126,7 @@
 .phone-container {
   position: relative;
   width: 100%;
+   margin-bottom: 16px !important;
 }
 
 .phone-input {

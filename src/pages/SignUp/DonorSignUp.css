@@ -71,6 +71,11 @@
     border-color: #5FAB7D;
 }
 
+/* Fix phone field spacing */
+.phone-containerDONOR {
+    margin-bottom: 1px !important;
+}
+
 /* Password with toggle icon */
 .password-field {
     position: relative;
@@ -93,7 +98,6 @@
 /* Submit button */
 .signup-form button {
     width: 100%;
-    /* ← Add this line */
     padding: 14px;
     background-color: #5FAB7D;
     color: white;

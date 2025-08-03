@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import './DonorSignUp.css';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function DonorSignUp() {
     const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
     });
 
     const [showPassword, setShowPassword] = useState(false);
@@ -50,16 +53,29 @@ export default function DonorSignUp() {
                             onChange={handleChange}
                         />
                     </div>
+
                     <input
                         name="email"
                         placeholder="Email"
                         onChange={handleChange}
                     />
-                    <input
-                        name="phone"
-                        placeholder="Phone Number"
-                        onChange={handleChange}
-                    />
+
+                    <div className="input-group phone-containerDONOR">
+                        <PhoneInput
+                            country={'lb'}
+                            value={formData.phone}
+                            onChange={(phone) => setFormData({ ...formData, phone })}
+                            inputProps={{
+                                name: 'phone',
+                                required: true,
+                                className: 'phone-input',
+                                autoComplete: 'tel',
+                                placeholder: 'Phone Number'
+                            }}
+                            buttonClass="phone-button"
+                        />
+                    </div>
+
                     <div className="password-field">
                         <input
                             type={showPassword ? 'text' : 'password'}
@@ -74,6 +90,7 @@ export default function DonorSignUp() {
                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </span>
                     </div>
+
                     <div className="password-field">
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
@@ -88,8 +105,10 @@ export default function DonorSignUp() {
                             {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </span>
                     </div>
+
                     <button type="submit">Sign Up</button>
                 </form>
+
                 <p className="login-prompt">
                     Already have an account?{' '}
                     <span
