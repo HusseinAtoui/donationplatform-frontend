@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import './NgoSignUp.css';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 
 export default function NGOSignUp() {
   const navigate = useNavigate();
@@ -24,6 +24,8 @@ export default function NGOSignUp() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -48,7 +50,6 @@ export default function NGOSignUp() {
   };
 
   const handleNext = () => {
-    // No validation here — just move to page 2
     setCurrentPage(2);
   };
 
@@ -74,7 +75,7 @@ export default function NGOSignUp() {
         </p>
         <h1 className="signup-title">Create Your NGO Account</h1>
         <form onSubmit={handleSubmit} className="signup-form" noValidate>
-          {/* Page 1 - Required fields */}
+          {/* Page 1 */}
           <div className={`form-page ${currentPage === 1 ? 'active' : 'hidden'}`}>
             <div className="input-group">
               <input
@@ -134,10 +135,11 @@ export default function NGOSignUp() {
               {errors.location && <div id="location-error" className="error-msg">{errors.location}</div>}
             </div>
 
+            {/* Password with toggle */}
             <div className="input-group password-field">
               <input
                 className="signup-input"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 placeholder="Password *"
                 value={formData.password}
@@ -145,13 +147,24 @@ export default function NGOSignUp() {
                 aria-invalid={errors.password ? 'true' : 'false'}
                 aria-describedby="password-error"
               />
+              <span
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowPassword(!showPassword); }}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </span>
               {errors.password && <div id="password-error" className="error-msg">{errors.password}</div>}
             </div>
 
+            {/* Confirm password with toggle */}
             <div className="input-group password-field">
               <input
                 className="signup-input"
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'}
                 name="confirmPassword"
                 placeholder="Confirm Password *"
                 value={formData.confirmPassword}
@@ -159,11 +172,21 @@ export default function NGOSignUp() {
                 aria-invalid={errors.confirmPassword ? 'true' : 'false'}
                 aria-describedby="confirmPassword-error"
               />
+              <span
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowConfirmPassword(!showConfirmPassword); }}
+              >
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </span>
               {errors.confirmPassword && <div id="confirmPassword-error" className="error-msg">{errors.confirmPassword}</div>}
             </div>
           </div>
 
-          {/* Page 2 - Optional fields */}
+          {/* Page 2 */}
           <div className={`form-page ${currentPage === 2 ? 'active' : 'hidden'}`}>
             <div className="input-group">
               <input
@@ -223,7 +246,7 @@ export default function NGOSignUp() {
             </div>
           </div>
 
-          {/* Navigation buttons */}
+          {/* Navigation */}
           <div className="nav-buttons">
             {currentPage === 1 && (
               <button
@@ -235,7 +258,6 @@ export default function NGOSignUp() {
                 <ChevronRight size={20} />
               </button>
             )}
-
             {currentPage === 2 && (
               <>
                 <button

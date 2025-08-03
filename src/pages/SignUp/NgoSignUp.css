@@ -149,8 +149,6 @@
 }
 
 /* Phone input adjustments for react-phone-input-2 */
-
-/* Container for the phone input to ensure relative positioning */
 .phone-container {
   position: relative;
   width: 100%;
@@ -205,6 +203,29 @@
 .country-list {
   z-index: 1000 !important;
 }
+
+/* Password with toggle icon */
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 40px; /* space for eye icon */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #5FAB7D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {
