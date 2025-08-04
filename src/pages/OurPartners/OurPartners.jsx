@@ -1,6 +1,7 @@
 import React from 'react';
 import './OurPartners.css';
 import PartnerCard from '../../components/PartnerCard/PartnerCard';
+import loginIllustration from '../../assets/login-illustration.jpg'; // import image
 
 export default function OurPartners() {
   // Dummy NGO data
@@ -8,21 +9,18 @@ export default function OurPartners() {
     {
       name: 'Hope Foundation',
       location: 'Beirut, Lebanon',
-      logo: '/logos/hope.png',
-      description: 'Supporting families with essential needs.'
+      logo: loginIllustration, // use imported image
     },
     {
       name: 'Warm Souls',
       location: 'Tripoli, Lebanon',
       logo: '/logos/warm-souls.png',
-      description: 'Distributing winter clothing to those in need.'
     },
     {
       name: 'Hearts United',
       location: 'Saida, Lebanon',
       logo: '', // fallback to placeholder
-      description: 'Focused on healthcare and shelter.'
-    }
+    },
   ];
 
   return (
@@ -35,7 +33,6 @@ export default function OurPartners() {
             name={partner.name}
             location={partner.location}
             logo={partner.logo}
-            description={partner.description}
           />
         ))}
       </div>

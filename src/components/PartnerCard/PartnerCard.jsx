@@ -1,7 +1,7 @@
 import React from 'react';
 import './PartnerCard.css';
 
-export default function PartnerCard({ name, location, logo, description }) {
+export default function PartnerCard({ name, location, logo }) {
   return (
     <div className="partner-card">
       <img
@@ -11,7 +11,6 @@ export default function PartnerCard({ name, location, logo, description }) {
       />
       <h3 className="partner-name">{name}</h3>
       {location && <p className="partner-location">{location}</p>}
-      {description && <p className="partner-description">{description}</p>}
     </div>
   );
 }
