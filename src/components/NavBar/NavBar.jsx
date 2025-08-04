@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './NavBar.css';
 
 export default function NavBar() {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const location = useLocation();
 
     const toggleMobileMenu = () => setMobileMenuOpen(!isMobileMenuOpen);
 
-    // Prevent page scroll when menu is open
     useEffect(() => {
         document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'auto';
-
-        // Clean up when component unmounts
         return () => {
             document.body.style.overflow = 'auto';
         };
     }, [isMobileMenuOpen]);
+
+    const isActive = (path) => location.pathname === path;
 
     return (
         <>
@@ -23,11 +23,11 @@ export default function NavBar() {
                 <div className="navbar__logo">WarmHands</div>
 
                 <nav className={`navbar__menu ${isMobileMenuOpen ? 'navbar__menu--open' : ''}`}>
-                    <a href="/" className="navbar__menu-item active">Home</a>
-                    <a href="/guide" className="navbar__menu-item">Guide</a>
-                    <a href="/map" className="navbar__menu-item">Map</a>
-                    <a href="/donations" className="navbar__menu-item">Donations</a>
-                    <a href="/partners" className="navbar__menu-item">Our Partners</a>
+                    <Link to="/" className={`navbar__menu-item ${isActive('/') ? 'active' : ''}`}>Home</Link>
+                    <Link to="/guide" className={`navbar__menu-item ${isActive('/guide') ? 'active' : ''}`}>Guide</Link>
+                    <Link to="/map" className={`navbar__menu-item ${isActive('/map') ? 'active' : ''}`}>Map</Link>
+                    <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`}>Donations</Link>
+                    <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`}>Our Partners</Link>
                 </nav>
 
                 <div className="navbar__actions">

@@ -6,6 +6,7 @@ import Login from './pages/Login/Login';
 import SignUpSelect from './pages/SignUp/SignUpSelect';
 import DonorSignUp from './pages/SignUp/DonorSignUp';
 import NgoSignUp from './pages/SignUp/NgoSignUp';
+import OurPartners from './pages/OurPartners/OurPartners';
 
 function AppContent() {
   const location = useLocation();
@@ -22,6 +23,7 @@ function AppContent() {
         <Route path="/signup" element={<SignUpSelect />} />
         <Route path="/signup/donor" element={<DonorSignUp />} />
         <Route path="/signup/ngo" element={<NgoSignUp />} />
+        <Route path="/our-partners" element={<OurPartners />} /> 
       </Routes>
     </>
   );
