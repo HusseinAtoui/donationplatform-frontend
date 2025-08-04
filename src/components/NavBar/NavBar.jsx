@@ -25,6 +25,7 @@ export default function NavBar() {
                 <nav className={`navbar__menu ${isMobileMenuOpen ? 'navbar__menu--open' : ''}`}>
                     <a href="/" className="navbar__menu-item active">Home</a>
                     <a href="/guide" className="navbar__menu-item">Guide</a>
+                    <a href="/map" className="navbar__menu-item">Map</a>
                     <a href="/donations" className="navbar__menu-item">Donations</a>
                     <a href="/partners" className="navbar__menu-item">Our Partners</a>
                 </nav>
