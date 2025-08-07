@@ -1,0 +1,17 @@
+.donations-page {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.donations-title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 40px;
+}
+
+.donations-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 32px;
+}
