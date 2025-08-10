@@ -28,6 +28,7 @@ export default function NavBar() {
                     <Link to="/map" className={`navbar__menu-item ${isActive('/map') ? 'active' : ''}`}>Map</Link>
                     <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`}>Donations</Link>
                     <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`}>Our Partners</Link>
+                       
                 </nav>
 
                 <div className="navbar__actions">
