@@ -185,6 +185,70 @@
   white-space: normal;
   word-wrap: break-word;
 }
+.requestDetailsContainer {
+  max-width: 900px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 35px 35px 45px 35px;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  color: #1a1a1a;
+  z-index: 1;
+}
+
+.sectionTitle {
+  font-weight: 700;
+  font-size: 30px;
+  margin-bottom: 30px;
+  border-bottom: 3px solid #5FAB7D;
+  padding-bottom: 10px;
+  max-width: max-content;
+  letter-spacing: 0.05em;
+  color: #2a2a2a;
+  text-transform: uppercase;
+}
+
+.requestDetailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 20px 35px;
+}
+
+.requestCard {
+  background: #f9fafa;
+  border: 1.5px solid #d1dfe5;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 6px rgba(94, 133, 122, 0.15);
+  transition: box-shadow 0.3s ease;
+  cursor: default;
+}
+
+.requestCard:hover {
+  box-shadow: 0 6px 16px rgba(94, 133, 122, 0.3);
+}
+
+.label {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  color: #4b615e;
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.value {
+  font-weight: 600;
+  font-size: 18px;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
 /* Responsive tweaks */
 @media (max-width: 960px) {

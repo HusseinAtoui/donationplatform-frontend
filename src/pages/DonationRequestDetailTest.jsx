@@ -15,6 +15,13 @@ export default function DonationRequestDetailTest() {
   const donationData = {
     description: 'Women’s Winter Coats needed to support the community during cold months.',
     status: 'urgent',
+    category: 'clothing',
+    count: 120,
+    gender: 'female',
+    dateNeeded: '2025-09-15',
+    location: 'Tallahassee, FL',
+    size: 'Medium to Large',
+    ageRange: '18-45',
   };
 
   return <DonationRequestDetail ngoData={ngoData} donationData={donationData} />;
