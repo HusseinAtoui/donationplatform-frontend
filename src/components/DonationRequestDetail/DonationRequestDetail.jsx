@@ -123,28 +123,28 @@ export default function DonationRequestDetail({ ngoData, donationData }) {
       </div>
 
       {/* Request Details Section */}
-     {/* Request Details Section */}
-<div className={styles.requestDetailsContainer}>
-  <h2 className={styles.sectionTitle}>Request Details</h2>
-  <div className={styles.requestDetailsGrid}>
+      {/* Request Details Section */}
+      <div className={styles.requestDetailsContainer}>
+        <h2 className={styles.sectionTitle}>Request Details</h2>
+        <div className={styles.requestDetailsGrid}>
 
-    {[
-      { label: 'Category', value: donationData.category },
-      { label: 'Count', value: donationData.count },
-      { label: 'Gender', value: donationData.gender },
-      { label: 'Date Needed', value: donationData.dateNeeded },
-      { label: 'Location', value: donationData.location },
-      { label: 'Size', value: donationData.size },
-      { label: 'Age Range', value: donationData.ageRange },
-    ].map(({ label, value }) => (
-      <div key={label} className={styles.requestCard}>
-        <span className={styles.label}>{label}</span>
-        <span className={styles.value}>{value}</span>
+          {[
+            { label: 'Category', value: donationData.category },
+            { label: 'Count', value: donationData.count },
+            { label: 'Gender', value: donationData.gender },
+            { label: 'Date Needed', value: donationData.dateNeeded },
+            { label: 'Location', value: donationData.location },
+            { label: 'Size', value: donationData.size },
+            { label: 'Age Range', value: donationData.ageRange },
+          ].map(({ label, value }) => (
+            <div key={label} className={styles.requestCard}>
+              <span className={styles.label}>{label}</span>
+              <span className={styles.value}>{value}</span>
+            </div>
+          ))}
+
+        </div>
       </div>
-    ))}
-
-  </div>
-</div>
 
 
     </div>
