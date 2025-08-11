@@ -10,6 +10,7 @@ import OurPartners from './pages/OurPartners/OurPartners';
 import Donations from './pages/Donations/Donations';
 import NGOProfile from "./pages/NGOProfile/NGOProfile";
 import DonorProfile from "./pages/DonorProfile/DonorProfile";
+import DonationRequestDetailTest from './pages/DonationRequestDetailTest';
 
 function AppContent() {
   const location = useLocation();
@@ -28,8 +29,9 @@ function AppContent() {
         <Route path="/signup/ngo" element={<NgoSignUp />} />
         <Route path="/our-partners" element={<OurPartners />} />
         <Route path="/donations" element={<Donations />} />
-        <Route path="/NGOProfile" element={<NGOProfile/>}/>
-<Route path="/DonorProfile"element={<DonorProfile/>}/>
+        <Route path="/NGOProfile" element={<NGOProfile />} />
+        <Route path="/DonorProfile" element={<DonorProfile />} />
+<Route path="/donation-test" element={<DonationRequestDetailTest />} />
 
       </Routes>
     </>

@@ -1,0 +1,184 @@
+/* Main page background */
+.donationReqPage {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  background: #f2f2f2;
+  padding-top: 200px;
+  /* leave room for navbar if fixed */
+  box-sizing: border-box;
+}
+
+/* Hero background area */
+.heroBg {
+  position: absolute;
+  width: 100%;
+  height: 505px;
+  top: 0;
+  left: 0;
+  background: #f2f2f2;
+  z-index: 0;
+}
+
+/* NGO Intro Display */
+.ngoIntroDisplay {
+  position: relative;
+  width: 1402px;
+  height: 281px;
+  margin: 0 auto;
+  top: 0;
+  background: white;
+  border-radius: 15px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 30px;
+  padding: 30px;
+  z-index: 1;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile Pic */
+.ngoPp {
+  width: 241px;
+  height: 235px;
+  background-color: #baf0cf;
+  border-radius: 15px;
+  background-position: center;
+  background-size: cover;
+  flex-shrink: 0;
+}
+
+/* NGO Info Box (right of profile) */
+.ngoInfoBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  position: relative;
+}
+
+/* NGO Name */
+.ngoName {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 72px;
+  color: #000;
+  margin: 0;
+  text-align: left;
+}
+
+/* Contact row */
+.ngoContactRow {
+  display: flex;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+
+/* Each Icon + Text group */
+.iconText {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Icon background circle */
+.iconBg {
+  width: 40px;
+  height: 40px;
+  background: #5FAB7D;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Replace these with actual SVG icons or font icons */
+.iconMapPin,
+.iconPhone,
+.iconMail,
+.iconClock {
+  width: 24px;
+  height: 24px;
+  fill: white;
+}
+
+/* Contact text */
+.contactText {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 20px;
+  color: #000;
+}
+
+/* Donation Description Container */
+.donationDescriptionContainer {
+  position: relative;
+  width: 1514px;
+  height: 331px;
+  margin: 50px auto 0 auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  padding: 40px;
+  z-index: 1;
+}
+
+/* Status banner (top red or green strip) */
+.statusBanner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 61px;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 36px;
+  color: white;
+  z-index: 2;
+}
+
+.statusBannerUrgent {
+  background-color: #FF5B5B;
+}
+
+.statusBannerStandard {
+  background-color: #A6D861;
+}
+
+/* Donation Description Box */
+.donationDescriptionBox {
+  margin-top: 80px;
+  /* leave space for banner */
+}
+
+/* Label "Donation Description:" */
+.donationDescriptionLabel {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 48px;
+  color: #000;
+  border: 1px solid rgba(0, 0, 0, 0.81);
+  width: max-content;
+  padding: 5px 15px;
+  margin-bottom: 20px;
+}
+
+/* The actual description text */
+.donationDescriptionText {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 36px;
+  color: #000;
+  max-width: 1162px;
+  margin-left: 40px;
+}

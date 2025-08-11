@@ -59,40 +59,40 @@ export default function NGOProfile() {
 
         {/* Overlapping header card */}
         <div className="card header-card">
-         <div className="avatar-holder">
-  <div className="avatar-lg">
-    {avatarSrc ? <img src={avatarSrc} alt="NGO avatar" /> : <Camera size={28} />}
-  </div>
+          <div className="avatar-holder">
+            <div className="avatar-lg">
+              {avatarSrc ? <img src={avatarSrc} alt="NGO avatar" /> : <Camera size={28} />}
+            </div>
 
-  {/* Plus button positioned relative to .avatar-holder (not inside the circle) */}
-  <button
-    type="button"
-    className="avatar-add"
-    onClick={pickFile}
-    aria-label="Change NGO picture"
-    title="Change picture"
-  >
-    <Plus size={50} strokeWidth={3} />
-  </button>
+            {/* Plus button positioned relative to .avatar-holder (not inside the circle) */}
+            <button
+              type="button"
+              className="avatar-add"
+              onClick={pickFile}
+              aria-label="Change NGO picture"
+              title="Change picture"
+            >
+              <Plus size={50} strokeWidth={3} />
+            </button>
 
-  <input
-    ref={fileRef}
-    type="file"
-    accept="image/*"
-    className="visually-hidden"
-    onChange={onAvatarChange}
-  />
-</div>  <div className="header-actions">
-  <button className="EDITbtn">Edit</button>
-  <button className="Settings" aria-label="settings">
-    <Settings size={16} />
-  </button>
-</div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="visually-hidden"
+              onChange={onAvatarChange}
+            />
+          </div>  <div className="header-actions">
+            <button className="EDITbtn">Edit</button>
+            <button className="Settings" aria-label="settings">
+              <Settings size={16} />
+            </button>
+          </div>
 
           <div className="header-main">
             <div className="title-row">
               <h1>NGO NAME</h1>
-            
+
             </div>
 
             <div className="contact-row">
