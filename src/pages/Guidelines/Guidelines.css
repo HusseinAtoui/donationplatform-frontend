@@ -32,6 +32,7 @@
     justify-content: center;
     align-items: center;
     text-align: center;
+    margin-bottom: 50px;
 }
 
 .how-to-donate-box h2 {
@@ -43,7 +44,6 @@
     margin: 0;
 }
 
-/* donation list */
 /* Section Titles */
 .donation-section h2 {
     font-family: 'Poppins', sans-serif;
@@ -54,6 +54,7 @@
     border-bottom: 2px solid #5FAB7D;
     display: inline-block;
     padding-bottom: 8px;
+    padding-left: 50px;
 }
 
 /* Cards grid per section */
