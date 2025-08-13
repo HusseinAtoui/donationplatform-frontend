@@ -122,7 +122,7 @@ export default function DonationRequestDetail({ ngoData, donationData }) {
         </div>
       </div>
 
-      {/* Request Details Section */}
+
       {/* Request Details Section */}
       <div className={styles.requestDetailsContainer}>
         <h2 className={styles.sectionTitle}>Request Details</h2>
