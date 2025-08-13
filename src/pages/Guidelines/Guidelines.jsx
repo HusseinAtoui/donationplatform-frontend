@@ -2,6 +2,7 @@
 import React from 'react';
 import Hero from '../../components/Hero/Hero.jsx';
 import './Guidelines.css';
+import '../../components/Hero/Hero.css';
 import donationImage from '../../assets/donationBox-img.jpg';
 
 export default function Guidelines() {
@@ -9,7 +10,7 @@ export default function Guidelines() {
         title: "Donation Guidelines",
         subtitle: "Learn how to contribute effectively and responsibly to our causes. Follow these guidelines to ensure your donations reach those who need them most.",
         buttonText: "Read More",
-        image: donationImage, // ✅ Pass the image here
+        image: donationImage, 
         onButtonClick: () => {
             window.scrollTo({ top: 600, behavior: 'smooth' });
         },

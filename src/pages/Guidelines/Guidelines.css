@@ -1,0 +1,23 @@
+.guidelines-page .hero {
+    padding: 90px 90px;
+    max-width: 1300px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.guidelines-page .hero-content {
+    max-width: 700px;
+    padding-right: 40px;
+}
+
+.guidelines-page .hero-image {
+    max-width: 600px;
+}
+
+.guidelines-page .hero-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+}
