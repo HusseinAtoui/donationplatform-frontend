@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import NavBar from './components/NavBar/NavBar';
@@ -11,6 +12,7 @@ import Donations from './pages/Donations/Donations';
 import NGOProfile from "./pages/NGOProfile/NGOProfile";
 import DonorProfile from "./pages/DonorProfile/DonorProfile";
 import DonationRequestDetailTest from './pages/DonationRequestDetailTest';
+import Guidelines from './pages/Guidelines/Guidelines'; // import your new Guidelines page
 
 function AppContent() {
   const location = useLocation();
@@ -31,8 +33,8 @@ function AppContent() {
         <Route path="/donations" element={<Donations />} />
         <Route path="/NGOProfile" element={<NGOProfile />} />
         <Route path="/DonorProfile" element={<DonorProfile />} />
-<Route path="/donation-test" element={<DonationRequestDetailTest />} />
-
+        <Route path="/donation-test" element={<DonationRequestDetailTest />} />
+        <Route path="/guide" element={<Guidelines />} />
       </Routes>
     </>
   );

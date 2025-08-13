@@ -28,17 +28,17 @@ export default function NavBar() {
                     <Link to="/map" className={`navbar__menu-item ${isActive('/map') ? 'active' : ''}`}>Map</Link>
                     <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`}>Donations</Link>
                     <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`}>Our Partners</Link>
-                           {/* ✅ Add visible text for Donor Profile */}
-          <Link to="/DonorProfile" 
-                className={`navbar__menu-item ${isActive('/DonorProfile') ? 'active' : ''}`}>
-            Donor Profile
-          </Link>
+                    {/* ✅ Add visible text for Donor Profile */}
+                    <Link to="/DonorProfile"
+                        className={`navbar__menu-item ${isActive('/DonorProfile') ? 'active' : ''}`}>
+                        Donor Profile
+                    </Link>
 
-          {/* ✅ Add a link to the NGO Profile page */}
-          <Link to="/NGOProfile" 
-                className={`navbar__menu-item ${isActive('/NGOProfile') ? 'active' : ''}`}>
-            NGO Profile
-          </Link>
+                    {/* ✅ Add a link to the NGO Profile page */}
+                    <Link to="/NGOProfile"
+                        className={`navbar__menu-item ${isActive('/NGOProfile') ? 'active' : ''}`}>
+                        NGO Profile
+                    </Link>
                 </nav>
 
                 <div className="navbar__actions">
