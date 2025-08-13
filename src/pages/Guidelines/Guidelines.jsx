@@ -12,9 +12,7 @@ export default function Guidelines() {
         subtitle: "Learn how to contribute effectively and responsibly to our causes. Follow these guidelines to ensure your donations reach those who need them most.",
         buttonText: "DONATE NOW",
         image: donationImage, 
-        onButtonClick: () => {
-            navigate('/donations'); 
-        },
+        onButtonClick: () => navigate('/donations'),
     };
 
     return (
@@ -26,6 +24,11 @@ export default function Guidelines() {
                 image={heroData.image}
                 onButtonClick={heroData.onButtonClick}
             />
+
+            {/* How to Donate Box */}
+            <div className="how-to-donate-box">
+                <h2>Here’s how to make sure your donations truly help.</h2>
+            </div>
 
             {/* Main Guidelines Content */}
             <section className="guidelines-content">
