@@ -34,11 +34,7 @@ export default function NavBar() {
                         Donor Profile
                     </Link>
 
-                    {/* ✅ Add a link to the NGO Profile page */}
-                    <Link to="/NGOProfile"
-                        className={`navbar__menu-item ${isActive('/NGOProfile') ? 'active' : ''}`}>
-                        NGO Profile
-                    </Link>
+               
                 </nav>
 
                 <div className="navbar__actions">
