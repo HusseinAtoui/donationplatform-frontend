@@ -8,6 +8,8 @@ export default function NavBar() {
 
     const toggleMobileMenu = () => setMobileMenuOpen(!isMobileMenuOpen);
 
+    const closeMobileMenu = () => setMobileMenuOpen(false);
+
     useEffect(() => {
         document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'auto';
         return () => { document.body.style.overflow = 'auto'; };
@@ -20,14 +22,14 @@ export default function NavBar() {
             <header className="navbar">
                 <div className="navbar__logo">WarmHands</div>
 
-                {/* Desktop menu */}
+                {/* Desktop + mobile menu */}
                 <nav className={`navbar__menu ${isMobileMenuOpen ? 'navbar__menu--open' : ''}`}>
-                    <Link to="/" className={`navbar__menu-item ${isActive('/') ? 'active' : ''}`}>Home</Link>
-                    <Link to="/guide" className={`navbar__menu-item ${isActive('/guide') ? 'active' : ''}`}>Guide</Link>
-                    <Link to="/map" className={`navbar__menu-item ${isActive('/map') ? 'active' : ''}`}>Map</Link>
-                    <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`}>Donations</Link>
-                    <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`}>Our Partners</Link>
-                    <Link to="/DonorProfile" className={`navbar__menu-item ${isActive('/DonorProfile') ? 'active' : ''}`}>Donor Profile</Link>
+                    <Link to="/" className={`navbar__menu-item ${isActive('/') ? 'active' : ''}`} onClick={closeMobileMenu}>Home</Link>
+                    <Link to="/guide" className={`navbar__menu-item ${isActive('/guide') ? 'active' : ''}`} onClick={closeMobileMenu}>Guide</Link>
+                    <Link to="/map" className={`navbar__menu-item ${isActive('/map') ? 'active' : ''}`} onClick={closeMobileMenu}>Map</Link>
+                    <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`} onClick={closeMobileMenu}>Donations</Link>
+                    <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`} onClick={closeMobileMenu}>Our Partners</Link>
+                    <Link to="/DonorProfile" className={`navbar__menu-item ${isActive('/DonorProfile') ? 'active' : ''}`} onClick={closeMobileMenu}>Donor Profile</Link>
                 </nav>
 
                 {/* Right side: login + hamburger */}
@@ -47,8 +49,8 @@ export default function NavBar() {
                 </div>
             </header>
 
-            {/* Mobile overlay */}
-            {isMobileMenuOpen && <div className="navbar__overlay" onClick={toggleMobileMenu}></div>}
+            {/* Overlay always closes menu when clicked */}
+            {isMobileMenuOpen && <div className="navbar__overlay" onClick={closeMobileMenu}></div>}
         </>
     );
 }
