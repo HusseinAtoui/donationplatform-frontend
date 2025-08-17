@@ -10,6 +10,7 @@
     max-width: 1300px;
     margin: 0 auto;
     box-sizing: border-box;
+    gap: 40px;
 }
 
 /* ------------------- HERO CONTENT ------------------- */
@@ -17,6 +18,7 @@
     flex: 1;
     padding-right: 40px;
     max-width: 600px;
+    align-items: flex-start;
 }
 
 /* ------------------- HERO TITLE ------------------- */
@@ -24,6 +26,7 @@
     font-size: 3rem;
     font-family: 'Poppins', sans-serif;
     margin-bottom: 20px;
+    line-height: 1.2;
 }
 
 /* ------------------- HERO SUBTITLE ------------------- */
@@ -31,6 +34,7 @@
     font-size: 1.25rem;
     font-family: 'Inter', sans-serif;
     margin-bottom: 30px;
+    color: #555;
 }
 
 /* ------------------- HERO BUTTON ------------------- */
@@ -60,4 +64,62 @@
     width: 100%;
     height: auto;
     border-radius: 16px;
+}
+
+/* ------------------- RESPONSIVE ------------------- */
+@media (max-width: 1024px) {
+    .hero {
+        padding: 60px 40px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-content {
+        padding-right: 0;
+        max-width: 100%;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+
+    .hero {
+        padding: 150px 24px;
+    }
+
+    .hero-title {
+        margin-top: 20px;
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .hero-image {
+        display: none;
+    }
+
+    .hero-content {
+        text-align: center;
+    }
+
+    .hero-button {
+        padding: 12px 32px;
+        font-size: 0.95rem;
+    }
+
+    .hero-content .hero-button {
+        display: block;
+        margin: 0 auto;
+    }
 }

@@ -44,8 +44,6 @@ export default function WhatWeDo() {
         "Track where your donation goes",
     ];
 
-    // These positions are hand-tuned coordinates (top, left)
-    // relative to the container to align circles on the SVG path.
     const circlePositions = [
         { left: '83px', top: '300px' },
         { left: '490px', top: '290px' },
@@ -58,35 +56,45 @@ export default function WhatWeDo() {
             <h2 className="whatwedo__title">What Do We Do!</h2>
             <p className="whatwedo__subtitle">All in one platform.</p>
 
-            <LineSVG />
+            {/* Desktop layout with SVG */}
+            <div className="whatwedo__desktop">
+                <LineSVG />
+                {steps.map((text, idx) => {
+                    const circlePos = circlePositions[idx];
+                    const textTop = parseInt(circlePos.top) + 90;
 
-            {/* Position circles absolutely on top of line */}
-            {steps.map((text, idx) => {
-                const circlePos = circlePositions[idx];
-                const textTop = parseInt(circlePos.top) + 90; // a bit below the circle
+                    return (
+                        <React.Fragment key={idx}>
+                            <StepCircle number={idx + 1} style={circlePos} />
+                            <h3
+                                className="whatwedo__step-text"
+                                style={{
+                                    position: 'absolute',
+                                    top: `${textTop}px`,
+                                    left: `calc(${circlePos.left} + 39.5px)`,
+                                    width: '180px',
+                                    transform: 'translateX(-50%)',
+                                    textAlign: 'center'
+                                }}
+                            >
+                                {text}
+                            </h3>
+                        </React.Fragment>
+                    );
+                })}
+            </div>
 
-                // For last text, adjust if needed (optional)
-                const isLast = idx === steps.length - 1;
-
-                return (
-                    <React.Fragment key={idx}>
-                        <StepCircle number={idx + 1} style={circlePos} />
-                        <h3
-                            className="whatwedo__step-text"
-                            style={{
-                                position: 'absolute',
-                                top: `${textTop}px`,
-                                left: `calc(${circlePos.left} + 39.5px)`,  // circle center (half of 79px)
-                                width: '180px',
-                                transform: 'translateX(-50%)', // centers text by shifting half its width left
-                                textAlign: 'center'
-                            }}
-                        >
-                            {text}
-                        </h3>
-                    </React.Fragment>
-                );
-            })}
+            {/* Mobile layout with styled circles */}
+            <div className="whatwedo__mobile">
+                {steps.map((text, idx) => (
+                    <div key={idx} className="whatwedo__mobile-step">
+                        <div className="whatwedo__mobile-circle">
+                            {idx + 1}
+                        </div>
+                        <p className="whatwedo__mobile-text">{text}</p>
+                    </div>
+                ))}
+            </div>
 
         </section>
     );

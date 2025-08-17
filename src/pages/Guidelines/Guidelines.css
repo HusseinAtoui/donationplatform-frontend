@@ -1,0 +1,145 @@
+/* guidelines hero */
+.guidelines-page .hero {
+    padding: 90px 90px;
+    max-width: 1300px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.guidelines-page .hero-content {
+    max-width: 700px;
+    padding-right: 40px;
+}
+
+.guidelines-page .hero-image {
+    max-width: 600px;
+}
+
+.guidelines-page .hero-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+}
+
+/* How to Donate Box */
+.how-to-donate-box {
+    width: 100%;
+    background-color: #5FAB7D;
+    padding: 20px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.how-to-donate-box h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 48px;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+/* Section Titles */
+.donation-section h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: #2a2a2a;
+    border-bottom: 2px solid #5FAB7D;
+    display: inline-block;
+    padding-bottom: 8px;
+    padding-left: 50px;
+}
+
+/* Cards grid per section */
+.donation-section .donation-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+/* Individual Card */
+.donation-card {
+    background-color: #ffffff;
+    padding: 25px 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.donation-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.donation-card h3 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    margin-bottom: 12px;
+    color: #2a2a2a;
+}
+
+.donation-card p {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 26px;
+    color: #555555;
+}
+
+/* Why Guidelines Section */
+.why-guidelines {
+    background-color: #f7f7f7;
+    padding: 40px 25px;
+    border-radius: 12px;
+    margin-top: 50px;
+}
+
+.why-guidelines h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 28px;
+    margin-bottom: 16px;
+    color: #2a2a2a;
+}
+
+.why-guidelines p {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 28px;
+    color: #555555;
+}
+
+/* Responsive tweaks */
+@media (max-width: 960px) {
+    .how-to-donate-box h2 {
+        font-size: 28px;
+    }
+
+    .donation-section h2 {
+        font-size: 26px;
+    }
+
+    .donation-card h3 {
+        font-size: 20px;
+    }
+
+    .donation-card p {
+        font-size: 15px;
+    }
+
+    .why-guidelines h2 {
+        font-size: 24px;
+    }
+
+    .why-guidelines p {
+        font-size: 15px;
+    }
+}

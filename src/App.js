@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import NavBar from './components/NavBar/NavBar';
@@ -8,6 +9,10 @@ import DonorSignUp from './pages/SignUp/DonorSignUp';
 import NgoSignUp from './pages/SignUp/NgoSignUp';
 import OurPartners from './pages/OurPartners/OurPartners';
 import Donations from './pages/Donations/Donations';
+import NGOProfile from "./pages/NGOProfile/NGOProfile";
+import DonorProfile from "./pages/DonorProfile/DonorProfile";
+import DonationRequestDetailTest from './pages/DonationRequestDetailTest';
+import Guidelines from './pages/Guidelines/Guidelines'; // import your new Guidelines page
 import Map from './pages/Map/Map';
 
 function AppContent() {
@@ -27,6 +32,10 @@ function AppContent() {
         <Route path="/signup/ngo" element={<NgoSignUp />} />
         <Route path="/our-partners" element={<OurPartners />} />
         <Route path="/donations" element={<Donations />} />
+        <Route path="/NGOProfile" element={<NGOProfile />} />
+        <Route path="/DonorProfile" element={<DonorProfile />} />
+        <Route path="/donation-test" element={<DonationRequestDetailTest />} />
+        <Route path="/guide" element={<Guidelines />} />
         <Route path="/map" element={<Map />} />
       </Routes>
     </>

@@ -18,6 +18,7 @@ export default function NGOSignUp() {
     inventorySize: '',
     requiredClothing: '',
     logoUrl: '',
+    logoFile: null, // store the actual File object here
     bio: '',
     summary: ''
   });
@@ -26,10 +27,11 @@ export default function NGOSignUp() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: '' }); // clear error on change
+    setErrors((prev) => ({ ...prev, [e.target.name]: '', form: '' })); // clear field + top-level errors
   };
 
   const validatePage1 = () => {
@@ -37,8 +39,11 @@ export default function NGOSignUp() {
     if (!formData.name.trim()) newErrors.name = 'NGO Name is required';
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    else if (!/^\d{6,15}$/.test(formData.phone)) newErrors.phone = 'Phone number is invalid';
+
+    const phoneDigits = (formData.phone || '').replace(/\D/g, '');
+    if (!phoneDigits) newErrors.phone = 'Phone number is required';
+    else if (!/^\d{6,15}$/.test(phoneDigits)) newErrors.phone = 'Phone number is invalid';
+
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (!formData.password) newErrors.password = 'Password is required';
     else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
@@ -50,21 +55,58 @@ export default function NGOSignUp() {
   };
 
   const handleNext = () => {
-    setCurrentPage(2);
+    // Optional: only allow moving to page 2 if page 1 is valid
+    if (validatePage1()) setCurrentPage(2);
   };
 
   const handleBack = () => {
     setCurrentPage(1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validatePage1()) {
       setCurrentPage(1);
       return;
     }
-    console.log('NGO sign-up data:', formData);
-    // TODO: submit logic here
+
+    setIsSubmitting(true);
+    setErrors((prev) => ({ ...prev, form: '' }));
+
+    try {
+      const fd = new FormData();
+      fd.append('name', formData.name);
+      fd.append('email', formData.email);
+      fd.append('phone', (formData.phone || '').replace(/\D/g, '')); // send only digits
+      fd.append('location', formData.location);
+      fd.append('password', formData.password);
+      if (formData.inventorySize) fd.append('inventorySize', String(formData.inventorySize));
+      if (formData.requiredClothing) fd.append('requiredClothing', formData.requiredClothing);
+      if (formData.bio) fd.append('bio', formData.bio);
+      if (formData.summary) fd.append('summary', formData.summary);
+      if (formData.logoFile) fd.append('logo', formData.logoFile); // <-- must match multer field name in backend
+
+      // With CRA proxy set to http://localhost:4000, this relative URL hits your backend
+      const res = await fetch('/api/ngo/create', {
+        method: 'POST',
+        body: fd // do NOT set Content-Type manually
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setErrors((prev) => ({ ...prev, form: data.error || 'Signup failed' }));
+        setIsSubmitting(false);
+        return;
+      }
+
+      alert('Signup successful! Please check your email to verify your account.');
+      navigate('/'); // or navigate to another page
+    } catch (err) {
+      console.error('Signup error:', err);
+      setErrors((prev) => ({ ...prev, form: 'Network error. Please try again.' }));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -74,7 +116,14 @@ export default function NGOSignUp() {
           ← Back Home
         </p>
         <h1 className="signup-title">Create Your NGO Account</h1>
+
         <form onSubmit={handleSubmit} className="signup-form" noValidate>
+          {errors.form && (
+            <div className="error-msg" style={{ marginBottom: 10 }}>
+              {errors.form}
+            </div>
+          )}
+
           {/* Page 1 */}
           <div className={`form-page ${currentPage === 1 ? 'active' : 'hidden'}`}>
             <div className="input-group">
@@ -108,7 +157,10 @@ export default function NGOSignUp() {
               <PhoneInput
                 country={'lb'}
                 value={formData.phone}
-                onChange={(phone) => setFormData({ ...formData, phone })}
+                onChange={(phone) => {
+                  setFormData({ ...formData, phone });
+                  setErrors((prev) => ({ ...prev, phone: '', form: '' }));
+                }}
                 inputProps={{
                   name: 'phone',
                   required: true,
@@ -237,9 +289,10 @@ export default function NGOSignUp() {
                 type="file"
                 accept="image/*"
                 onChange={(e) => {
-                  const file = e.target.files[0];
+                  const file = e.target.files && e.target.files[0];
                   if (file) {
-                    setFormData({ ...formData, logoUrl: file.name }); // just the name
+                    setFormData({ ...formData, logoUrl: file.name, logoFile: file });
+                    setErrors((prev) => ({ ...prev, form: '' }));
                   }
                 }}
                 className="real-file-input"
@@ -269,11 +322,12 @@ export default function NGOSignUp() {
                   className="nav-arrow back-arrow"
                   onClick={handleBack}
                   aria-label="Go to previous page"
+                  disabled={isSubmitting}
                 >
                   <ChevronLeft size={20} />
                 </button>
-                <button type="submit" className="submit-btn">
-                  Submit
+                <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit'}
                 </button>
               </>
             )}
