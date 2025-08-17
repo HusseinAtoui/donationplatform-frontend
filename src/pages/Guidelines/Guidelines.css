@@ -119,6 +119,7 @@
 
 /* Responsive tweaks */
 @media (max-width: 960px) {
+
     .how-to-donate-box h2 {
         font-size: 28px;
     }
@@ -141,5 +142,34 @@
 
     .why-guidelines p {
         font-size: 15px;
+    }
+
+    .guidelines-page .hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 150px 24px;
+    }
+
+    .guidelines-page .hero-content {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .guidelines-page .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .guidelines-page .hero-content p {
+        font-size: 16px;
+    }
+
+    .guidelines-page .hero-image {
+        max-width: 100%;
+        margin-top: 30px;
+    }
+
+    .guidelines-page .hero-image img {
+        width: 100%;
+        height: auto;
     }
 }
