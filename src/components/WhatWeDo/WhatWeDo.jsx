@@ -52,7 +52,7 @@ export default function WhatWeDo() {
     ];
 
     return (
-        <section className="whatwedo">
+        <section className="whatwedo" id="what-we-do" >
             <h2 className="whatwedo__title">What Do We Do!</h2>
             <p className="whatwedo__subtitle">All in one platform.</p>
 

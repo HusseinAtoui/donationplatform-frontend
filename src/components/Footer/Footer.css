@@ -1,16 +1,13 @@
 .footer-container {
     position: relative;
     background-color: #5FAB7D;
-    padding: 72px 76px 72px 76px;
+    padding: 72px 76px;
     color: white;
     font-family: 'Poppins', sans-serif;
-    isolation: isolate;
-    box-sizing: border-box;
     border-top-left-radius: 80px;
     border-top-right-radius: 80px;
     overflow: hidden;
-    width: 100%; 
-    max-width: none; 
+    width: 100%;
 }
 
 /* Soft white circles background */
@@ -39,20 +36,20 @@
     right: -100px;
 }
 
+/* Inner layout */
 .footer-inner {
     position: relative;
     max-width: 1512px;
     margin: 0 auto;
     display: flex;
-    gap: 140px;
     justify-content: flex-start;
+    gap: 140px;
     flex-wrap: wrap;
     z-index: 1;
-    box-sizing: border-box;
-    padding-left: 70px; 
+    padding-left: 70px;
 }
 
-/* === Logo + Description Section === */
+/* Logo + Description */
 .footer-logo-desc {
     max-width: 349px;
     display: flex;
@@ -68,7 +65,6 @@
     user-select: none;
 }
 
-/* Paragraph text uses Inter font, fallback to sans-serif */
 .footer-logo-desc p {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
@@ -78,9 +74,14 @@
     margin: 0;
 }
 
-/* === Links Section === */
+/* Links wrapper for horizontal alignment */
+.footer-links-wrapper {
+    display: flex;
+    gap: 60px; /* space between link groups */
+}
+
+/* Individual link groups */
 .footer-links-group {
-    max-width: 181px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -122,28 +123,34 @@
 /* === Responsive tweaks === */
 @media (max-width: 960px) {
     .footer-inner {
-        justify-content: space-between; /* keep logo left, links right */
-        gap: 20px;
-        flex-wrap: wrap; /* allow wrapping if very narrow */
+        justify-content: center;
+        gap: 60px;
         padding-left: 20px;
     }
 
     .footer-logo-desc {
         max-width: 100%;
-        flex: 0 0 auto; /* keep left aligned */
+        flex: 0 0 auto;
         text-align: center;
-        margin-bottom: 10px; /* spacing on small screens if needed */
+        margin-bottom: 20px;
     }
 
-    /* Wrap the two link groups in a horizontal container */
-    .footer-links-container {
-        display: flex;
-        justify-content: flex-end;
-        text-align: center;
+    .footer-links-wrapper {
+        flex-direction: row;
+        justify-content: center;
+        gap: 40px;
+        width: 100%;
+        flex-wrap: wrap;
     }
 
     .footer-links-group {
-        max-width: 181px;
-        flex: 0 0 auto; /* prevent shrinking */
+        text-align: center;
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-links-wrapper {
+        gap: 30px;
     }
 }

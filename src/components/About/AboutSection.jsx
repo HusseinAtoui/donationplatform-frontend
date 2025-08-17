@@ -4,7 +4,7 @@ import { ReactComponent as AboutIllustration } from '../../assets/about-illustra
 
 const AboutSection = () => {
     return (
-        <section className="about-section">
+        <section className="about-section" id="about-us">
             <div className="about-text">
                 <h2>About Us</h2>
                 <p className="about__description">

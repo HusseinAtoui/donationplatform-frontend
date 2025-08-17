@@ -4,7 +4,7 @@ import { FiMapPin, FiPhone, FiMail, FiClock } from 'react-icons/fi';
 
 const ContactSection = () => {
   return (
-    <section className="contact-container">
+    <section className="contact-container" id="contact-us">
       {/* Form side */}
       <div className="contact-form-wrapper">
         <form className="contact-form">

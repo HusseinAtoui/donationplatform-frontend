@@ -37,8 +37,8 @@ function AppContent() {
         <Route path="/DonorProfile" element={<DonorProfile />} />
         <Route path="/donation-test" element={<DonationRequestDetailTest />} />
         <Route path="/guide" element={<Guidelines />} />
-   <Route path="/adminngo" element={<AdminNGO />} />
-       <Route path="/ngo/:id" element={<NGOPublicProfile />} />  {/* 👈 add this */}
+        <Route path="/adminngo" element={<AdminNGO />} />
+        <Route path="/ngo/:id" element={<NGOPublicProfile />} />  {/* 👈 add this */}
       </Routes>
     </>
   );
