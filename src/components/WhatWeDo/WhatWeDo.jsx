@@ -84,16 +84,18 @@ export default function WhatWeDo() {
                 })}
             </div>
 
-            {/* Mobile layout without SVG */}
+            {/* Mobile layout with styled circles */}
             <div className="whatwedo__mobile">
-                <ol className="whatwedo__list">
-                    {steps.map((text, idx) => (
-                        <li key={idx} className="whatwedo__list-item">
-                            {text}
-                        </li>
-                    ))}
-                </ol>
+                {steps.map((text, idx) => (
+                    <div key={idx} className="whatwedo__mobile-step">
+                        <div className="whatwedo__mobile-circle">
+                            {idx + 1}
+                        </div>
+                        <p className="whatwedo__mobile-text">{text}</p>
+                    </div>
+                ))}
             </div>
+
         </section>
     );
 }
