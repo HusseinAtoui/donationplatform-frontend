@@ -69,3 +69,34 @@
     z-index: 1;
     pointer-events: none;
 }
+.donations-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+@media (max-width: 1024px){ .donations-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px){  .donations-grid { grid-template-columns: 1fr; } }
+/* No underlines anywhere inside the card links */
+.donation-card a,
+.donation-card a:visited,
+.donation-card a:hover,
+.donation-card a:active,
+.ngo-info-link,
+.ngo-info-link:visited,
+.ngo-info-link:hover,
+.ngo-info-link:active {
+  text-decoration: none !important;
+  color: inherit; /* keep your existing black text */
+}
+
+/* Ensure headings inside the link never get underlined by globals */
+.ngo-info-link .ngo-name {
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+/* Keep accessibility focus visible without underlines */
+.ngo-info-link:focus-visible {
+  outline: 2px solid #5fab7d;
+  outline-offset: 2px;
+}

@@ -23,11 +23,7 @@
   --add-btn: clamp(40px, 7vw, 64px);
 
   /* Tweak these two to match your exact look */
-
-  /* was: clamp(18px, 3.5vw, 44px) */
   --avatar-lift: clamp(90px, 6vw, 96px); /* rises more into the cover */
-
- /* how much avatar rises into the cover */
   --actions-top: clamp(8px, 2.2vw, 22px);    /* vertical offset for Edit/gear from card top */
 }
 
@@ -116,6 +112,7 @@
 .avatar-add:focus-visible{ outline: 3px solid #cde7d6; outline-offset: 2px; }
 .avatar-add svg, .avatar-add i, .avatar-add span{ width: 200%; height: 200%; }
 .avatar-add svg{ stroke-width: 3; }
+
 .header-actions{
   grid-area: actions;
   align-self: start;
@@ -137,7 +134,6 @@
   border-radius: 12px;
   font-weight: 800;
 }
-
 
 /* Icon-only Settings button (no border) */
 .Settings{
@@ -239,7 +235,6 @@
    ============================ */
 @media (max-width: 820px){
   .header-card{
-    /* keep two columns on small screens too */
     grid-template-columns: minmax(120px, var(--avatar)) 1fr;
     grid-template-rows: auto auto;
     grid-template-areas:
@@ -253,7 +248,7 @@
     justify-self: end;
     align-self: start;
     margin-top: clamp(4px, 1.5vw, 12px);
-    flex-wrap: nowrap;       /* don’t let Edit/gear wrap under each other */
+    flex-wrap: nowrap;
     white-space: nowrap;
   }
 }
@@ -270,6 +265,122 @@
 }
 
 /* Space between content and footer */
-.wrap:last-of-type {
- margin-bottom: clamp(16px, 3vh, 48px);
+.wrap:last-of-type { margin-bottom: clamp(16px, 3vh, 48px); }
+/* Nudge the Create Request button down a bit only on this form */
+.create-request-card .btn {
+  margin-top: 12px;          /* move it slightly down */
+}
+/* ============================
+   Requests UI (grid, 3 per row)
+   ============================ */
+
+.requests-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 across */
+  gap: 20px;                             /* space between cards */
+}
+
+.req-card {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.req-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+}
+
+/* Urgent highlight */
+.req-card.urgent {
+  border-color: #f46e6e;
+  box-shadow: 0 8px 20px rgba(244,110,110,0.15);
+}
+
+.req-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.req-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.req-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background: #eaf3ee;
+  border: 1px solid var(--border);
+  flex: 0 0 auto;
+}
+
+.req-title { display: grid; gap: 2px; }
+.req-name {
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.req-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.req-count-chip {
+  padding: 6px 12px;
+  min-width: 42px;
+  text-align: center;
+  border-radius: 999px;
+  background: #f3faf6;
+  border: 1px solid #d9e9df;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.req-desc {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* Status bars */
+.req-status {
+  margin-top: 6px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  text-align: center;
+  font-weight: 800;
+  border: 1px solid var(--border);
+}
+
+.req-status.ok {
+  background: #cfeedd;      /* soft green */
+  color: #245a33;
+  border-color: #b9e2cc;
+}
+
+.req-status.danger {
+  background: #ffe1e1;      /* soft red */
+  color: #7a1f1f;
+  border-color: #f6b1b1;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+  .requests-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 680px) {
+  .requests-row { grid-template-columns: 1fr; }
 }
