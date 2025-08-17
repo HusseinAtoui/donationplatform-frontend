@@ -81,3 +81,37 @@
     /* keep this in style prop or here */
     width: 180px;
 }
+
+/* Default: show desktop layout */
+.whatwedo__desktop {
+    display: block;
+}
+
+.whatwedo__mobile {
+    display: none;
+}
+
+/* Mobile: hide desktop SVG, show vertical list */
+@media (max-width: 768px) {
+    .whatwedo__desktop {
+        display: none;
+    }
+
+    .whatwedo__mobile {
+        display: block;
+        text-align: left;
+        margin-top: 40px;
+    }
+
+    .whatwedo__list {
+        list-style: decimal;
+        padding-left: 20px;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    .whatwedo__list-item {
+        margin-bottom: 16px;
+    }
+}

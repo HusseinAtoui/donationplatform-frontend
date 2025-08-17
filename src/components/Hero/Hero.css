@@ -91,13 +91,9 @@
 
 @media (max-width: 768px) {
 
-    .hero-content .hero-button {
-        display: block;
-        margin: 0 auto;
-    }
 
     .hero {
-        padding: 40px 24px;
+        padding: 80px 24px;
     }
 
     .hero-title {
@@ -120,5 +116,10 @@
     .hero-button {
         padding: 12px 32px;
         font-size: 0.95rem;
+    }
+
+    .hero-content .hero-button {
+        display: block;
+        margin: 0 auto;
     }
 }
