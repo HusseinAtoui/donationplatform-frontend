@@ -26,14 +26,23 @@
 .ngo-info {
     display: flex;
     align-items: center;
-}
-
+}/* LOCKED, PERFECT CIRCLE — never grows/shrinks with content */
 .ngo-logo-placeholder {
-    width: 64px;
-    height: 65px;
-    border-radius: 50%;
-    background-color: #f0efef;
-    margin-right: 16px;
+  width: 64px;
+  height: 64px;                 /* equal to width */
+  border-radius: 50%;
+  overflow: hidden;
+
+  /* stop Flexbox from resizing it */
+  flex: 0 0 64px;               /* basis 64px, no grow, no shrink */
+  align-self: center;           /* ignore parent stretch */
+
+  /* if you set a background image per NGO, keep it stable */
+  background: #f0efef center / cover no-repeat;
+
+  /* optional: if other CSS fights this, aspect-ratio is extra safety */
+  aspect-ratio: 1 / 1;
+  box-sizing: content-box;
 }
 
 .ngo-text {

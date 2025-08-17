@@ -12,14 +12,14 @@ import {
   Camera,
   Heart,
   Gift,
-  UserRound
+  UserRound,
 } from "lucide-react";
 
 // CRA env style; set REACT_APP_API_BASE=http://localhost:4000 (no trailing slash) in frontend .env
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000";
 
 export default function DonorProfile() {
-  const [avatarSrc, setAvatarSrc] = useState(null);
+  const [avatarSrc, setAvatarSrc] = useState(null); // local preview (blob URL)
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [profile, setProfile] = useState(null);
@@ -38,6 +38,7 @@ export default function DonorProfile() {
     e.target.value = "";
   };
 
+  // Revoke any blob URL on unmount or when it changes
   useEffect(() => {
     return () => {
       if (avatarSrc?.startsWith("blob:")) URL.revokeObjectURL(avatarSrc);
@@ -54,7 +55,6 @@ export default function DonorProfile() {
         const token = localStorage.getItem("token");
         if (!token) {
           setErr("Not authenticated. Please log in.");
-          // optional: window.location.href = "/login";
           setLoading(false);
           return;
         }
@@ -65,7 +65,6 @@ export default function DonorProfile() {
 
         if (res.status === 401 || res.status === 403) {
           setErr("Your session expired or you do not have access. Please log in.");
-          // optional: window.location.href = "/login";
           setLoading(false);
           return;
         }
@@ -85,12 +84,14 @@ export default function DonorProfile() {
     })();
   }, []);
 
-  // Derived display values
+  // Derived display values with sensible fallbacks
   const name = profile?.name || "Donor Name";
   const email = profile?.email || "donor@example.com";
   const phone = profile?.phone || "+961 71 234 567";
   const address = profile?.location || "Beirut, Lebanon";
-  const bio = profile?.bio || "Brief bio about the donor. What they care about, preferred donation types, and any relevant notes for NGOs coordinating pickups.";
+  const bio =
+    profile?.bio ||
+    "Brief bio about the donor. What they care about, preferred donation types, and any relevant notes for NGOs coordinating pickups.";
   const createdAt = profile?.createdAt ? new Date(profile.createdAt) : null;
   const memberSince = createdAt
     ? createdAt.toLocaleString(undefined, { month: "short", year: "numeric" })
@@ -108,11 +109,7 @@ export default function DonorProfile() {
           {/* Avatar */}
           <div className="avatar-holder">
             <div className="avatar-lg">
-              {shownAvatar ? (
-                <img src={shownAvatar} alt="Donor avatar" />
-              ) : (
-                <Camera size={28} />
-              )}
+              {shownAvatar ? <img src={shownAvatar} alt="Donor avatar" /> : <Camera size={28} />}
             </div>
 
             <button
@@ -135,8 +132,14 @@ export default function DonorProfile() {
 
           {/* Actions (top-right) */}
           <div className="header-actions">
-            <button className="EDITbtn">Edit</button>
-            <button className="Settings" aria-label="settings">
+            <button className="EDITbtn" onClick={() => alert("Edit not wired yet")}>
+              Edit
+            </button>
+            <button
+              className="Settings"
+              aria-label="settings"
+              onClick={() => alert("Settings not wired yet")}
+            >
               <Settings size={18} />
             </button>
           </div>
@@ -180,7 +183,9 @@ export default function DonorProfile() {
       {/* Preferences & Details */}
       <section className="wrap two-col">
         <div className="card">
-          <h3 className="section-title"><Heart /> Donation Preferences</h3>
+          <h3 className="section-title">
+            <Heart /> Donation Preferences
+          </h3>
           <div className="tags">
             <span className="tag">Clothing</span>
             <span className="tag">Food</span>
@@ -191,12 +196,26 @@ export default function DonorProfile() {
         </div>
 
         <div className="card">
-          <h3 className="section-title"><UserRound /> Profile Details</h3>
+          <h3 className="section-title">
+            <UserRound /> Profile Details
+          </h3>
           <ul className="kv-list">
-            <li><span>Member Since</span><strong>{memberSince}</strong></li>
-            <li><span>Preferred Contact</span><strong>Email</strong></li>
-            <li><span>Pickup Radius</span><strong>Up to 10 km</strong></li>
-            <li><span>Languages</span><strong>Arabic, English</strong></li>
+            <li>
+              <span>Member Since</span>
+              <strong>{memberSince}</strong>
+            </li>
+            <li>
+              <span>Preferred Contact</span>
+              <strong>Email</strong>
+            </li>
+            <li>
+              <span>Pickup Radius</span>
+              <strong>Up to 10 km</strong>
+            </li>
+            <li>
+              <span>Languages</span>
+              <strong>Arabic, English</strong>
+            </li>
           </ul>
         </div>
       </section>
@@ -204,7 +223,9 @@ export default function DonorProfile() {
       {/* Notes */}
       <section className="wrap">
         <div className="card">
-          <h3 className="section-title"><Gift /> Notes</h3>
+          <h3 className="section-title">
+            <Gift /> Notes
+          </h3>
           <p className="muted">
             Add any special instructions here (e.g., building access, preferred pickup times).
           </p>
@@ -217,9 +238,12 @@ export default function DonorProfile() {
 }
 
 function Chip({ icon: Icon, text }) {
+  if (!text) return null;
   return (
     <div className="chip">
-      <span className="chip-icon"><Icon size={14} /></span>
+      <span className="chip-icon">
+        <Icon size={14} />
+      </span>
       <span className="chip-text">{text}</span>
     </div>
   );

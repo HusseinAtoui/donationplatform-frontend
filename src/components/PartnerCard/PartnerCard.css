@@ -34,3 +34,14 @@
   font-size: 14px;
   color: #5FAB7D;
 }
+/* The clickable NGO header inside the card */
+.ngo-info-link,
+.ngo-info-link:visited,
+.ngo-info-link:hover,
+.ngo-info-link:active {
+  text-decoration: none !important;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

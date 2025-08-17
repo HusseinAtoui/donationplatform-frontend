@@ -46,7 +46,7 @@ function RequestCard({ req }) {
   const meta = metaPieces.join(" • ");
 
   return (
-    <div className="card req-card">
+    <div className={`card req-card ${urgent ? "urgent" : ""}`}>
       <div className="req-top">
         <div className="req-left">
           <div className="req-avatar" />
@@ -63,7 +63,9 @@ function RequestCard({ req }) {
 
       {meta && <div className="req-desc">{meta}</div>}
 
-      <div className={`req-status ${urgent ? "danger" : "ok"}`}>{statusText}</div>
+      <div className={`req-status ${urgent ? "danger" : "ok"}`}>
+        {statusText}
+      </div>
     </div>
   );
 }
@@ -511,7 +513,11 @@ export default function NGOProfile() {
         </div>
 
         {/* Create Request */}
-        <form className="card" onSubmit={handleCreateRequest} style={{ marginBottom: 16 }}>
+        <form
+          className="card create-request-card"
+          onSubmit={handleCreateRequest}
+          style={{ marginBottom: 16 }}
+        >
           <h3 style={{ marginBottom: 8 }}>
             <Package size={18} style={{ verticalAlign: "text-bottom" }} /> Create a Request
           </h3>
@@ -615,8 +621,8 @@ export default function NGOProfile() {
           </button>
         </form>
 
-        {/* Requests list — new compact cards */}
-        <div className="requests-grid">
+        {/* Requests list — horizontal row */}
+        <div className="requests-row">
           {reqLoading && <div className="card"><p>Loading requests…</p></div>}
           {!reqLoading && requests.length === 0 && (
             <div className="card"><p className="muted">No requests yet.</p></div>
