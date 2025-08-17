@@ -273,3 +273,116 @@
 .wrap:last-of-type {
  margin-bottom: clamp(16px, 3vh, 48px);
 }
+/* ============================
+   Requests UI (cards + grid)
+   ============================ */
+
+.requests-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.req-card{
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.req-top{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.req-left{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.req-avatar{
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background: #eaf3ee;
+  border: 1px solid var(--border);
+  flex: 0 0 auto;
+}
+
+.req-title{
+  display: grid;
+  gap: 2px;
+}
+
+.req-name{
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.req-sub{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.req-count-chip{
+  padding: 6px 10px;
+  min-width: 42px;
+  text-align: center;
+  border-radius: 999px;
+  background: #e8f1ec;
+  border: 1px solid var(--border);
+  font-weight: 800;
+  color: var(--text);
+}
+
+.req-desc{
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* “Status bar” like the donation cards */
+.req-status{
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 800;
+  border: 1px solid var(--border);
+}
+
+.req-status.ok{
+  background: #bfe6a8;      /* soft green */
+  color: #2b5721;
+  border-color: #a0d58a;
+    margin-top: 20px;  
+}
+
+.req-status.danger{
+  background: #ff8e8e;      /* soft red */
+  color: #7a1f1f;
+  border-color: #f46e6e;
+}
+
+/* Two-column form for the create-request card */
+.grid-two{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 920px){
+  .requests-grid{ grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px){
+  .grid-two{ grid-template-columns: 1fr; }
+}

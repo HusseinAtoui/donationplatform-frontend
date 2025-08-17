@@ -29,7 +29,7 @@ export default function NavBar() {
                     <Link to="/map" className={`navbar__menu-item ${isActive('/map') ? 'active' : ''}`} onClick={closeMobileMenu}>Map</Link>
                     <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`} onClick={closeMobileMenu}>Donations</Link>
                     <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`} onClick={closeMobileMenu}>Our Partners</Link>
-                    <Link to="/DonorProfile" className={`navbar__menu-item ${isActive('/DonorProfile') ? 'active' : ''}`} onClick={closeMobileMenu}>Donor Profile</Link>
+              
                 </nav>
 
                 {/* Right side: login + hamburger */}

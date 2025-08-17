@@ -1,6 +1,9 @@
+// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Login.css';
+
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000/api';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style={{ marginRight: '10px' }}>
@@ -11,15 +14,13 @@ const GoogleIcon = () => (
   </svg>
 );
 
-// Backend base (matches your Express mount: app.use('/api/ngo', ...))
-const API_BASE = 'http://localhost:4000/api';
-
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [userType, setUserType] = useState('NGO'); // default NGO
-  const [email, setEmail] = useState('');
+  // You can change the default to 'NGO' if you mostly test NGO logins
+  const [userType, setUserType] = useState('Donor');
+  const [identifier, setIdentifier] = useState('');   // email OR phone for Donor; email for NGO
   const [password, setPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -36,52 +37,73 @@ export default function Login() {
     }
   }
 
-  async function handleLogin() {
+  async function loginTo(url, payload) {
+    console.log('[FE] POST', url, payload);
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    // Try to parse JSON; if not, build a fallback error
+    let body = {};
+    try { body = await res.json(); } catch (_) {}
+
+    console.log('[FE] login response', res.status, body);
+    return { ok: res.ok, status: res.status, body };
+  }
+
+  async function handleLogin(e) {
+    e?.preventDefault?.();
     setError('');
-    if (!email || !password) {
-      setError('Please fill email and password');
+
+    if (!identifier || !password) {
+      setError('Please fill all fields.');
       return;
     }
 
     try {
       setLoading(true);
 
-      // Pick endpoint by role selection
-      let url = '';
-      if (userType === 'NGO') {
-        url = `${API_BASE}/ngo/login`;      // ✅ correct NGO endpoint
-      } else {
-        url = `${API_BASE}/user/login`;     // 🔧 change when donor login exists
+      const donorUrl = `${API_BASE}/user/login`;
+      const ngoUrl   = `${API_BASE}/ngo/login`;
+      const primary  = userType === 'NGO' ? ngoUrl : donorUrl;
+      const fallback = userType === 'NGO' ? donorUrl : ngoUrl;
+
+      const payload = { identifier: identifier.trim(), password };
+
+      // Try the selected role first
+      let { ok, status, body } = await loginTo(primary, payload);
+
+      // If generic invalid creds, auto-try the other endpoint (helps if the toggle was wrong)
+      if (!ok && status === 401 && body?.error === 'Invalid credentials.') {
+        console.log('[FE] trying fallback endpoint…');
+        const r2 = await loginTo(fallback, payload);
+        if (r2.ok) { ok = true; status = r2.status; body = r2.body; }
       }
 
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: email, password }),
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Login failed');
+      if (!ok) {
+        throw new Error(body?.error || `Login failed (${status})`);
       }
 
-      const { token } = await res.json();
+      const { token } = body || {};
+      if (!token) throw new Error('No token returned from server.');
 
-      // Save token + role
       localStorage.setItem('token', token);
 
-      let role = userType.toLowerCase(); // fallback from UI
+      // Determine role from token (backend sets: "ngo" or "user")
+      let role = userType.toLowerCase();
       const decoded = decodeJwt(token);
       if (decoded?.role) role = decoded.role;
+
       localStorage.setItem('role', role);
 
-      // 🔀 Redirect to routes that ALREADY exist in your App.jsx
       if (role === 'ngo') {
-        navigate('/NGOProfile');     // matches <Route path="/NGOProfile" ... />
-      } else if (role === 'donor') {
-        navigate('/DonorProfile');   // matches <Route path="/DonorProfile" ... />
+        navigate('/NGOProfile');
+      } else if (role === 'user') {
+        navigate('/DonorProfile');
       } else {
-        navigate('/');               // safety fallback
+        navigate('/');
       }
     } catch (e) {
       setError(e.message);
@@ -96,6 +118,7 @@ export default function Login() {
         <p className="return-text" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           ← Return Home
         </p>
+
         <h1 className="welcome-title">Welcome Back to WarmHands!</h1>
 
         {justVerified && (
@@ -104,7 +127,7 @@ export default function Login() {
           </div>
         )}
 
-        <p className="login-as-label">Login in as:</p>
+        <p className="login-as-label">Log in as:</p>
         <div className="user-type-toggle">
           <button
             className={`user-type-btn ${userType === 'Donor' ? 'active' : ''}`}
@@ -122,27 +145,35 @@ export default function Login() {
           </button>
         </div>
 
-        <label className="input-label">Email</label>
-        <input
-          className="login-input"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <form onSubmit={handleLogin}>
+          <label className="input-label">
+            {userType === 'Donor' ? 'Email or Phone' : 'Email'}
+          </label>
+          <input
+            className="login-input"
+            type={userType === 'Donor' ? 'text' : 'email'}
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder={userType === 'Donor' ? 'e.g. user@example.com or +9617...' : 'user@example.com'}
+            autoComplete="username"
+          />
 
-        <label className="input-label">Password</label>
-        <input
-          className="login-input"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <label className="input-label">Password</label>
+          <input
+            className="login-input"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleLogin(e)}
+            autoComplete="current-password"
+          />
 
-        <p className="forgot-password">Forgot your password?</p>
+          <p className="forgot-password">Forgot your password?</p>
 
-        <button className="login-btn" onClick={handleLogin} disabled={loading}>
-          {loading ? 'Logging in…' : 'LOGIN'}
-        </button>
+          <button className="login-btn" onClick={handleLogin} disabled={loading} type="submit">
+            {loading ? 'Logging in…' : 'LOGIN'}
+          </button>
+        </form>
 
         {error && <div style={{ color: 'crimson', marginTop: 10 }}>{error}</div>}
 
