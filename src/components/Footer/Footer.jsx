@@ -16,25 +16,29 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Company Links */}
-          <div className="footer-links-group">
-            <h3>Company</h3>
-            <ul>
-              <li><a href="#what-we-do">What do we do</a></li>
-              <li><a href="#about-us">About Us</a></li>
-              <li><a href="#contact-us">Contact Us</a></li>
-            </ul>
-          </div>
+          {/* Wrap the two link groups */}
+          <div className="footer-links-container">
+            {/* Company Links */}
+            <div className="footer-links-group">
+              <h3>Company</h3>
+              <ul>
+                <li><a href="#what-we-do">What do we do</a></li>
+                <li><a href="#about-us">About Us</a></li>
+                <li><a href="#contact-us">Contact Us</a></li>
+              </ul>
+            </div>
 
-          {/* Customer Service Links */}
-          <div className="footer-links-group">
-            <h3>Customer Service</h3>
-            <ul>
-              <li><a href="#donation-guide">Donation Guide</a></li>
-              <li><a href="#map">Map</a></li>
-            </ul>
+            {/* Customer Service Links */}
+            <div className="footer-links-group">
+              <h3>Customer Service</h3>
+              <ul>
+                <li><a href="#donation-guide">Donation Guide</a></li>
+                <li><a href="#map">Map</a></li>
+              </ul>
+            </div>
           </div>
         </div>
+
       </div>
     </footer>
   );

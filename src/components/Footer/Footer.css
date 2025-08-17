@@ -122,15 +122,28 @@
 /* === Responsive tweaks === */
 @media (max-width: 960px) {
     .footer-inner {
-        justify-content: center;
-        gap: 60px;
-        padding-left: 20px; /* reduce padding on small screens */
+        justify-content: space-between; /* keep logo left, links right */
+        gap: 20px;
+        flex-wrap: wrap; /* allow wrapping if very narrow */
+        padding-left: 20px;
     }
 
-    .footer-logo-desc,
-    .footer-links-group {
+    .footer-logo-desc {
         max-width: 100%;
-        flex: 1 1 300px;
+        flex: 0 0 auto; /* keep left aligned */
         text-align: center;
+        margin-bottom: 10px; /* spacing on small screens if needed */
+    }
+
+    /* Wrap the two link groups in a horizontal container */
+    .footer-links-container {
+        display: flex;
+        justify-content: flex-end;
+        text-align: center;
+    }
+
+    .footer-links-group {
+        max-width: 181px;
+        flex: 0 0 auto; /* prevent shrinking */
     }
 }
