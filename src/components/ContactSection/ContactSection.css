@@ -129,3 +129,57 @@ button {
   font-size: 24px;
   /* size icons nicely */
 }
+
+/* ======= Responsive for phones ======= */
+@media (max-width: 768px) {
+  .contact-container {
+    flex-direction: column; /* stack vertically */
+    align-items: center;
+    padding: 20px;
+  }
+
+  /* Flip the order */
+  .contact-form-wrapper {
+    order: 2; /* show after info */
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .contact-info-wrapper {
+    order: 1; /* show first */
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .contact-info-items {
+    width: 100%;
+    gap: 20px;
+  }
+
+  .form-group-row {
+    flex-direction: column; /* stack first & last name */
+    gap: 12px;
+  }
+
+  button {
+    width: 100%; /* full width button */
+  }
+
+  .contact-info-text h2 {
+    font-size: 28px;
+  }
+
+  .contact-info-text p {
+    font-size: 14px;
+  }
+
+  .info-item {
+    font-size: 16px;
+  }
+
+  .icon-bg {
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+  }
+}
