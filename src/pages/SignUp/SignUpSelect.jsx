@@ -22,32 +22,35 @@ export default function UserTypeSelection() {
 
                 <h1 className="welcome-title">Join WarmHands as:</h1>
 
-                <div className="user-type-toggle">
-                    <button
-                        className={`user-type-btn ${selected === 'donor' ? 'active' : ''}`}
-                        onClick={() => handleSelect('donor')}
-                    >
-                        Donor
-                    </button>
-                    <button
-                        className={`user-type-btn ${selected === 'ngo' ? 'active' : ''}`}
-                        onClick={() => handleSelect('ngo')}
-                    >
-                        NGO
-                    </button>
-                </div>
+                {/* Centered buttons + login prompt */}
+                <div className="user-type-section">
+                    <div className="user-type-toggle">
+                        <button
+                            className={`user-type-btn ${selected === 'donor' ? 'active' : ''}`}
+                            onClick={() => handleSelect('donor')}
+                        >
+                            Donor
+                        </button>
+                        <button
+                            className={`user-type-btn ${selected === 'ngo' ? 'active' : ''}`}
+                            onClick={() => handleSelect('ngo')}
+                        >
+                            NGO
+                        </button>
+                    </div>
 
-                <p className="login-prompt">
-                    Already have an account?{' '}
-                    <span
-                        className="login-link"
-                        onClick={() => navigate('/login')}
-                        role="button"
-                        tabIndex={0}
-                    >
-                        Login
-                    </span>
-                </p>
+                    <p className="login-prompt">
+                        Already have an account?{' '}
+                        <span
+                            className="login-link"
+                            onClick={() => navigate('/login')}
+                            role="button"
+                            tabIndex={0}
+                        >
+                            Login
+                        </span>
+                    </p>
+                </div>
             </div>
 
             <div className="login-image" />

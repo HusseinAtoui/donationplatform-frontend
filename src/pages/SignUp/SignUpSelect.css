@@ -11,7 +11,7 @@
 /* Left Section */
 .signup-select-left {
     flex: 1;
-    max-width: 50%; /* ✅ Add this line */
+    max-width: 50%;
     padding: 60px 80px;
     display: flex;
     flex-direction: column;
@@ -40,11 +40,21 @@
     font-family: 'Poppins', sans-serif;
 }
 
+/* Centered section for buttons + prompt */
+.user-type-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* center horizontally */
+    width: 100%;
+    margin-top: 10px;
+}
+
 /* Buttons */
 .user-type-toggle {
     display: flex;
     gap: 12px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .user-type-btn {
@@ -69,7 +79,7 @@
 .login-prompt {
     font-size: 14px;
     color: #333;
-    margin-top: 24px;
+    text-align: center;
     font-family: 'Poppins', sans-serif;
 }
 
@@ -85,10 +95,10 @@
     color: #4a9468;
 }
 
-/* Right Section (image stays the same) */
+/* Right Section (image) */
 .login-image {
     flex: 1;
-    max-width: 50%; /* ✅ Add this line */
+    max-width: 50%;
     background-image: url('../../assets/login-illustration.jpg');
     background-size: cover;
     background-position: center;
@@ -107,5 +117,17 @@
         flex: none;
         height: 50vh;
         padding: 40px 30px;
+    }
+
+    /* Keep buttons and prompt nicely spaced on mobile */
+    .user-type-toggle {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .user-type-btn {
+        width: 100%;
+        text-align: center;
     }
 }
