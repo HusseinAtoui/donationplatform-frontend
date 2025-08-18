@@ -184,14 +184,82 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .login-container {
         flex-direction: column;
+        height: auto;
     }
 
     .login-left, .login-image {
         max-width: 100%;
         flex: none;
-        height: 50vh;
+        width: 100%;
+    }
+
+    .login-left {
+        padding: 40px 30px;
+    }
+
+    .welcome-title {
+        font-size: 28px;
+        margin-bottom: 24px;
+    }
+
+    .user-type-toggle {
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .login-input {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+
+    .login-btn, .google-btn {
+        font-size: 15px;
+        padding: 12px;
+    }
+
+    .forgot-password {
+        font-size: 13px;
+    }
+
+    .signup-prompt {
+        font-size: 13px;
     }
 }
+
+@media (max-width: 480px) {
+    .login-left {
+        padding: 30px 20px;
+    }
+
+    .welcome-title {
+        font-size: 24px;
+    }
+
+    .user-type-toggle {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .login-btn, .google-btn {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .forgot-password {
+        text-align: center;
+    }
+
+    .signup-prompt {
+        text-align: center;
+    }
+
+    .login-image {
+        height: 30vh;
+        background-size: cover;
+        background-position: center;
+    }
+}
+
