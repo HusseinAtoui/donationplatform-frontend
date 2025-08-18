@@ -1,22 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@500;700&display=swap');
 
+/* Container */
 .signup-container {
     display: flex;
-    height: 100vh;
+    flex-direction: row;
+    width: 100%;
+    min-height: 100vh;
     font-family: 'Poppins', sans-serif;
-    overflow: hidden;
+    overflow-x: hidden;
+    align-items: stretch;
 }
 
 /* Left Section */
 .signup-left {
     flex: 1;
-    max-width: 50%;
-    padding: 60px 80px;
+    padding: 40px 60px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* start from top */
     background-color: #ffffff;
     box-sizing: border-box;
+    overflow: visible;
 }
 
 /* Return text */
@@ -25,8 +29,7 @@
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
-    margin-bottom: 30px;
-    font-family: 'Poppins', sans-serif;
+    margin-bottom: 20px;
 }
 
 /* Heading */
@@ -34,22 +37,39 @@
     font-size: 32px;
     font-weight: 700;
     color: #1C1C1C;
-    margin-bottom: 30px;
-    font-family: 'Poppins', sans-serif;
+    margin-bottom: 20px;
+}
+
+/* Error/Success banners */
+.error-banner,
+.success-banner {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.error-banner {
+    background-color: #fde2e2;
+    color: #d32f2f;
+}
+
+.success-banner {
+    background-color: #e2f9e6;
+    color: #388e3c;
 }
 
 /* Form */
 .signup-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    font-family: 'Inter', sans-serif;
+    gap: 12px;
 }
 
-/* First + Last Name side by side */
+/* Name row */
 .name-row {
     display: flex;
-    gap: 16px;
+    gap: 12px;
 }
 
 .name-row input {
@@ -58,11 +78,10 @@
 
 /* Input fields */
 .signup-form input {
-    padding: 12px 16px;
+    padding: 12px 14px;
     border: 1.5px solid #ccc;
     border-radius: 8px;
     font-size: 14px;
-    font-family: 'Inter', sans-serif;
     outline: none;
     transition: border-color 0.2s ease;
 }
@@ -71,24 +90,28 @@
     border-color: #5FAB7D;
 }
 
-/* Fix phone field spacing */
+/* Phone input */
 .phone-containerDONOR {
-    margin-bottom: 1px !important;
+    width: 100%;
 }
 
-/* Password with toggle icon */
+.phone-input {
+    width: 100% !important;
+}
+
+/* Password field with toggle */
 .password-field {
     position: relative;
 }
 
 .password-field input {
     width: 100%;
-    padding-right: 40px;
+    padding-right: 36px;
 }
 
 .toggle-password {
     position: absolute;
-    right: 12px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
@@ -98,7 +121,7 @@
 /* Submit button */
 .signup-form button {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     background-color: #5FAB7D;
     color: white;
     font-weight: 600;
@@ -117,8 +140,7 @@
 .login-prompt {
     font-size: 14px;
     color: #333;
-    margin-top: 24px;
-    font-family: 'Poppins', sans-serif;
+    margin-top: 16px;
     text-align: center;
 }
 
@@ -134,31 +156,40 @@
     color: #4a9468;
 }
 
-/* Right Section */
+/* Right Section / Image */
 .login-image {
     flex: 1;
-    max-width: 50%;
     background-image: url('../../assets/login-illustration.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    min-height: 100vh;
 }
 
-/* Responsive */
+/* Responsive for Mobile */
 @media (max-width: 768px) {
     .signup-container {
         flex-direction: column;
+        align-items: stretch;
     }
 
-    .signup-left,
-    .login-image {
-        max-width: 100%;
-        flex: none;
-        height: 50vh;
-        padding: 40px 30px;
+    .signup-left {
+        width: 100%;
+        padding: 20px;
+        margin-top: 50%;
+        margin-bottom: 30%;
+    }
+
+      .login-image {
+       display: none;
     }
 
     .name-row {
         flex-direction: column;
+    }
+
+    .signup-form button {
+        padding: 10px;
+        font-size: 15px;
     }
 }
