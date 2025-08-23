@@ -8,7 +8,7 @@ const AboutSection = () => {
             <div className="about-text">
                 <h2>About Us</h2>
                 <p className="about__description">
-                    At WarmHands, we believe generosity shouldn’t be complicated —
+                    At TyebeTyebak, we believe generosity shouldn’t be complicated —
                     and help shouldn’t feel out of reach. We're a community-powered
                     platform that connects your gently used clothing and essentials with local shelters,
                     nonprofits, and families in need. Whether it’s a winter coat, a school bag, or a care kit

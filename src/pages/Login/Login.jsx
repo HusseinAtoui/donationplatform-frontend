@@ -119,7 +119,7 @@ export default function Login() {
           ← Return Home
         </p>
 
-        <h1 className="welcome-title">Welcome Back to WarmHands!</h1>
+        <h1 className="welcome-title">Welcome Back to TyebeTyebak!</h1>
 
         {justVerified && (
           <div className="notice" style={{ color: 'green', marginBottom: 12 }}>

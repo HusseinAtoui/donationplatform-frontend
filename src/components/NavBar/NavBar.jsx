@@ -63,7 +63,7 @@ export default function NavBar() {
   return (
     <>
       <header className="navbar">
-        <div className="navbar__logo">WarmHands</div>
+        <div className="navbar__logo">TyebeTyebak</div>
 
         {/* Desktop + mobile menu */}
         <nav className={`navbar__menu ${isMobileMenuOpen ? 'navbar__menu--open' : ''}`}>

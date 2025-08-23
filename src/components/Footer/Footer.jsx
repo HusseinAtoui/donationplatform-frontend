@@ -9,10 +9,10 @@ const Footer = () => {
         {/* Logo + Description */}
         <div className="footer-logo-desc">
           <div className="footer-logo">
-            <span>WarmHands</span>
+            <span>TyebeTyebak</span>
           </div>
           <p>
-            WarmHands connects donors with local shelters and nonprofits to deliver clothing, essentials, and care where it’s needed most.
+            TyebeTyebak connects donors with local shelters and nonprofits to deliver clothing, essentials, and care where it’s needed most.
           </p>
         </div>
 

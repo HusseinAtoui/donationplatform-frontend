@@ -20,7 +20,7 @@ export default function UserTypeSelection() {
                     ← Return Home
                 </p>
 
-                <h1 className="welcome-title">Join WarmHands as:</h1>
+                <h1 className="welcome-title">Join TyebeTyebak as:</h1>
 
                 {/* Centered buttons + login prompt */}
                 <div className="user-type-section">
