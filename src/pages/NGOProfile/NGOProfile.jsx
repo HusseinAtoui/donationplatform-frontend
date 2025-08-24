@@ -427,85 +427,6 @@ export default function NGOProfile() {
         </div>
       </section>
 
-      {/* Posts */}
-      <section className="wrap">
-        <div className="posts-head">
-          <h2>Posts</h2>
-        </div>
-
-        {/* Create Post */}
-        <form className="card" onSubmit={handleCreatePost} style={{ marginBottom: 16 }}>
-          <h3 style={{ marginBottom: 8 }}>Create a Post</h3>
-          <textarea
-            className="signup-input"
-            rows={3}
-            placeholder="Share an update…"
-            value={newText}
-            onChange={(e) => setNewText(e.target.value)}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setNewFiles(Array.from(e.target.files || []))}
-            style={{ margin: "8px 0" }}
-          />
-          <button className="btn" type="submit" disabled={creatingPost}>
-            {creatingPost ? "Posting…" : "Post"}
-          </button>
-        </form>
-
-        <div className="stack">
-          {postLoading && (
-            <div className="card">
-              <p>Loading posts…</p>
-            </div>
-          )}
-
-          {!postLoading && posts.length === 0 && (
-            <div className="card">
-              <p className="muted">No posts yet.</p>
-            </div>
-          )}
-
-          {!postLoading &&
-            posts.map((p) => (
-              <div key={p.postId || p.id} className="card post">
-                <div className="post-top">
-                  <div className="post-id">
-                    <div className="avatar-sm" />
-                    <div className="org">{name || "NGO"}</div>
-                  </div>
-                  <div className="date">
-                    {new Date(p.createdAt || Date.now()).toLocaleString()}
-                  </div>
-                </div>
-
-                <p className="muted">{p.text}</p>
-
-                {!!p.images?.length && (
-                  <div className="grid">
-                    {p.images.map((url, i) => (
-                      <div key={i} className="ph">
-                        <img
-                          src={url}
-                          alt={`post-${i}`}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            borderRadius: 8,
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-        </div>
-      </section>
-
       {/* Requests */}
       <section className="wrap">
         <div className="posts-head">
@@ -630,6 +551,85 @@ export default function NGOProfile() {
           {!reqLoading && requests.map((r) => (
             <RequestCard key={r.requestId || r.id} req={r} />
           ))}
+        </div>
+      </section>
+
+      {/* Posts */}
+      <section className="wrap">
+        <div className="posts-head">
+          <h2>Posts</h2>
+        </div>
+
+        {/* Create Post */}
+        <form className="card" onSubmit={handleCreatePost} style={{ marginBottom: 16 }}>
+          <h3 style={{ marginBottom: 8 }}>Create a Post</h3>
+          <textarea
+            className="signup-input"
+            rows={3}
+            placeholder="Share an update…"
+            value={newText}
+            onChange={(e) => setNewText(e.target.value)}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setNewFiles(Array.from(e.target.files || []))}
+            style={{ margin: "8px 0" }}
+          />
+          <button className="btn" type="submit" disabled={creatingPost}>
+            {creatingPost ? "Posting…" : "Post"}
+          </button>
+        </form>
+
+        <div className="stack">
+          {postLoading && (
+            <div className="card">
+              <p>Loading posts…</p>
+            </div>
+          )}
+
+          {!postLoading && posts.length === 0 && (
+            <div className="card">
+              <p className="muted">No posts yet.</p>
+            </div>
+          )}
+
+          {!postLoading &&
+            posts.map((p) => (
+              <div key={p.postId || p.id} className="card post">
+                <div className="post-top">
+                  <div className="post-id">
+                    <div className="avatar-sm" />
+                    <div className="org">{name || "NGO"}</div>
+                  </div>
+                  <div className="date">
+                    {new Date(p.createdAt || Date.now()).toLocaleString()}
+                  </div>
+                </div>
+
+                <p className="muted">{p.text}</p>
+
+                {!!p.images?.length && (
+                  <div className="grid">
+                    {p.images.map((url, i) => (
+                      <div key={i} className="ph">
+                        <img
+                          src={url}
+                          alt={`post-${i}`}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            borderRadius: 8,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
         </div>
       </section>
 
