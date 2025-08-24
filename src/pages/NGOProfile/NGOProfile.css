@@ -65,16 +65,13 @@
 .header-card {
   position: relative;
   margin-top: -60px;
-  /* pull over the cover */
   padding: 24px;
   display: grid;
   grid-template-columns: var(--avatar) 1fr;
   grid-template-rows: auto auto;
   grid-template-areas:
     "avatar actions"
-    /* row 1: avatar left, actions right */
     "main   main";
-  /* row 2: header content full width */
   column-gap: 24px;
   row-gap: 20px;
   align-items: start;
@@ -190,14 +187,15 @@
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   margin-bottom: 12px;
 }
 
 .close-btn {
   position: absolute;
   top: 0;
-  right: -100px; /* adjust spacing from the right edge */
+  right: -100px;
+  /* adjust spacing from the right edge */
   font-size: 22px;
   color: var(--muted);
   background: none;
@@ -250,7 +248,6 @@ textarea {
   min-height: 100px;
 }
 
-/* Icon-only Settings button (no border) */
 /* Icon-only Settings button */
 .Settings {
   width: 44px;
@@ -262,14 +259,15 @@ textarea {
   align-items: center;
   justify-content: center;
 
-  background: var(--green);   
-  color: #fff;                
+  background: var(--green);
+  color: #fff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .Settings:hover {
-  background: var(--green-600);  /* Darker green on hover */
+  background: var(--green-600);
+  /* Darker green on hover */
   transform: translateY(-1px);
 }
 
@@ -289,7 +287,8 @@ textarea {
   text-align: left;
   cursor: pointer;
   font-size: 14px;
-  color: #333; /* default */
+  color: #333;
+  /* default */
 }
 
 .menu-item:hover {
@@ -298,17 +297,20 @@ textarea {
 
 /* Specific colors */
 .menu-item.admin {
-  color: #2563eb; /* blue for Admin */
+  color: #2563eb;
+  /* blue for Admin */
   font-weight: 500;
 }
 
 .menu-item.signout {
-  color: #16a34a; /* green for Sign Out */
+  color: #16a34a;
+  /* green for Sign Out */
   font-weight: 500;
 }
 
 .menu-item.danger {
-  color: #dc2626; /* red for Delete */
+  color: #dc2626;
+  /* red for Delete */
   font-weight: 600;
 }
 
