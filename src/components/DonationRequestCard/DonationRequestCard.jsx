@@ -16,38 +16,30 @@ export default function DonationRequestCard({
   return (
     <div className="donation-card">
       <div className="donation-card-content">
-
-        {/* Top row: Logo + Name + Donate button */}
         <div className="top-row">
-          {ngoId ? (
-            <Link to={`/ngo/${ngoId}`} className="ngo-info-link">
-              <div
-                className="ngo-logo-placeholder"
-                style={ngoLogo ? { backgroundImage: `url(${ngoLogo})` } : undefined}
-              />
-              <span className="ngo-name">{ngoName}</span>
-            </Link>
-          ) : (
-            <div className="ngo-info-link">
-              <div className="ngo-logo-placeholder" />
-              <span className="ngo-name">{ngoName}</span>
-            </div>
-          )}
+          <div className="ngo-info-flex">
+            <div
+              className="ngo-logo-placeholder"
+              style={ngoLogo ? { backgroundImage: `url(${ngoLogo})` } : undefined}
+            />
+            <h3 className="ngo-name">{ngoName}</h3>
+          </div>
 
-          <button className="donate-button" onClick={onDonate}>Donate</button>
+          <button className="donate-button" onClick={onDonate}>
+            Donate
+          </button>
         </div>
 
-        {/* Below row: Location + Description */}
         <div className="bottom-row">
           <p className="ngo-location">📍 {location}</p>
           <p className="donation-description">{description}</p>
         </div>
-
       </div>
 
       <div className={`status-banner ${bannerClass}`}>
         {bannerClass === 'urgent' ? 'Urgent' : 'Standard'}
       </div>
     </div>
+
   );
 }

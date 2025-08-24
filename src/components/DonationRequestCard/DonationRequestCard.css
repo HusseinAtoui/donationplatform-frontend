@@ -12,22 +12,20 @@
 
 .donation-card-content {
   padding: 20px;
-  padding-bottom: 64px; /* space for the bottom banner */
+  padding-bottom: 64px; /* space for the status banner */
 }
 
-/* Top row: Logo + Name + Donate */
+/* Top row: logo + name + button */
 .top-row {
   display: flex;
-  align-items: center; /* vertical alignment */
-  justify-content: space-between; /* logo+name left, button right */
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
 }
 
-.ngo-info-link {
+.ngo-info-flex {
   display: flex;
   align-items: center;
-  text-decoration: none;
-  color: inherit;
   gap: 12px;
 }
 
@@ -35,8 +33,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  overflow: hidden;
-  flex: 0 0 64px;
+  flex-shrink: 0;
   background: #f0efef center / cover no-repeat;
   aspect-ratio: 1 / 1;
 }
@@ -45,19 +42,22 @@
   font-size: 20px;
   font-weight: 500;
   color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Donate button stays on the right */
+/* Donate button smaller */
 .donate-button {
+  width: 70px;
+  padding: 10px 40px;
+  font-size: 14px;
   background-color: #5fab7d;
   color: white;
   border: none;
   border-radius: 5px;
-  padding: 10px 20px;
-  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-   margin-left: 80px;
+  flex-shrink: 0;
 }
 
 .donate-button:hover {
@@ -68,7 +68,7 @@
 .bottom-row {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .ngo-location {
@@ -104,21 +104,4 @@
 
 .status-banner.standard {
   background-color: #A6D861;
-}
-
-/* Mobile tweaks */
-@media (max-width: 480px) {
-  .donation-card-content {
-    padding: 16px;
-    padding-bottom: 60px;
-  }
-
-  .donation-description {
-    font-size: 16px;
-    width: 100%;
-  }
-
-  .donate-button {
-    width: auto;
-  }
 }
