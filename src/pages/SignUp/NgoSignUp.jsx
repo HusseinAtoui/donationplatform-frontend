@@ -87,7 +87,7 @@ export default function NGOSignUp() {
       if (formData.logoFile) fd.append('logo', formData.logoFile); // <-- must match multer field name in backend
 
       // With CRA proxy set to http://localhost:4000, this relative URL hits your backend
-      const res = await fetch('/api/ngo/create', {
+      const res = await fetch('http://localhost:4000/api/ngo/create', {
         method: 'POST',
         body: fd // do NOT set Content-Type manually
       });
