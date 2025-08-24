@@ -154,48 +154,49 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
+      <div
+        className="modal card edit-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
-          <h3>Edit Profile</h3>
-          <button className="icon-btn" onClick={onClose} aria-label="Close">
-            <X size={18} />
+          <h2>Edit NGO Profile</h2>
+          <button className="icon-btn close-btn" onClick={onClose}>
+            ✕
           </button>
         </div>
 
-        <form onSubmit={handleSave}>
-          <div className="grid-two">
+        <form onSubmit={handleSave} className="modal-form">
+          <div className="form-grid">
             <div>
-              <label className="input-label">Name</label>
-              <input className="signup-input" name="name" value={form.name} onChange={update} />
+              <label>Name</label>
+              <input name="name" value={form.name} onChange={update} />
             </div>
             <div>
-              <label className="input-label">Email</label>
-              <input className="signup-input" name="email" type="email" value={form.email} onChange={update} />
+              <label>Email</label>
+              <input type="email" name="email" value={form.email} onChange={update} />
             </div>
             <div>
-              <label className="input-label">Phone</label>
-              <input className="signup-input" name="phone" value={form.phone} onChange={update} />
+              <label>Phone</label>
+              <input name="phone" value={form.phone} onChange={update} />
             </div>
             <div>
-              <label className="input-label">Location</label>
-              <input className="signup-input" name="location" value={form.location} onChange={update} />
+              <label>Location</label>
+              <input name="location" value={form.location} onChange={update} />
             </div>
             <div className="col-span-2">
-              <label className="input-label">Logo URL</label>
-              <input className="signup-input" name="logoUrl" value={form.logoUrl} onChange={update} placeholder="https://..." />
+              <label>Logo URL</label>
+              <input name="logoUrl" value={form.logoUrl} onChange={update} placeholder="https://..." />
             </div>
             <div className="col-span-2">
-              <label className="input-label">Summary / Bio</label>
-              <textarea className="signup-input" rows={4} name="summary" value={form.summary} onChange={update} placeholder="Mission, activities, impact…" />
+              <label>Summary / Bio</label>
+              <textarea rows={4} name="summary" value={form.summary} onChange={update} placeholder="Mission, activities, impact…" />
             </div>
           </div>
 
           <div className="modal-actions">
-            <button className="btn ghost" type="button" onClick={onClose}>
-              Cancel
-            </button>
+
             <button className="btn" type="submit" disabled={saving}>
-              {saving ? "Saving…" : <><Save size={16} style={{ verticalAlign: "text-bottom", marginRight: 6 }} /> Save</>}
+              {saving ? "Saving…" : "Save Changes"}
             </button>
           </div>
         </form>
@@ -203,6 +204,7 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
     </div>
   );
 }
+
 
 export default function NGOProfile() {
   const navigate = useNavigate();
