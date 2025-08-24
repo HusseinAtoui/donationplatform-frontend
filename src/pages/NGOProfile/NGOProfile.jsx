@@ -88,7 +88,7 @@ function SettingsMenu({
   return (
     <div className="settings-menu card" role="menu" style={{ position: "absolute", right: 0, top: "2.25rem", zIndex: 10, padding: 8, minWidth: 200 }}>
       <button className="menu-item" onClick={() => { onEdit(); onClose(); }}>
-        <Pencil size={16} style={{ marginRight: 8 }} /> Edit Profile
+        <Pencil size={16} style={{ marginRight: 8 }} /> Admin Page
       </button>
       <button className="menu-item" onClick={() => { onSignOut(); onClose(); }}>
         <LogOut size={16} style={{ marginRight: 8 }} /> Sign Out
