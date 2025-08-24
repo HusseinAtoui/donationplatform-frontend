@@ -5,6 +5,9 @@ import 'react-phone-input-2/lib/style.css';
 import './NgoSignUp.css';
 import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 
+// ✅ unified API base (same style as NGOProfile)
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
+
 export default function NGOSignUp() {
   const navigate = useNavigate();
 
@@ -18,7 +21,7 @@ export default function NGOSignUp() {
     inventorySize: '',
     requiredClothing: '',
     logoUrl: '',
-    logoFile: null, // store the actual File object here
+    logoFile: null,
     bio: '',
     summary: ''
   });
@@ -31,7 +34,7 @@ export default function NGOSignUp() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors((prev) => ({ ...prev, [e.target.name]: '', form: '' })); // clear field + top-level errors
+    setErrors((prev) => ({ ...prev, [e.target.name]: '', form: '' }));
   };
 
   const validatePage1 = () => {
@@ -55,13 +58,9 @@ export default function NGOSignUp() {
   };
 
   const handleNext = () => {
-    // Optional: only allow moving to page 2 if page 1 is valid
     if (validatePage1()) setCurrentPage(2);
   };
-
-  const handleBack = () => {
-    setCurrentPage(1);
-  };
+  const handleBack = () => setCurrentPage(1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,19 +76,19 @@ export default function NGOSignUp() {
       const fd = new FormData();
       fd.append('name', formData.name);
       fd.append('email', formData.email);
-      fd.append('phone', (formData.phone || '').replace(/\D/g, '')); // send only digits
+      fd.append('phone', (formData.phone || '').replace(/\D/g, ''));
       fd.append('location', formData.location);
       fd.append('password', formData.password);
       if (formData.inventorySize) fd.append('inventorySize', String(formData.inventorySize));
       if (formData.requiredClothing) fd.append('requiredClothing', formData.requiredClothing);
       if (formData.bio) fd.append('bio', formData.bio);
       if (formData.summary) fd.append('summary', formData.summary);
-      if (formData.logoFile) fd.append('logo', formData.logoFile); // <-- must match multer field name in backend
+      if (formData.logoFile) fd.append('logo', formData.logoFile); // must match multer field
 
-      // With CRA proxy set to http://localhost:4000, this relative URL hits your backend
-      const res = await fetch('http://localhost:4000/api/ngo/create', {
+      // ✅ use API_BASE
+      const res = await fetch(`${API_BASE}/api/ngo/create`, {
         method: 'POST',
-        body: fd // do NOT set Content-Type manually
+        body: fd
       });
 
       const data = await res.json();
@@ -100,7 +99,7 @@ export default function NGOSignUp() {
       }
 
       alert('Signup successful! Please check your email to verify your account.');
-      navigate('/'); // or navigate to another page
+      navigate('/');
     } catch (err) {
       console.error('Signup error:', err);
       setErrors((prev) => ({ ...prev, form: 'Network error. Please try again.' }));
@@ -118,11 +117,7 @@ export default function NGOSignUp() {
         <h1 className="signup-title">Create Your NGO Account</h1>
 
         <form onSubmit={handleSubmit} className="signup-form" noValidate>
-          {errors.form && (
-            <div className="error-msg" style={{ marginBottom: 10 }}>
-              {errors.form}
-            </div>
-          )}
+          {errors.form && <div className="error-msg" style={{ marginBottom: 10 }}>{errors.form}</div>}
 
           {/* Page 1 */}
           <div className={`form-page ${currentPage === 1 ? 'active' : 'hidden'}`}>
@@ -187,7 +182,7 @@ export default function NGOSignUp() {
               {errors.location && <div id="location-error" className="error-msg">{errors.location}</div>}
             </div>
 
-            {/* Password with toggle */}
+            {/* Password */}
             <div className="input-group password-field">
               <input
                 className="signup-input"
@@ -212,7 +207,7 @@ export default function NGOSignUp() {
               {errors.password && <div id="password-error" className="error-msg">{errors.password}</div>}
             </div>
 
-            {/* Confirm password with toggle */}
+            {/* Confirm password */}
             <div className="input-group password-field">
               <input
                 className="signup-input"

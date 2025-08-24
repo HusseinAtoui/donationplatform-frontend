@@ -12,6 +12,12 @@ import {
   Clock,
   Camera,
   Package,
+  LogOut,
+  Trash2,
+  Pencil,
+  X,
+  Save,
+  ChevronDown
 } from "lucide-react";
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000/api";
@@ -70,6 +76,134 @@ function RequestCard({ req }) {
   );
 }
 
+/* ------------ Settings Dropdown ------------ */
+function SettingsMenu({
+  open,
+  onClose,
+  onEdit,
+  onSignOut,
+  onDeleteAccount
+}) {
+  if (!open) return null;
+  return (
+    <div className="settings-menu card" role="menu" style={{ position: "absolute", right: 0, top: "2.25rem", zIndex: 10, padding: 8, minWidth: 200 }}>
+      <button className="menu-item" onClick={() => { onEdit(); onClose(); }}>
+        <Pencil size={16} style={{ marginRight: 8 }} /> Edit Profile
+      </button>
+      <button className="menu-item" onClick={() => { onSignOut(); onClose(); }}>
+        <LogOut size={16} style={{ marginRight: 8 }} /> Sign Out
+      </button>
+      <hr className="menu-sep" />
+      <button
+        className="menu-item danger"
+        onClick={() => {
+          onClose();
+          onDeleteAccount();
+        }}
+      >
+        <Trash2 size={16} style={{ marginRight: 8 }} /> Delete Account
+      </button>
+    </div>
+  );
+}
+
+/* ------------ Edit Profile Modal ------------ */
+function EditProfileModal({ open, onClose, profile, onSave }) {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    location: "",
+    summary: "",
+    logoUrl: ""
+  });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (open && profile) {
+      setForm({
+        name: profile.name || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        location: profile.location || "",
+        summary: profile.summary || profile.bio || "",
+        logoUrl: profile.logoUrl || ""
+      });
+    }
+  }, [open, profile]);
+
+  function update(e) {
+    const { name, value } = e.target;
+    setForm((s) => ({ ...s, [name]: value }));
+  }
+
+  async function handleSave(e) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await onSave(form);
+      onClose();
+    } catch (err) {
+      alert(err?.message || "Failed to save profile");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (!open) return null;
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
+        <div className="modal-header">
+          <h3>Edit Profile</h3>
+          <button className="icon-btn" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSave}>
+          <div className="grid-two">
+            <div>
+              <label className="input-label">Name</label>
+              <input className="signup-input" name="name" value={form.name} onChange={update} />
+            </div>
+            <div>
+              <label className="input-label">Email</label>
+              <input className="signup-input" name="email" type="email" value={form.email} onChange={update} />
+            </div>
+            <div>
+              <label className="input-label">Phone</label>
+              <input className="signup-input" name="phone" value={form.phone} onChange={update} />
+            </div>
+            <div>
+              <label className="input-label">Location</label>
+              <input className="signup-input" name="location" value={form.location} onChange={update} />
+            </div>
+            <div className="col-span-2">
+              <label className="input-label">Logo URL</label>
+              <input className="signup-input" name="logoUrl" value={form.logoUrl} onChange={update} placeholder="https://..." />
+            </div>
+            <div className="col-span-2">
+              <label className="input-label">Summary / Bio</label>
+              <textarea className="signup-input" rows={4} name="summary" value={form.summary} onChange={update} placeholder="Mission, activities, impact…" />
+            </div>
+          </div>
+
+          <div className="modal-actions">
+            <button className="btn ghost" type="button" onClick={onClose}>
+              Cancel
+            </button>
+            <button className="btn" type="submit" disabled={saving}>
+              {saving ? "Saving…" : <><Save size={16} style={{ verticalAlign: "text-bottom", marginRight: 6 }} /> Save</>}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function NGOProfile() {
   const navigate = useNavigate();
 
@@ -102,6 +236,10 @@ export default function NGOProfile() {
   // avatar preview (local only)
   const [avatarSrc, setAvatarSrc] = useState(null);
   const fileRef = useRef(null);
+
+  // settings & modal
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const pickFile = () => fileRef.current?.click();
   const onAvatarChange = (e) => {
@@ -319,6 +457,88 @@ export default function NGOProfile() {
     }
   }
 
+  // ---- Settings actions ----
+  function handleSignOut() {
+    localStorage.removeItem("token");
+    navigate("/login");
+  }
+
+  async function handleDeleteAccount() {
+    const sure = window.confirm(
+      "Delete account? This action cannot be undone."
+    );
+    if (!sure) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/ngo/me`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Failed to delete account");
+      }
+      localStorage.removeItem("token");
+      navigate("/signup"); // or /login
+    } catch (e) {
+      alert(e.message || "Delete failed");
+    }
+  }
+
+  async function handleSaveProfile(updates) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const payload = {
+      name: updates.name?.trim(),
+      email: updates.email?.trim(),
+      phone: updates.phone?.trim(),
+      location: updates.location?.trim(),
+      summary: updates.summary ?? "",
+      logoUrl: updates.logoUrl?.trim(),
+    };
+
+    const res = await fetch(`${API_BASE}/ngo/me`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || "Failed to update profile");
+    }
+
+    const data = await res.json(); // assume { profile: {...} } or updated fields
+    // Merge conservatively
+    setProfile((p) => ({ ...p, ...(data.profile || payload) }));
+  }
+
+  // close settings when clicking outside (simple capture)
+  useEffect(() => {
+    function onDocClick(e) {
+      const btn = document.querySelector(".Settings");
+      const menu = document.querySelector(".settings-menu");
+      if (!btn || !menu) return;
+      const clickedInside = btn.contains(e.target) || menu.contains(e.target);
+      if (!clickedInside) setSettingsOpen(false);
+    }
+    if (settingsOpen) document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [settingsOpen]);
+
   if (loading) {
     return (
       <div className="page">
@@ -358,7 +578,7 @@ export default function NGOProfile() {
         <div className="cover" />
 
         {/* Header card */}
-        <div className="card header-card">
+        <div className="card header-card" style={{ position: "relative" }}>
           <div className="avatar-holder">
             <div className="avatar-lg">
               {avatar ? <img src={avatar} alt="NGO avatar" /> : <Camera size={28} />}
@@ -384,20 +604,33 @@ export default function NGOProfile() {
             />
           </div>
 
-          <div className="header-actions">
+          <div className="header-actions" style={{ position: "relative" }}>
             <button
               className="EDITbtn"
-              onClick={() => alert("Edit profile not wired yet")}
+              onClick={() => setEditOpen(true)}
+              title="Edit Profile"
             >
               Edit
             </button>
+
             <button
               className="Settings"
               aria-label="settings"
-              onClick={() => alert("Settings not wired yet")}
+              onClick={() => setSettingsOpen((v) => !v)}
+              title="Settings"
+              style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
             >
               <Settings size={16} />
+              <ChevronDown size={14} />
             </button>
+
+            <SettingsMenu
+              open={settingsOpen}
+              onClose={() => setSettingsOpen(false)}
+              onEdit={() => setEditOpen(true)}
+              onSignOut={handleSignOut}
+              onDeleteAccount={handleDeleteAccount}
+            />
           </div>
 
           <div className="header-main">
@@ -634,6 +867,14 @@ export default function NGOProfile() {
       </section>
 
       <Footer />
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        profile={profile}
+        onSave={handleSaveProfile}
+      />
     </div>
   );
 }
