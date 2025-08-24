@@ -1,3 +1,6 @@
+/* ============================
+   OurPartners Page
+   ============================ */
 .partners-page {
   padding: 60px 80px;
   background-color: #f9f9f9;
@@ -13,13 +16,16 @@
   margin-bottom: 40px;
 }
 
+/* Grid of partner cards */
 .partners-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 24px;
-  justify-content: center;
+  justify-items: center;
+  align-items: start;
 }
-/* Ensure linked card has no underline */
+
+/* Reset link styling */
 .link-reset,
 .link-reset:visited,
 .link-reset:hover,
@@ -29,17 +35,125 @@
   display: block;
 }
 
-/* Prevent any stray “underline under image” effect */
+/* ============================
+   Partner Card
+   ============================ */
+.partner-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 220px;
+
+  height: 260px; /* fixed consistent height */
+  box-sizing: border-box;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.partner-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* Partner Logo */
 .partner-logo {
   width: 80px;
   height: 80px;
   border-radius: 50%;
   overflow: hidden;
+  margin-bottom: 12px;
 }
 .partner-logo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block; /* <-- removes baseline gap/line under images */
+  display: block;
   border-radius: 50%;
+}
+
+/* Partner Name */
+.partner-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: #111827;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* truncate long names */
+  width: 100%;
+}
+
+/* Partner Location */
+.partner-location {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* truncate long locations */
+  width: 100%;
+}
+
+/* ============================
+   Responsive
+   ============================ */
+@media (max-width: 1024px) {
+  .partners-page {
+    padding: 40px 32px;
+  }
+}
+
+@media (max-width: 680px) {
+  .partners-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  .partner-card {
+    height: 240px;
+  }
+  .partner-logo {
+    width: 70px;
+    height: 70px;
+  }
+  .partner-name {
+    font-size: 15px;
+  }
+  .partner-location {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .partners-grid {
+    grid-template-columns: repeat(2, 1fr); /* exactly 2 per row */
+    gap: 12px;
+  }
+  .partner-card {
+    max-width: 200px; /* slightly smaller to fit nicely */
+    height: 220px;    /* keep consistent height */
+    padding: 10px;
+  }
+  .partner-logo {
+    width: 60px;
+    height: 60px;
+  }
+  .partner-name {
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .partner-location {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
