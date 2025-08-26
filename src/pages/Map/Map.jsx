@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect } from "react";
@@ -39,7 +39,7 @@ export default function NGOMap() {
             ? selectedCategories.map(c => c.value).join(",")
             : "any";
       }
-      const res = await axios.get(`${apiUrl}/map/ngos`, { params });
+      const res = await axios.get(`${apiUrl}/api/map/ngos`, { params });
       setNgos(res.data);
     } catch (err) {
       console.error("Error fetching NGOs", err);
@@ -58,7 +58,7 @@ export default function NGOMap() {
       <div
         style={{
           position: "absolute",
-          top: "20px",
+          top: "90px",
           left: "50%",
           transform: "translateX(-50%)",
           background: "white",
@@ -120,12 +120,14 @@ export default function NGOMap() {
           center={[33.8938, 35.5018]}
           zoom={12}
           style={{ height: "100%", width: "100%" }}
-          whenReady={() => console.log("Map is ready")}
+          zoomControl={false}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+
+          <ZoomControl position="bottomright" />
 
           {ngos
             .filter(ngo => {

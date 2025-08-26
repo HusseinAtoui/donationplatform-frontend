@@ -15,6 +15,7 @@ import DonationRequestDetailTest from './pages/DonationRequestDetailTest';
 import Guidelines from './pages/Guidelines/Guidelines'; // import your new Guidelines page
 import AdminNGO from './pages/AdminNGO/adminngo.jsx'
 import NGOPublicProfile from './pages/NGOPublicProfile/NGOPublicProfile';
+import Map from './pages/Map/Map';
 
 function AppContent() {
   const location = useLocation();
@@ -39,6 +40,7 @@ function AppContent() {
         <Route path="/guide" element={<Guidelines />} />
         <Route path="/adminngo" element={<AdminNGO />} />
         <Route path="/ngo/:id" element={<NGOPublicProfile />} />  {/* 👈 add this */}
+        <Route path="/map" element={<Map />} />
       </Routes>
     </>
   );
