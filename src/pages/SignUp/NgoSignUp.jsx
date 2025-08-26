@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// src/pages/NGOSignUp/NGOSignUp.jsx
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
@@ -10,6 +11,44 @@ const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
 
 export default function NGOSignUp() {
   const navigate = useNavigate();
+
+  // === EXACT LOGIC PORTED FROM DOMContentLoaded SNIPPET ===
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenParam = urlParams.get('token');
+    const userParam = urlParams.get('user');
+
+    // Handle URL parameters if they exist
+    if (tokenParam && userParam) {
+      try {
+        // Decode and store both token and user data
+        const userData = JSON.parse(decodeURIComponent(userParam));
+        localStorage.setItem('authToken', tokenParam);
+        localStorage.setItem('userData', JSON.stringify(userData));
+
+        // Clean the URL after storing
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.clear();
+        // Redirect (SPA-friendly)
+        navigate('/login', { replace: true }); // change if your login route differs
+        return;
+      }
+    }
+
+    // Check stored credentials
+    const token = localStorage.getItem('authToken');
+    const userDataString = localStorage.getItem('userData');
+
+    if (!token || !userDataString) {
+      console.warn('Missing credentials. Redirecting...');
+      localStorage.clear();
+      navigate('/login', { replace: true }); // change if your login route differs
+      return;
+    }
+  }, [navigate]);
+  // === END PORTED LOGIC ===
 
   const [formData, setFormData] = useState({
     name: '',
@@ -50,6 +89,7 @@ export default function NGOSignUp() {
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (!formData.password) newErrors.password = 'Password is required';
     else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+
     if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm password';
     else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
 
@@ -85,7 +125,6 @@ export default function NGOSignUp() {
       if (formData.summary) fd.append('summary', formData.summary);
       if (formData.logoFile) fd.append('logo', formData.logoFile); // must match multer field
 
-      // ✅ use API_BASE
       const res = await fetch(`${API_BASE}/api/ngo/create`, {
         method: 'POST',
         body: fd

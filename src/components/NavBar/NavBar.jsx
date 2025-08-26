@@ -73,6 +73,8 @@ export default function NavBar() {
           <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`} onClick={closeMobileMenu}>Donations</Link>
           <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`} onClick={closeMobileMenu}>Our Partners</Link>
             <Link to="/adminngo" className={`navbar__menu-item ${isActive('/adminngo') ? 'active' : ''}`} onClick={closeMobileMenu}>Admin</Link>
+           <Link to="/messages" className={`navbar__menu-item ${isActive('/messages') ? 'active' : ''}`} onClick={closeMobileMenu}>msg</Link>
+
         </nav>
 
         {/* Right side: login/profile icon + hamburger */}

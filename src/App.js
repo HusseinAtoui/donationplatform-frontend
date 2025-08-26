@@ -15,8 +15,12 @@ import DonationRequestDetailTest from './pages/DonationRequestDetailTest';
 import Guidelines from './pages/Guidelines/Guidelines'; // import your new Guidelines page
 import AdminNGO from './pages/AdminNGO/adminngo.jsx'
 import NGOPublicProfile from './pages/NGOPublicProfile/NGOPublicProfile';
+<<<<<<< Updated upstream
 import Map from './pages/Map/Map';
 
+=======
+import MessagesPage from './pages/Messages/MessagesPage';
+>>>>>>> Stashed changes
 function AppContent() {
   const location = useLocation();
 
@@ -39,8 +43,13 @@ function AppContent() {
         <Route path="/donation-test" element={<DonationRequestDetailTest />} />
         <Route path="/guide" element={<Guidelines />} />
         <Route path="/adminngo" element={<AdminNGO />} />
+<<<<<<< Updated upstream
         <Route path="/ngo/:id" element={<NGOPublicProfile />} />  {/* 👈 add this */}
         <Route path="/map" element={<Map />} />
+=======
+        <Route path="/ngo/:id" element={<NGOPublicProfile />} />  
+           <Route path="/messages" element={<MessagesPage />} />
+>>>>>>> Stashed changes
       </Routes>
     </>
   );
