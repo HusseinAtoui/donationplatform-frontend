@@ -452,7 +452,6 @@ export default function NGOSignUp() {
 
       <div className="login-image" />
 
-      {/* Map Modal */}
       {showMap && (
         <div
           style={{
