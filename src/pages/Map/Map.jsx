@@ -131,22 +131,22 @@ export default function NGOMap() {
 
           {ngos
             .filter(ngo => {
-              const isValid = ngo.location?.coordinates &&
-                             !isNaN(ngo.location.coordinates.lat) && 
-                             !isNaN(ngo.location.coordinates.lng);
+              const isValid = ngo.coordinates &&
+                   !isNaN(ngo.coordinates.lat) && 
+                   !isNaN(ngo.coordinates.lng);
               if (!isValid) {
                 console.log('Invalid NGO location:', ngo);
               }
               return isValid;
             })
             .map(ngo => {
-              console.log('Rendering NGO marker:', ngo.name, ngo.location.coordinates);
+              console.log('Rendering NGO marker:', ngo.name, ngo.coordinates);
               return (
                 <Marker
                   key={ngo.id}
                   position={[
-                    ngo.location.coordinates.lat,
-                    ngo.location.coordinates.lng
+                    ngo.coordinates.lat,
+                    ngo.coordinates.lng
                   ]}
                   eventHandlers={{
                     click: () => console.log('Marker clicked:', ngo.name)
@@ -156,7 +156,7 @@ export default function NGOMap() {
                     <div style={{ minWidth: '200px' }}>
                       <strong>{ngo.name}</strong>
                       <br />
-                      {ngo.location.address}
+                      {ngo.location}
                       <br />
                       {ngo.phone && <span>📞 {ngo.phone}</span>}
                     </div>
