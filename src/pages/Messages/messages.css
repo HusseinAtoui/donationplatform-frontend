@@ -7,18 +7,19 @@
   overflow: hidden; /* prevent whole page scroll */
 }
 
+/* Sidebar */
 .sidebar {
   border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
-  height: 100%; /* important */
-  overflow: hidden; /* ensure child can scroll */
+  height: 100%;
+  overflow: hidden; /* child handles scroll */
 }
 
 .search-box {
   padding: 10px;
   border-bottom: 1px solid #e5e7eb;
-  flex-shrink: 0; /* prevent shrinking */
+  flex-shrink: 0; /* fixed height */
 }
 
 .search-box input {
@@ -44,6 +45,7 @@
   border-radius: 3px;
 }
 
+/* Loading / errors / empty hints */
 .loading,
 .error-msg,
 .empty-hint {
@@ -52,10 +54,12 @@
   color: #6b7280;
 }
 
+/* Main chat area */
 .main {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  height: 100%; /* full height for chat window */
+  overflow: hidden; /* scrolling handled inside ChatWindow */
   justify-content: center;
   align-items: center;
 }

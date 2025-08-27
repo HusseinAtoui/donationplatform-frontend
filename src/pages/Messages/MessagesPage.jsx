@@ -1,4 +1,3 @@
-// src/pages/MessagesPage.jsx
 import React, { useEffect, useState } from 'react';
 import ConversationList from '../../components/chat/ConversationList';
 import ChatWindow from '../../components/chat/ChatWindow';
@@ -37,85 +36,29 @@ const MOCK_CONVERSATIONS = [
       { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
       { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
     ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
+  }, {
+    id: 'c3',
+    name: 'Care for All',
     avatar: '/placeholder-avatar.png',
     messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+      { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
+      { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
     ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
+  }, {
+    id: 'c3',
+    name: 'Care for All',
     avatar: '/placeholder-avatar.png',
     messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+      { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
+      { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
     ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
+  }, {
+    id: 'c3',
+    name: 'Care for All',
     avatar: '/placeholder-avatar.png',
     messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
-    ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
-    ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
-    ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
-    ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
-    ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
-    ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
-    ],
-  },{
-    id: 'c1',
-    name: 'Helping Hands NGO',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+      { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
+      { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
     ],
   },
 ];
@@ -132,9 +75,9 @@ export default function MessagesPage() {
     // Dummy load
     setTimeout(() => {
       setConversations(MOCK_CONVERSATIONS);
-      setActive(MOCK_CONVERSATIONS[0]); // start with first active
+      setActive(MOCK_CONVERSATIONS[0]);
       setLoading(false);
-    }, 300); // simulate API delay
+    }, 300);
   }, []);
 
   const filtered = conversations.filter((c) =>
@@ -167,7 +110,7 @@ export default function MessagesPage() {
         )}
       </aside>
 
-      {/* Main Chat Window */}
+      {/* Chat Window */}
       <main className="main">
         {active ? (
           <ChatWindow conversation={active} me={me} />
