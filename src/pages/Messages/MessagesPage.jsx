@@ -37,24 +37,24 @@ const MOCK_CONVERSATIONS = [
       { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
     ],
   }, {
-    id: 'c3',
-    name: 'Care for All',
+    id: 'c4',
+    name: 'Care',
     avatar: '/placeholder-avatar.png',
     messages: [
       { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
       { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
     ],
   }, {
-    id: 'c3',
-    name: 'Care for All',
+    id: 'c5',
+    name: 'warm hands',
     avatar: '/placeholder-avatar.png',
     messages: [
       { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
       { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
     ],
   }, {
-    id: 'c3',
-    name: 'Care for All',
+    id: 'c6',
+    name: 'tyebetyebak',
     avatar: '/placeholder-avatar.png',
     messages: [
       { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },

@@ -18,6 +18,7 @@ export default function ChatWindow({ conversation, me }) {
     setText('');
   };
 
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (bodyRef.current) {
       bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
@@ -32,7 +33,9 @@ export default function ChatWindow({ conversation, me }) {
         {messages.map((m) => (
           <div key={m.id} className={`msg ${m.senderId === me.id ? 'mine' : ''}`}>
             <div className="msg-text">{m.text}</div>
-            <div className="msg-time">{new Date(m.createdAt).toLocaleTimeString()}</div>
+            <div className="msg-time">
+              {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </div>
           </div>
         ))}
       </div>
