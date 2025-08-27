@@ -9,46 +9,49 @@ import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 // ✅ unified API base (same style as NGOProfile)
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
 
+const GoogleIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style={{ marginRight: '10px' }}>
+    <path fill="#4285F4" d="M24 9.5c3.2 0 6.1 1.1 8.3 3.3l6.2-6.2C33.7 3.5 29.1 2 24 2 14.6 2 6.5 7.7 3 16.5l7.5 5.8C12.4 17 17.8 14 24 14z" />
+    <path fill="#34A853" d="M46.5 24c0-1.6-.2-3.1-.6-4.5H24v9h12.7c-.5 3-2.9 5.5-6.1 6.4l7.5 5.8c4.3-4 6.9-10 6.9-16.7z" />
+    <path fill="#FBBC05" d="M10.5 28.3c-.3-1-.5-2.1-.5-3.3s.2-2.3.5-3.3l-7.5-5.8C.8 20.6 0 22.2 0 24s.8 3.4 2.5 4.8l7.5-5.5z" />
+    <path fill="#EA4335" d="M24 44c5.4 0 10-1.8 13.3-4.8l-7.5-5.8c-2.2 1.5-5 2.3-8 2.3-6.1 0-11.3-4.1-13.1-9.7l-7.5 5.8C6.4 40.1 14.5 46 24 46z" />
+  </svg>
+);
+
 export default function NGOSignUp() {
   const navigate = useNavigate();
 
-  // === EXACT LOGIC PORTED FROM DOMContentLoaded SNIPPET ===
+  // ——— URL param handling only; no forced auth for public signup ———
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tokenParam = urlParams.get('token');
     const userParam = urlParams.get('user');
 
-    // Handle URL parameters if they exist
     if (tokenParam && userParam) {
       try {
-        // Decode and store both token and user data
         const userData = JSON.parse(decodeURIComponent(userParam));
         localStorage.setItem('authToken', tokenParam);
         localStorage.setItem('userData', JSON.stringify(userData));
-
         // Clean the URL after storing
         window.history.replaceState({}, document.title, window.location.pathname);
       } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.clear();
-        // Redirect (SPA-friendly)
-        navigate('/login', { replace: true }); // change if your login route differs
-        return;
+        console.error('Error parsing user data from URL:', error);
+        // Don’t block signup; just clear any partial junk and continue
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
       }
     }
 
-    // Check stored credentials
-    const token = localStorage.getItem('authToken');
-    const userDataString = localStorage.getItem('userData');
+    // NOTE: We intentionally do NOT redirect if there's no token.
+    // Signup stays publicly accessible.
+  }, []);
+  // ——— END ———
 
-    if (!token || !userDataString) {
-      console.warn('Missing credentials. Redirecting...');
-      localStorage.clear();
-      navigate('/login', { replace: true }); // change if your login route differs
-      return;
-    }
-  }, [navigate]);
-  // === END PORTED LOGIC ===
+  // >>> Google signup: added tiny handler to kick off OAuth
+  const handleGoogleSignup = () => {
+    window.location.href = `${API_BASE}/api/ngo/auth/google`;
+  };
+  // <<< Google signup
 
   const [formData, setFormData] = useState({
     name: '',
@@ -138,7 +141,7 @@ export default function NGOSignUp() {
       }
 
       alert('Signup successful! Please check your email to verify your account.');
-      navigate('/');
+      navigate('/login'); // or go to home '/', your call
     } catch (err) {
       console.error('Signup error:', err);
       setErrors((prev) => ({ ...prev, form: 'Network error. Please try again.' }));
@@ -360,13 +363,31 @@ export default function NGOSignUp() {
                 >
                   <ChevronLeft size={20} />
                 </button>
+                
                 <button type="submit" className="submit-btn" disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Submit'}
                 </button>
               </>
             )}
+            
           </div>
+          
         </form>
+
+        {/* Divider and Google button - like Login */}
+        <div className="login-divider">
+          <div className="line" />
+          <span>Or Sign Up with</span>
+          <div className="line" />
+        </div>
+
+        <button
+          className="google-btn"
+          onClick={handleGoogleSignup}
+        >
+          <GoogleIcon />
+          Google
+        </button>
       </div>
 
       <div className="login-image" />
