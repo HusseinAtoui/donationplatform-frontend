@@ -5,6 +5,20 @@ import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import './NgoSignUp.css';
 import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// Fix Leaflet marker icon paths
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
 
 // ✅ unified API base (same style as NGOProfile)
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
@@ -20,6 +34,24 @@ const GoogleIcon = () => (
 
 export default function NGOSignUp() {
   const navigate = useNavigate();
+  const [showMap, setShowMap] = useState(false);
+
+  function LocationMarker() {
+    useMapEvents({
+      click(e) {
+        const { lat, lng } = e.latlng;
+        setFormData((prev) => ({
+          ...prev,
+          coordinates: { lat, lng }
+        }));
+        setShowMap(false); // close modal after picking
+      },
+    });
+
+    return formData.coordinates.lat ? (
+      <Marker position={[formData.coordinates.lat, formData.coordinates.lng]} />
+    ) : null;
+  }
 
   // ——— URL param handling only; no forced auth for public signup ———
   useEffect(() => {
@@ -65,7 +97,8 @@ export default function NGOSignUp() {
     logoUrl: '',
     logoFile: null,
     bio: '',
-    summary: ''
+    summary: '',
+    coordinates: { lat: null, lng: null }
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -127,6 +160,11 @@ export default function NGOSignUp() {
       if (formData.bio) fd.append('bio', formData.bio);
       if (formData.summary) fd.append('summary', formData.summary);
       if (formData.logoFile) fd.append('logo', formData.logoFile); // must match multer field
+      if (formData.coordinates.lat && formData.coordinates.lng) {
+        fd.append('coordinates[lat]', formData.coordinates.lat);
+        fd.append('coordinates[lng]', formData.coordinates.lng);
+      }
+
 
       const res = await fetch(`${API_BASE}/api/ngo/create`, {
         method: 'POST',
@@ -170,7 +208,7 @@ export default function NGOSignUp() {
                 placeholder="NGO Name *"
                 value={formData.name}
                 onChange={handleChange}
-                aria-invalid={errors.name ? 'true' : 'false'}
+                aria-invalid={errors.name ? "true" : "false"}
                 aria-describedby="name-error"
               />
               {errors.name && <div id="name-error" className="error-msg">{errors.name}</div>}
@@ -184,7 +222,7 @@ export default function NGOSignUp() {
                 placeholder="Email *"
                 value={formData.email}
                 onChange={handleChange}
-                aria-invalid={errors.email ? 'true' : 'false'}
+                aria-invalid={errors.email ? "true" : "false"}
                 aria-describedby="email-error"
               />
               {errors.email && <div id="email-error" className="error-msg">{errors.email}</div>}
@@ -211,6 +249,7 @@ export default function NGOSignUp() {
               {errors.phone && <div className="error-msg">{errors.phone}</div>}
             </div>
 
+            {/* Location input (unchanged) */}
             <div className="input-group">
               <input
                 className="signup-input"
@@ -218,10 +257,33 @@ export default function NGOSignUp() {
                 placeholder="Location *"
                 value={formData.location}
                 onChange={handleChange}
-                aria-invalid={errors.location ? 'true' : 'false'}
+                aria-invalid={errors.location ? "true" : "false"}
                 aria-describedby="location-error"
               />
               {errors.location && <div id="location-error" className="error-msg">{errors.location}</div>}
+            </div>
+
+            {/* Coordinates picker */}
+            <div className="input-group">
+              <input
+                className="signup-input"
+                name="coordinatesDisplay"
+                placeholder="Coordinates (click button to select)"
+                value={
+                  formData.coordinates.lat && formData.coordinates.lng
+                    ? `${formData.coordinates.lat.toFixed(5)}, ${formData.coordinates.lng.toFixed(5)}`
+                    : ''
+                }
+                readOnly
+              />
+              <button
+                type="button"
+                className="signup-btn"
+                onClick={() => setShowMap(true)}
+                style={{ marginTop: '5px' }}
+              >
+                Select Coordinates on Map
+              </button>
             </div>
 
             {/* Password */}
@@ -363,18 +425,16 @@ export default function NGOSignUp() {
                 >
                   <ChevronLeft size={20} />
                 </button>
-                
+
                 <button type="submit" className="submit-btn" disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Submit'}
                 </button>
               </>
             )}
-            
           </div>
-          
         </form>
 
-        {/* Divider and Google button - like Login */}
+        {/* Divider and Google button */}
         <div className="login-divider">
           <div className="line" />
           <span>Or Sign Up with</span>
@@ -391,6 +451,69 @@ export default function NGOSignUp() {
       </div>
 
       <div className="login-image" />
+
+      {/* Map Modal */}
+      {showMap && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "1rem",
+              borderRadius: "10px",
+              width: "80%",
+              height: "70%",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => setShowMap(false)}
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                border: "none",
+                background: "red",
+                color: "white",
+                padding: "5px 10px",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              ✕
+            </button>
+
+            <MapContainer
+              center={
+                formData.coordinates.lat
+                  ? [formData.coordinates.lat, formData.coordinates.lng]
+                  : [33.8938, 35.5018]
+              }
+              zoom={12}
+              style={{ height: "100%", width: "100%", borderRadius: "8px" }}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <LocationMarker />
+            </MapContainer>
+          </div>
+        </div>
+      )}
     </div>
   );
+
 }
