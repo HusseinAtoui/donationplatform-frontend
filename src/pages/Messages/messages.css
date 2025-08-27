@@ -1,7 +1,42 @@
-.messages-page { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 80px); }
-.sidebar { border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
-.start-box { display: flex; gap: 6px; padding: 10px; border-bottom: 1px solid #e5e7eb; }
-.start-box input { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; }
-.start-btn { margin: 8px 10px; border: none; background: #10b981; color: #fff; border-radius: 8px; padding: 8px 10px; }
-.loading { padding: 10px; color: #6b7280; }
-.main { height: 100%; }
+.messages-page {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: calc(100vh - 80px); /* fits under your navbar */
+  background: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.sidebar {
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-box {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.search-box input {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.loading,
+.error-msg,
+.empty-hint {
+  padding: 16px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.main {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

@@ -2,125 +2,97 @@
 import React, { useEffect, useState } from 'react';
 import ConversationList from '../../components/chat/ConversationList';
 import ChatWindow from '../../components/chat/ChatWindow';
-import { listConversations, startConversation } from '../../api/messaging';
 import './messages.css';
 
+// Dummy user
 function getMe() {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-    const [, p2] = token.split('.');
-    const payload = JSON.parse(atob(p2));
-    return { id: payload.id, role: payload.role, email: payload.email, name: payload.name };
-  } catch {
-    return null;
-  }
+  return { id: 'u1', role: 'user', name: 'John Doe', email: 'john@example.com' };
 }
 
-const isFn = (x) => typeof x === 'function';
+// Dummy conversations
+const MOCK_CONVERSATIONS = [
+  {
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },
+  {
+    id: 'c2',
+    name: 'Kind Hearts',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'ngo2', text: 'Thanks for your donation!', createdAt: new Date() },
+      { id: 'm2', senderId: 'u1', text: 'You are welcome!', createdAt: new Date() },
+    ],
+  },
+  {
+    id: 'c3',
+    name: 'Care for All',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
+      { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
+    ],
+  },
+];
 
 export default function MessagesPage() {
   const [me] = useState(getMe());
   const [conversations, setConversations] = useState([]);
   const [active, setActive] = useState(null);
-  const [newTarget, setNewTarget] = useState('');
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        setErr('');
-        const res = await listConversations();
-        const list = Array.isArray(res)
-          ? res
-          : Array.isArray(res?.conversations)
-          ? res.conversations
-          : [];
-        if (!mounted) return;
-        setConversations(list);
-        if (!active && list.length) setActive(list[0]);
-      } catch (e) {
-        console.error(e);
-        if (mounted) setErr('Failed to load conversations.');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Dummy load
+    setTimeout(() => {
+      setConversations(MOCK_CONVERSATIONS);
+      setActive(MOCK_CONVERSATIONS[0]); // start with first active
+      setLoading(false);
+    }, 300); // simulate API delay
   }, []);
 
-  // sanity log (once)
-  useEffect(() => {
-    // If either prints "object"/"undefined", the import/export is wrong.
-    console.log('MessagesPage sanity', {
-      ConversationList: typeof ConversationList,
-      ChatWindow: typeof ChatWindow,
-    });
-  }, []);
-
-  async function handleStart() {
-    const target = newTarget.trim();
-    if (!target) return;
-    try {
-      const body = me?.role === 'user' ? { ngoId: target } : { userId: target };
-      const { conversation } = await startConversation(body);
-      setConversations((prev) => {
-        const exists = prev.find((p) => p.id === conversation.id);
-        return exists ? prev : [conversation, ...prev];
-      });
-      setActive(conversation);
-      setNewTarget('');
-    } catch (e) {
-      console.error(e);
-      alert('Failed to start conversation');
-    }
-  }
+  const filtered = conversations.filter((c) =>
+    c.name?.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="messages-page">
+      {/* Sidebar */}
       <aside className="sidebar">
-        <div className="start-box">
+        <div className="search-box">
           <input
-            placeholder={me?.role === 'user' ? 'NGO ID' : 'User ID'}
-            value={newTarget}
-            onChange={(e) => setNewTarget(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleStart();
-            }}
+            type="text"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <button className="start-btn" onClick={handleStart} disabled={!newTarget.trim()}>
-          Start
-        </button>
 
         {loading ? (
           <div className="loading">Loading…</div>
         ) : err ? (
           <div className="error-msg">{err}</div>
-        ) : isFn(ConversationList) ? (
+        ) : (
           <ConversationList
-            conversations={conversations}
+            conversations={filtered}
             activeId={active?.id}
             onSelect={setActive}
           />
-        ) : (
-          <div className="error-msg">ConversationList import isn’t a component (see console)</div>
         )}
       </aside>
 
+      {/* Main Chat Window */}
       <main className="main">
-        {isFn(ChatWindow) ? (
+        {active ? (
           <ChatWindow conversation={active} me={me} />
         ) : (
-          <div className="error-msg">ChatWindow import isn’t a component (see console)</div>
-        )}
-        {!active && !loading && !err && (
-          <div className="empty-hint">Select a conversation or start a new one.</div>
+          <div className="empty-hint">Select a conversation to start chatting</div>
         )}
       </main>
     </div>

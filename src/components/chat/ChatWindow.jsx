@@ -1,32 +1,42 @@
-import React from 'react';
+// src/components/chat/ChatWindow.jsx
+import React, { useState } from 'react';
+import './ChatWindow.css';
 
 export default function ChatWindow({ conversation, me }) {
-  if (!conversation) {
-    return <div className="chat-window empty">Select a conversation or start a new one.</div>;
-  }
+  const [messages, setMessages] = useState(conversation.messages || []);
+  const [text, setText] = useState('');
+
+  const handleSend = () => {
+    if (!text.trim()) return;
+    setMessages([
+      ...messages,
+      { id: Date.now(), senderId: me.id, text, createdAt: new Date().toISOString() },
+    ]);
+    setText('');
+  };
 
   return (
     <div className="chat-window">
-      <header className="chat-header">
-        <h3>{conversation.title || conversation.id}</h3>
-        <span className="muted">{me?.name || me?.email || 'You'}</span>
-      </header>
+      <header className="chat-header">{conversation.name}</header>
 
       <div className="chat-body">
-        {(conversation.messages || []).map((m) => (
-          <div
-            key={m.id || `${m.senderId}-${m.createdAt}`}
-            className={`msg ${m.senderId === me?.id ? 'mine' : ''}`}
-          >
+        {messages.map((m) => (
+          <div key={m.id} className={`msg ${m.senderId === me.id ? 'mine' : ''}`}>
             <div className="msg-text">{m.text}</div>
-            <div className="msg-time">
-              {m.createdAt ? new Date(m.createdAt).toLocaleString() : ''}
-            </div>
+            <div className="msg-time">{new Date(m.createdAt).toLocaleTimeString()}</div>
           </div>
         ))}
       </div>
 
-      <footer className="chat-footer muted">Composer goes here…</footer>
+      <footer className="chat-footer">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          placeholder="Type a message..."
+        />
+        <button onClick={handleSend}>Send</button>
+      </footer>
     </div>
   );
 }
