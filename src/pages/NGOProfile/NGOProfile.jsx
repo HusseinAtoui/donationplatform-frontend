@@ -641,7 +641,7 @@ export default function NGOProfile() {
             </div>
 
             <div className="contact-row">
-              <Chip icon={MapPin} text={location.address} />
+              <Chip icon={MapPin} text={location} />
               <Chip icon={Phone} text={phone} />
               <Chip icon={Mail} text={email} />
               <Chip icon={Clock} text={"Mon – Fri: 10AM – 6PM"} />
