@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // for navigation
 import ConversationList from '../../components/chat/ConversationList';
 import ChatWindow from '../../components/chat/ChatWindow';
 import './messages.css';
@@ -10,60 +11,16 @@ function getMe() {
 
 // Dummy conversations
 const MOCK_CONVERSATIONS = [
-  {
-    id: 'c1',
-    name: 'Helping Hands NGO',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
-      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
-    ],
-  },
-  {
-    id: 'c2',
-    name: 'Kind Hearts',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'ngo2', text: 'Thanks for your donation!', createdAt: new Date() },
-      { id: 'm2', senderId: 'u1', text: 'You are welcome!', createdAt: new Date() },
-    ],
-  },
-  {
-    id: 'c3',
-    name: 'Care for All',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
-      { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
-    ],
-  }, {
-    id: 'c4',
-    name: 'Care',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
-      { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
-    ],
-  }, {
-    id: 'c5',
-    name: 'warm hands',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
-      { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
-    ],
-  }, {
-    id: 'c6',
-    name: 'tyebetyebak',
-    avatar: '/placeholder-avatar.png',
-    messages: [
-      { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
-      { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
-    ],
-  },
+  { id: 'c1', name: 'Helping Hands NGO', avatar: '/placeholder-avatar.png', messages: [{ id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() }, { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() }] },
+  { id: 'c2', name: 'Kind Hearts', avatar: '/placeholder-avatar.png', messages: [{ id: 'm1', senderId: 'ngo2', text: 'Thanks for your donation!', createdAt: new Date() }, { id: 'm2', senderId: 'u1', text: 'You are welcome!', createdAt: new Date() }] },
+  { id: 'c3', name: 'Care for All', avatar: '/placeholder-avatar.png', messages: [{ id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() }, { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() }] },
+  { id: 'c4', name: 'Care', avatar: '/placeholder-avatar.png', messages: [{ id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() }, { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() }] },
+  { id: 'c5', name: 'Warm Hands', avatar: '/placeholder-avatar.png', messages: [{ id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() }, { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() }] },
+  { id: 'c6', name: 'Tyebetyebak', avatar: '/placeholder-avatar.png', messages: [{ id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() }, { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() }] },
 ];
 
 export default function MessagesPage() {
+  const navigate = useNavigate();
   const [me] = useState(getMe());
   const [conversations, setConversations] = useState([]);
   const [active, setActive] = useState(null);
@@ -72,7 +29,6 @@ export default function MessagesPage() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    // Dummy load
     setTimeout(() => {
       setConversations(MOCK_CONVERSATIONS);
       setActive(MOCK_CONVERSATIONS[0]);
@@ -88,6 +44,12 @@ export default function MessagesPage() {
     <div className="messages-page">
       {/* Sidebar */}
       <aside className="sidebar">
+        {/* Go Back Button */}
+        <div className="go-back" onClick={() => navigate('/')}>
+          &larr; Home
+        </div>
+
+        {/* Search Box */}
         <div className="search-box">
           <input
             type="text"
@@ -97,6 +59,7 @@ export default function MessagesPage() {
           />
         </div>
 
+        {/* Conversation List */}
         {loading ? (
           <div className="loading">Loading…</div>
         ) : err ? (
