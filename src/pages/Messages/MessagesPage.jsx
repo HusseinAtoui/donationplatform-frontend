@@ -37,6 +37,86 @@ const MOCK_CONVERSATIONS = [
       { id: 'm1', senderId: 'ngo3', text: 'Can we schedule a visit?', createdAt: new Date() },
       { id: 'm2', senderId: 'u1', text: 'Sure, I am available tomorrow.', createdAt: new Date() },
     ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
+  },{
+    id: 'c1',
+    name: 'Helping Hands NGO',
+    avatar: '/placeholder-avatar.png',
+    messages: [
+      { id: 'm1', senderId: 'u1', text: 'Hi there!', createdAt: new Date() },
+      { id: 'm2', senderId: 'ngo1', text: 'Hello! How can we help you?', createdAt: new Date() },
+    ],
   },
 ];
 

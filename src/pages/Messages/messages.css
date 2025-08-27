@@ -1,20 +1,24 @@
 .messages-page {
   display: grid;
   grid-template-columns: 280px 1fr;
-  height: calc(100vh - 80px); /* fits under your navbar */
+  height: calc(100vh - 80px); /* full screen minus navbar */
   background: #fff;
   font-family: 'Poppins', sans-serif;
+  overflow: hidden; /* prevent whole page scroll */
 }
 
 .sidebar {
   border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
+  height: 100%; /* important */
+  overflow: hidden; /* ensure child can scroll */
 }
 
 .search-box {
   padding: 10px;
   border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0; /* prevent shrinking */
 }
 
 .search-box input {
@@ -23,6 +27,21 @@
   border-radius: 8px;
   padding: 8px;
   font-size: 14px;
+}
+
+.conversation-list {
+  flex: 1;          /* fill remaining space */
+  overflow-y: auto; /* enable vertical scroll */
+  padding: 8px 0;
+}
+
+/* optional: smooth scrollbar */
+.conversation-list::-webkit-scrollbar {
+  width: 6px;
+}
+.conversation-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
 }
 
 .loading,
