@@ -15,8 +15,6 @@ import {
   LogOut,
   Trash2,
   Pencil,
-  X,
-  Save,
   ChevronDown
 } from "lucide-react";
 
@@ -82,13 +80,15 @@ function SettingsMenu({
   onClose,
   onEdit,
   onSignOut,
-  onDeleteAccount
+  onDeleteAccount,
+  isDeleting = false
 }) {
   if (!open) return null;
   return (
     <div className="settings-menu card" role="menu" style={{ position: "absolute", right: 0, top: "2.25rem", zIndex: 10, padding: 8, minWidth: 200 }}>
+      {/* Renamed to Edit Profile and keeps opening the modal */}
       <button className="menu-item" onClick={() => { onEdit(); onClose(); }}>
-        <Pencil size={16} style={{ marginRight: 8 }} /> Admin Page
+        <Pencil size={16} style={{ marginRight: 8 }} /> Edit Profile
       </button>
       <button className="menu-item" onClick={() => { onSignOut(); onClose(); }}>
         <LogOut size={16} style={{ marginRight: 8 }} /> Sign Out
@@ -96,12 +96,13 @@ function SettingsMenu({
       <hr className="menu-sep" />
       <button
         className="menu-item danger"
+        disabled={isDeleting}
         onClick={() => {
           onClose();
           onDeleteAccount();
         }}
       >
-        <Trash2 size={16} style={{ marginRight: 8 }} /> Delete Account
+        <Trash2 size={16} style={{ marginRight: 8 }} /> {isDeleting ? 'Deleting…' : 'Delete Account'}
       </button>
     </div>
   );
@@ -125,7 +126,7 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
         name: profile.name || "",
         email: profile.email || "",
         phone: profile.phone || "",
-        location: profile.location || "",
+        location: profile.location?.address || profile.location || "",
         summary: profile.summary || profile.bio || "",
         logoUrl: profile.logoUrl || ""
       });
@@ -194,7 +195,6 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
           </div>
 
           <div className="modal-actions">
-
             <button className="btn" type="submit" disabled={saving}>
               {saving ? "Saving…" : "Save Changes"}
             </button>
@@ -204,7 +204,6 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
     </div>
   );
 }
-
 
 export default function NGOProfile() {
   const navigate = useNavigate();
@@ -242,6 +241,7 @@ export default function NGOProfile() {
   // settings & modal
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const pickFile = () => fileRef.current?.click();
   const onAvatarChange = (e) => {
@@ -462,6 +462,7 @@ export default function NGOProfile() {
   // ---- Settings actions ----
   function handleSignOut() {
     localStorage.removeItem("token");
+    localStorage.removeItem("role");
     navigate("/login");
   }
 
@@ -478,6 +479,7 @@ export default function NGOProfile() {
     }
 
     try {
+      setDeleting(true);
       const res = await fetch(`${API_BASE}/ngo/me`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -487,9 +489,12 @@ export default function NGOProfile() {
         throw new Error(body.error || "Failed to delete account");
       }
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
       navigate("/signup"); // or /login
     } catch (e) {
       alert(e.message || "Delete failed");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -517,6 +522,11 @@ export default function NGOProfile() {
       },
       body: JSON.stringify(payload),
     });
+
+    if (res.status === 202) {
+      alert("We sent a verification link to your new email. Please confirm it to finish updating your account email.");
+      return;
+    }
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
@@ -607,12 +617,13 @@ export default function NGOProfile() {
           </div>
 
           <div className="header-actions" style={{ position: "relative" }}>
+            {/* Changed: top button now goes to Admin page */}
             <button
               className="EDITbtn"
-              onClick={() => setEditOpen(true)}
-              title="Edit Profile"
+              onClick={() => navigate('/adminngo')}
+              title="Admin"
             >
-              Edit
+              Admin
             </button>
 
             <button
@@ -629,9 +640,10 @@ export default function NGOProfile() {
             <SettingsMenu
               open={settingsOpen}
               onClose={() => setSettingsOpen(false)}
-              onEdit={() => setEditOpen(true)}
+              onEdit={() => setEditOpen(true)}   // dropdown "Edit Profile" opens modal
               onSignOut={handleSignOut}
               onDeleteAccount={handleDeleteAccount}
+              isDeleting={deleting}
             />
           </div>
 
@@ -870,7 +882,7 @@ export default function NGOProfile() {
 
       <Footer />
 
-      {/* Edit Profile Modal */}
+      {/* Edit Profile Modal (opened from dropdown now) */}
       <EditProfileModal
         open={editOpen}
         onClose={() => setEditOpen(false)}

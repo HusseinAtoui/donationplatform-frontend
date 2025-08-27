@@ -1,7 +1,6 @@
-// src/pages/NGOInventoryAdmin/NGOInventoryAdmin.jsx
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
- import './adminngo.css'; // if the CSS file is in the same folder
+import "./adminngo.css";
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000/api";
 const CONTENT_BASE = `${API_BASE}/home`; // matches your existing mount
@@ -18,7 +17,7 @@ function Section({ title, right, children }) {
   );
 }
 
-function TextInput({ label, name, value, onChange, type="text", placeholder, min }) {
+function TextInput({ label, name, value, onChange, type = "text", placeholder, min }) {
   return (
     <label className="fi">
       <span>{label}</span>
@@ -31,17 +30,6 @@ function TextInput({ label, name, value, onChange, type="text", placeholder, min
         placeholder={placeholder}
         min={min}
       />
-    </label>
-  );
-}
-
-function Select({ label, name, value, onChange, children }) {
-  return (
-    <label className="fi">
-      <span>{label}</span>
-      <select className="fi-input" name={name} value={value} onChange={onChange}>
-        {children}
-      </select>
     </label>
   );
 }
@@ -68,10 +56,9 @@ export default function AdminNGO() {
   const [savingInv, setSavingInv] = useState(false);
 
   const [activeTab, setActiveTab] = useState("inventory"); // 'inventory' | 'requests' | 'acceptances'
+  const [acceptanceFilterRid, setAcceptanceFilterRid] = useState("");
 
-  // ---------------------------
   // Auth + Profile
-  // ---------------------------
   useEffect(() => {
     (async () => {
       try {
@@ -104,9 +91,7 @@ export default function AdminNGO() {
     })();
   }, [navigate]);
 
-  // ---------------------------
   // Fetchers
-  // ---------------------------
   const fetchInventory = useCallback(async (ngoId) => {
     try {
       const res = await fetch(`${CONTENT_BASE}/inventory?ngoId=${encodeURIComponent(ngoId)}`);
@@ -153,26 +138,21 @@ export default function AdminNGO() {
     fetchAcceptances(ngo.id);
   }, [ngo?.id, fetchInventory, fetchRequests, fetchAcceptances]);
 
-  // ---------------------------
-  // Derived: pledges per Request
-  // acceptances entries: { id, requestId, donorName, quantity, status }
-  // ---------------------------
-  const pledgeByRequest = useMemo(() => {
+  // Derived fallback counters from acceptances
+  const fallbackByRequest = useMemo(() => {
     const map = new Map();
     for (const a of acceptances) {
       const rid = String(a.requestId ?? a.request?.id ?? a.request?._id ?? a.requestId);
       const v = map.get(rid) || { pledged: 0, received: 0 };
       const qty = Number(a.quantity || 0);
       v.pledged += qty;
-      if (String(a.status || "").toLowerCase() === "received") v.received += qty;
+      if ((a.status || "").toLowerCase() === "received") v.received += qty;
       map.set(rid, v);
     }
     return map;
   }, [acceptances]);
 
-  // ---------------------------
   // Inventory CRUD
-  // ---------------------------
   function onInvChange(e) {
     const { name, value } = e.target;
     setInvForm((s) => ({ ...s, [name]: value }));
@@ -243,7 +223,7 @@ export default function AdminNGO() {
 
   async function deleteInventoryRow(row) {
     if (!ngo?.id) return;
-  if (!window.confirm("Delete this inventory item?")) return;
+    if (!window.confirm("Delete this inventory item?")) return;
 
     const token = localStorage.getItem("token");
     if (!token) return navigate("/login");
@@ -264,61 +244,81 @@ export default function AdminNGO() {
     }
   }
 
-  // ---------------------------
-  // Acceptances → Mark Received (moves into inventory)
-  // ---------------------------
-  async function markAcceptanceReceived(a) {
+  // Acceptances actions
+async function markAcceptanceReceived(a) {
+  if (!ngo?.id) return;
+  const token = localStorage.getItem("token");
+  if (!token) return navigate("/login");
+
+  try {
+    // Just mark received — backend will also upsert inventory
+    const res1 = await fetch(
+      `${CONTENT_BASE}/acceptances/${encodeURIComponent(a.id || a._id)}/receive`,
+      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+    );
+    const body = await res1.json().catch(() => ({}));
+    if (!res1.ok) throw new Error(body.error || "Failed to mark acceptance as received");
+
+    await Promise.all([fetchAcceptances(ngo.id), fetchInventory(ngo.id), fetchRequests(ngo.id)]);
+    alert("Marked received and inventory updated.");
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+  async function cancelAcceptance(a) {
     if (!ngo?.id) return;
     const token = localStorage.getItem("token");
     if (!token) return navigate("/login");
-
-    // Optional: attach minimal categorization from the linked request
-    const req = requests.find(
-      r => String(r.requestId ?? r.id ?? r._id) === String(a.requestId ?? a.request?.id ?? a.request?._id)
-    );
+    if (!window.confirm("Cancel this acceptance?")) return;
 
     try {
-      // 1) Mark acceptance received
-      const res1 = await fetch(`${CONTENT_BASE}/acceptances/${encodeURIComponent(a.id || a._id)}/receive`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res1.ok) {
-        const body = await res1.json().catch(() => ({}));
-        throw new Error(body.error || "Failed to mark acceptance as received");
-      }
+      const res = await fetch(
+        `${CONTENT_BASE}/acceptances/${encodeURIComponent(a.id || a._id)}/cancel`,
+        { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+      );
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || "Failed to cancel acceptance");
 
-      // 2) Upsert into inventory (+quantity)
-      const invPayload = {
-        ngoId: ngo.id,
-        category: req?.category || "General",
-        size: req?.size || "",
-        gender: req?.gender || "",
-        location: req?.location || ngo.location || "",
-        delta: Number(a.quantity || 0), // server can treat 'delta' as increment
-      };
-      const res2 = await fetch(`${CONTENT_BASE}/inventory`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(invPayload),
-      });
-      if (!res2.ok) {
-        const body = await res2.json().catch(() => ({}));
-        throw new Error(body.error || "Failed to add items to inventory");
-      }
-
-      await Promise.all([fetchAcceptances(ngo.id), fetchInventory(ngo.id)]);
-      alert("Marked received and inventory updated.");
+      await Promise.all([fetchAcceptances(ngo.id), fetchRequests(ngo.id)]);
     } catch (e) {
       alert(e.message);
     }
   }
 
-  if (loading) return <div className="admin-wrap"><div className="admin-card"><p>Loading…</p></div></div>;
-  if (err) return <div className="admin-wrap"><div className="admin-card"><p style={{color:"crimson"}}>{err}</p></div></div>;
+  function messageAccepter(a) {
+    const type = String(a.accepterType || "").toLowerCase();
+    if (type === "ngo") {
+      alert("Messaging between NGOs isn’t supported. Ask the donor to accept as a user.");
+      return;
+    }
+    const url = `/messages/start?withUser=${encodeURIComponent(a.accepterId)}&requestId=${encodeURIComponent(
+      a.requestId
+    )}`;
+    navigate(url);
+  }
+
+  const filteredAcceptances = useMemo(() => {
+    if (!acceptanceFilterRid) return acceptances;
+    return acceptances.filter((a) => String(a.requestId) === String(acceptanceFilterRid));
+  }, [acceptances, acceptanceFilterRid]);
+
+  if (loading)
+    return (
+      <div className="admin-wrap">
+        <div className="admin-card">
+          <p>Loading…</p>
+        </div>
+      </div>
+    );
+  if (err)
+    return (
+      <div className="admin-wrap">
+        <div className="admin-card">
+          <p style={{ color: "crimson" }}>{err}</p>
+        </div>
+      </div>
+    );
   if (!ngo) return null;
 
   return (
@@ -326,25 +326,80 @@ export default function AdminNGO() {
       <header className="admin-header">
         <h1>{ngo.name || "NGO"} — Inventory Admin</h1>
         <div className="admin-tabs">
-          <button className={activeTab==="inventory"?"tab active":"tab"} onClick={() => setActiveTab("inventory")}>Inventory</button>
-          <button className={activeTab==="requests"?"tab active":"tab"} onClick={() => setActiveTab("requests")}>Requests</button>
-          <button className={activeTab==="acceptances"?"tab active":"tab"} onClick={() => setActiveTab("acceptances")}>Acceptances</button>
+          <button
+            className={activeTab === "inventory" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("inventory")}
+          >
+            Inventory
+          </button>
+          <button
+            className={activeTab === "requests" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("requests")}
+          >
+            Requests
+          </button>
+          <button
+            className={activeTab === "acceptances" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("acceptances")}
+          >
+            Acceptances
+          </button>
         </div>
       </header>
 
       {/* Inventory Form */}
-      {activeTab==="inventory" && (
+      {activeTab === "inventory" && (
         <Section title={invForm.id ? "Edit Inventory Item" : "Add Inventory Item"}>
           <form className="grid-form" onSubmit={saveInventory}>
-            <TextInput label="Category*" name="category" value={invForm.category} onChange={onInvChange} placeholder="e.g., Women's Winter Coats" />
-            <TextInput label="Size" name="size" value={invForm.size} onChange={onInvChange} placeholder="e.g., S / M / L or 6–12 yrs" />
-            <TextInput label="Gender" name="gender" value={invForm.gender} onChange={onInvChange} placeholder="Women / Men / Unisex / Kids" />
-            <TextInput label="Location" name="location" value={invForm.location} onChange={onInvChange} placeholder="e.g., Beirut" />
-            <TextInput label="Count*" name="count" type="number" min="0" value={invForm.count} onChange={onInvChange} placeholder="e.g., 50" />
+            <TextInput
+              label="Category*"
+              name="category"
+              value={invForm.category}
+              onChange={onInvChange}
+              placeholder="e.g., Women's Winter Coats"
+            />
+            <TextInput
+              label="Size"
+              name="size"
+              value={invForm.size}
+              onChange={onInvChange}
+              placeholder="e.g., S / M / L or 6–12 yrs"
+            />
+            <TextInput
+              label="Gender"
+              name="gender"
+              value={invForm.gender}
+              onChange={onInvChange}
+              placeholder="Women / Men / Unisex / Kids"
+            />
+            <TextInput
+              label="Location"
+              name="location"
+              value={invForm.location}
+              onChange={onInvChange}
+              placeholder="e.g., Beirut"
+            />
+            <TextInput
+              label="Count*"
+              name="count"
+              type="number"
+              min="0"
+              value={invForm.count}
+              onChange={onInvChange}
+              placeholder="e.g., 50"
+            />
             <div className="form-actions">
-              <button className="btn" type="submit" disabled={savingInv}>{savingInv ? "Saving…" : (invForm.id ? "Update Item" : "Add Item")}</button>
+              <button className="btn" type="submit" disabled={savingInv}>
+                {savingInv ? "Saving…" : invForm.id ? "Update Item" : "Add Item"}
+              </button>
               {invForm.id && (
-                <button type="button" className="btn-outline" onClick={() => setInvForm({ id:"", category:"", size:"", gender:"", location:"", count:"" })}>
+                <button
+                  type="button"
+                  className="btn-outline"
+                  onClick={() =>
+                    setInvForm({ id: "", category: "", size: "", gender: "", location: "", count: "" })
+                  }
+                >
                   Cancel
                 </button>
               )}
@@ -354,47 +409,49 @@ export default function AdminNGO() {
       )}
 
       {/* Inventory Table */}
-      {activeTab==="inventory" && (
+      {activeTab === "inventory" && (
         <Section title="Current Inventory">
           <div className="table-wrap">
             <table className="table">
-              <thead>
-                <tr>
-                  <th>Category</th>
-                  <th>Size</th>
-                  <th>Gender</th>
-                  <th>Location</th>
-                  <th>Count</th>
-                  <th>Updated</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {inventory.length === 0 && (
-                  <tr><td colSpan={7} className="muted center">No inventory yet.</td></tr>
-                )}
-                {inventory.map((row) => (
-                  <tr key={row.id || row._id}>
-                    <td>{row.category || "—"}</td>
-                    <td>{row.size || "—"}</td>
-                    <td>{row.gender || "—"}</td>
-                    <td>{row.location || "—"}</td>
-                    <td><strong>{row.count ?? 0}</strong></td>
-                    <td>{row.updatedAt ? new Date(row.updatedAt).toLocaleString() : "—"}</td>
-                    <td className="right">
-                      <button className="small" onClick={() => editInventoryRow(row)}>Edit</button>
-                      <button className="small danger" onClick={() => deleteInventoryRow(row)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+<thead>
+  <tr>
+    <th>Category</th>
+    <th>Size</th>
+    <th>Gender</th>
+    <th>Location</th>
+    <th>Requested</th>
+    <th>Pledged</th>
+    <th>Received</th>
+    <th>Open</th>
+  </tr>
+</thead>
+<tbody>
+  {inventory.length === 0 && (
+    <tr>
+      <td colSpan={8} className="muted center">No inventory yet.</td>
+    </tr>
+  )}
+  {inventory.map((row, i) => (
+    <tr key={row.id || row._id || i}>
+      <td>{row.category || "—"}</td>
+      <td>{row.size || "—"}</td>
+      <td>{row.gender || "—"}</td>
+      <td>{row.location || "—"}</td>
+      <td>{row.requested ?? 0}</td>
+      <td>{row.pledged ?? 0}</td>
+      <td>{row.received ?? 0}</td>
+      <td><strong>{row.open ?? 0}</strong></td>
+    </tr>
+  ))}
+</tbody>
+
             </table>
           </div>
         </Section>
       )}
 
       {/* Requests */}
-      {activeTab==="requests" && (
+      {activeTab === "requests" && (
         <Section title="Requests Overview">
           <div className="table-wrap">
             <table className="table">
@@ -408,28 +465,52 @@ export default function AdminNGO() {
                   <th>Status</th>
                   <th>Needed By</th>
                   <th>Location</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {requests.length === 0 && (
-                  <tr><td colSpan={8} className="muted center">No requests yet.</td></tr>
+                  <tr>
+                    <td colSpan={9} className="muted center">
+                      No requests yet.
+                    </td>
+                  </tr>
                 )}
                 {requests.map((r) => {
                   const rid = String(r.requestId ?? r.id ?? r._id);
-                  const pledges = pledgeByRequest.get(rid) || { pledged: 0, received: 0 };
                   const total = Number(r.count || 0);
-                  const remaining = Math.max(total - pledges.pledged, 0);
+                  const fb = fallbackByRequest.get(rid) || { pledged: 0, received: 0 };
+                  const pledged =
+                    typeof r.pledgedCount === "number" ? r.pledgedCount : fb.pledged;
+                  const received =
+                    typeof r.fulfilledCount === "number" ? r.fulfilledCount : fb.received;
+                  const remaining = Math.max(total - pledged, 0);
                   const urgent = String(r.status || "").toLowerCase() === "urgent";
                   return (
-                    <tr key={rid} className={urgent ? "row-urgent": ""}>
+                    <tr key={rid} className={urgent ? "row-urgent" : ""}>
                       <td>{r.category || "—"}</td>
-                      <td><strong>{total}</strong></td>
-                      <td>{pledges.pledged}</td>
-                      <td>{pledges.received}</td>
-                      <td><strong>{remaining}</strong></td>
+                      <td>
+                        <strong>{total}</strong>
+                      </td>
+                      <td>{pledged}</td>
+                      <td>{received}</td>
+                      <td>
+                        <strong>{remaining}</strong>
+                      </td>
                       <td>{r.status || "Standard"}</td>
                       <td>{r.dateNeeded ? new Date(r.dateNeeded).toLocaleDateString() : "—"}</td>
                       <td>{r.location || "—"}</td>
+                      <td className="right">
+                        <button
+                          className="small"
+                          onClick={() => {
+                            setAcceptanceFilterRid(rid);
+                            setActiveTab("acceptances");
+                          }}
+                        >
+                          View Acceptances
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -440,41 +521,86 @@ export default function AdminNGO() {
       )}
 
       {/* Acceptances */}
-      {activeTab==="acceptances" && (
-        <Section title="Accepted Donations (In-Transit)">
+      {activeTab === "acceptances" && (
+        <Section
+          title="Accepted Donations (In-Transit)"
+          right={
+            acceptanceFilterRid ? (
+              <button className="btn-outline small" onClick={() => setAcceptanceFilterRid("")}>
+                Clear Filter
+              </button>
+            ) : null
+          }
+        >
           <div className="table-wrap">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Donor</th>
+                  <th>Accepter</th>
+                  <th>Type</th>
                   <th>Request</th>
                   <th>Qty</th>
                   <th>Status</th>
+                  <th>Method</th>
+                  <th>Handoff</th>
+                  <th>Location</th>
                   <th>Accepted At</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {acceptances.length === 0 && (
-                  <tr><td colSpan={6} className="muted center">No acceptances yet.</td></tr>
+                {filteredAcceptances.length === 0 && (
+                  <tr>
+                    <td colSpan={10} className="muted center">
+                      No acceptances yet.
+                    </td>
+                  </tr>
                 )}
-                {acceptances.map((a) => {
+                {filteredAcceptances.map((a) => {
                   const rid = String(a.requestId ?? a.request?.id ?? a.request?._id ?? "—");
                   const status = (a.status || "").toLowerCase();
+                  const type = (a.accepterType || a.donorType || "").toLowerCase();
+                  const name = a.accepterName || a.donorName || a.donor?.name || "—";
                   return (
                     <tr key={a.id || a._id}>
-                      <td>{a.donorName || a.donor?.name || "—"}</td>
+                      <td>{name}</td>
+                      <td className="caps">{type || "user"}</td>
                       <td>{rid}</td>
-                      <td><strong>{a.quantity ?? 0}</strong></td>
+                      <td>
+                        <strong>{a.quantity ?? 0}</strong>
+                      </td>
                       <td>{a.status || "accepted"}</td>
+                      <td>{a.deliveryMethod || "—"}</td>
+                      <td>{a.handoffWindow || "—"}</td>
+                      <td>{a.handoffLocation || "—"}</td>
                       <td>{a.createdAt ? new Date(a.createdAt).toLocaleString() : "—"}</td>
                       <td className="right">
-                        {status !== "received" ? (
-                          <button className="small" onClick={() => markAcceptanceReceived(a)}>Mark Received → Inventory</button>
-                        ) : (
-                          <span className="pill ok">Received</span>
-                        )}
+                        <div className="btn-group">
+                          {/* Make Message an outline button */}
+                          <button className="btn-outline" onClick={() => messageAccepter(a)}>
+                            Message
+                          </button>
+
+                          {status !== "received" ? (
+                            <>
+                              {/* Make Received match Message, with green text/border */}
+                              <button
+                                className="btn-outline"
+                                onClick={() => markAcceptanceReceived(a)}
+                              >
+                                Received
+                              </button>
+
+                              <button className="small danger" onClick={() => cancelAcceptance(a)}>
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <span className="pill ok">Received</span>
+                          )}
+                        </div>
                       </td>
+
                     </tr>
                   );
                 })}

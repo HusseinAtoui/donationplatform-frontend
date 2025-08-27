@@ -1,5 +1,5 @@
 // src/pages/Login.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Login.css';
 
@@ -18,9 +18,8 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // You can change the default to 'NGO' if you mostly test NGO logins
-  const [userType, setUserType] = useState('Donor');
-  const [identifier, setIdentifier] = useState('');   // email OR phone for Donor; email for NGO
+  const [userType, setUserType] = useState('Donor'); // default can be 'NGO'
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -37,6 +36,54 @@ export default function Login() {
     }
   }
 
+  // ⬇️ Handle OAuth redirect (?token=&user=) from backend and store session
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tokenFromOAuth = params.get('token');
+    const userJson = params.get('user');
+
+    if (tokenFromOAuth) {
+      try {
+        localStorage.setItem('token', tokenFromOAuth);
+
+        const decoded = decodeJwt(tokenFromOAuth);
+        const role = decoded?.role || 'user';
+        localStorage.setItem('role', role);
+
+        if (userJson) {
+          const user = JSON.parse(decodeURIComponent(userJson));
+          localStorage.setItem('userData', JSON.stringify(user));
+        }
+
+        const to =
+          role === 'ngo' ? '/NGOProfile' :
+          role === 'user' ? '/DonorProfile' :
+          '/';
+        navigate(to, { replace: true });
+      } catch (e) {
+        console.error('OAuth parse error:', e);
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('userData');
+      }
+    }
+  }, [location.search, navigate]);
+
+  // 🔐 If already authenticated (normal login path), route the user to the correct profile
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const decoded = decodeJwt(token);
+    const role = decoded?.role || localStorage.getItem('role');
+
+    if (role === 'ngo') {
+      navigate('/NGOProfile', { replace: true });
+    } else if (role === 'user') {
+      navigate('/DonorProfile', { replace: true });
+    }
+  }, [navigate]);
+
   async function loginTo(url, payload) {
     console.log('[FE] POST', url, payload);
     const res = await fetch(url, {
@@ -45,7 +92,6 @@ export default function Login() {
       body: JSON.stringify(payload),
     });
 
-    // Try to parse JSON; if not, build a fallback error
     let body = {};
     try { body = await res.json(); } catch (_) {}
 
@@ -72,10 +118,8 @@ export default function Login() {
 
       const payload = { identifier: identifier.trim(), password };
 
-      // Try the selected role first
       let { ok, status, body } = await loginTo(primary, payload);
 
-      // If generic invalid creds, auto-try the other endpoint (helps if the toggle was wrong)
       if (!ok && status === 401 && body?.error === 'Invalid credentials.') {
         console.log('[FE] trying fallback endpoint…');
         const r2 = await loginTo(fallback, payload);
@@ -91,7 +135,6 @@ export default function Login() {
 
       localStorage.setItem('token', token);
 
-      // Determine role from token (backend sets: "ngo" or "user")
       let role = userType.toLowerCase();
       const decoded = decodeJwt(token);
       if (decoded?.role) role = decoded.role;
@@ -110,6 +153,24 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // Build correct Google OAuth URL for current userType
+  function getGoogleAuthUrl() {
+    return userType === 'NGO'
+      ? `${API_BASE}/ngo/auth/google`
+      : `${API_BASE}/user/auth/google`; // donor Google OAuth
+  }
+
+  // ⬇️ Start Google OAuth for current user type
+  function handleGoogleLogin() {
+    window.location.href = getGoogleAuthUrl();
+  }
+
+  // Keep: toggle-aware signup routing
+  function goToSignup() {
+    const path = userType === 'NGO' ? '/signup/ngo' : '/signup/donor';
+    navigate(path);
   }
 
   return (
@@ -181,7 +242,7 @@ export default function Login() {
           Don't have an account{' '}
           <span
             className="signup-link"
-            onClick={() => navigate('/signup')}
+            onClick={goToSignup}
             role="button"
             tabIndex={0}
             style={{ cursor: 'pointer' }}
@@ -196,7 +257,7 @@ export default function Login() {
           <div className="line" />
         </div>
 
-        <button className="google-btn" onClick={() => alert('Google login not wired yet')}>
+        <button className="google-btn" onClick={handleGoogleLogin}>
           <GoogleIcon />
           Google
         </button>

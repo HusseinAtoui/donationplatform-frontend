@@ -1,0 +1,65 @@
+.messages-page {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: calc(100vh - 0px); /* full screen minus navbar */
+  background: #fff;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden; /* prevent whole page scroll */
+}
+
+/* Sidebar */
+.sidebar {
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; /* child handles scroll */
+}
+
+.search-box {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0; /* fixed height */
+}
+
+.search-box input {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.conversation-list {
+  flex: 1;          /* fill remaining space */
+  overflow-y: auto; /* enable vertical scroll */
+  padding: 8px 0;
+}
+
+/* optional: smooth scrollbar */
+.conversation-list::-webkit-scrollbar {
+  width: 6px;
+}
+.conversation-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+/* Loading / errors / empty hints */
+.loading,
+.error-msg,
+.empty-hint {
+  padding: 16px;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Main chat area */
+.main {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* full height for chat window */
+  overflow: hidden; /* scrolling handled inside ChatWindow */
+  justify-content: center;
+  align-items: center;
+}
