@@ -4,6 +4,9 @@ import "leaflet/dist/leaflet.css";
 import { useState, useEffect } from "react";
 import Select from "react-select";
 import axios from "axios";
+import greyMarkerImage from '../../assets/grey-map-marker.png';
+import redMarkerImage from '../../assets/red-map-marker.png';
+import './Map.css';
 
 // Fix for Leaflet marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -13,10 +16,30 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-export default function NGOMap() {
+// Default Leaflet marker
+const ngoIcon = new L.Icon({
+  iconUrl: greyMarkerImage,
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const requestIcon = new L.Icon({
+  iconUrl: redMarkerImage,
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+export default function MapView() {
   const [ngos, setNgos] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [withRequests, setWithRequests] = useState(false);
+  const [displayType, setDisplayType] = useState("both");
   const [selectedCategories, setSelectedCategories] = useState([]);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -28,98 +51,72 @@ export default function NGOMap() {
     { value: "hats", label: "Hats" }
   ];
 
-  const fetchNgos = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const params = {};
-      if (withRequests) {
-        params.withRequests = "true";
-        params.categories =
-          selectedCategories.length > 0
-            ? selectedCategories.map(c => c.value).join(",")
-            : "any";
-      }
-      const res = await axios.get(`${apiUrl}/api/map/ngos`, { params });
-      setNgos(res.data);
+      const [ngosRes, requestsRes] = await Promise.all([
+        axios.get(`${apiUrl}/api/map/ngos`),
+        axios.get(`${apiUrl}/api/map/requests`, {
+          params: {
+            category: selectedCategories.length
+              ? selectedCategories.map(c => c.value).join(",")
+              : "any"
+          }
+        })
+      ]);
+      setNgos(ngosRes.data);
+      setRequests(requestsRes.data);
     } catch (err) {
-      console.error("Error fetching NGOs", err);
+      console.error("Error fetching map data", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchNgos();
-  }, []);
+    fetchData();
+  }, [selectedCategories]);
+
+  const displayNgos = displayType === "ngos" || displayType === "both";
+  const displayRequests = displayType === "requests" || displayType === "both";
 
   return (
-    <div style={{ height: "100vh", position: "relative" }}>
-      {/* Floating Filter Panel */}
-      <div
-        style={{
-          position: "absolute",
-          top: "90px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          background: "white",
-          padding: "0.5rem 1rem",
-          borderRadius: "9999px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-          display: "flex",
-          alignItems: "center",
-          gap: "1rem",
-          zIndex: 1000,
-          flexWrap: "wrap"
-        }}
-      >
-        <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <input
-            type="checkbox"
-            checked={withRequests}
-            onChange={() => setWithRequests(!withRequests)}
-          />
-          With Requests
+    <div className="map-page">
+      <div className="map-filters">
+        <label className="map-display-label">
+          Display:
+          <select
+            value={displayType}
+            onChange={e => setDisplayType(e.target.value)}
+            className="map-display-select"
+          >
+            <option value="both">NGOs & Requests</option>
+            <option value="ngos">NGOs</option>
+            <option value="requests">Requests</option>
+          </select>
         </label>
 
-        {withRequests && (
+        {displayType === "requests" && (
           <Select
             isMulti
             options={categoryOptions}
             value={selectedCategories}
             onChange={setSelectedCategories}
-            placeholder="Categories..."
-            styles={{
-              container: base => ({
-                ...base,
-                minWidth: "200px",
-                flexGrow: 1
-              })
-            }}
+            placeholder="Filter categories..."
+            className="map-category-select"
           />
         )}
 
-        <button
-          onClick={fetchNgos}
-          style={{
-            background: "#007bff",
-            color: "white",
-            border: "none",
-            padding: "0.5rem 1rem",
-            borderRadius: "9999px",
-            cursor: "pointer"
-          }}
-        >
-          Filter
-        </button>
+        {/* <button className="map-refresh-btn" onClick={fetchData}>Refresh</button> */}
       </div>
 
       {loading ? (
-        <p style={{ padding: "1rem" }}>Loading NGOs...</p>
+        <p className="map-loading">Loading map data...</p>
       ) : (
         <MapContainer
           center={[33.8938, 35.5018]}
           zoom={12}
-          style={{ height: "100%", width: "100%" }}
+          className="map-container"
           zoomControl={false}
         >
           <TileLayer
@@ -129,41 +126,41 @@ export default function NGOMap() {
 
           <ZoomControl position="bottomright" />
 
-          {ngos
-            .filter(ngo => {
-              const isValid = ngo.coordinates &&
-                   !isNaN(ngo.coordinates.lat) && 
-                   !isNaN(ngo.coordinates.lng);
-              if (!isValid) {
-                console.log('Invalid NGO location:', ngo);
-              }
-              return isValid;
-            })
-            .map(ngo => {
-              console.log('Rendering NGO marker:', ngo.name, ngo.coordinates);
-              return (
-                <Marker
-                  key={ngo.id}
-                  position={[
-                    ngo.coordinates.lat,
-                    ngo.coordinates.lng
-                  ]}
-                  eventHandlers={{
-                    click: () => console.log('Marker clicked:', ngo.name)
-                  }}
-                >
-                  <Popup>
-                    <div style={{ minWidth: '200px' }}>
-                      <strong>{ngo.name}</strong>
-                      <br />
-                      {ngo.location}
-                      <br />
-                      {ngo.phone && <span>📞 {ngo.phone}</span>}
-                    </div>
-                  </Popup>
-                </Marker>
-              );
-            })}
+          {displayNgos && ngos
+            .filter(ngo => ngo.coordinates && !isNaN(ngo.coordinates.lat) && !isNaN(ngo.coordinates.lng))
+            .map(ngo => (
+              <Marker key={ngo.id} position={[ngo.coordinates.lat, ngo.coordinates.lng]} icon={ngoIcon}>
+                <Popup>
+                  <div className="popup-card">
+                    <strong>{ngo.name}</strong><br />
+                    {ngo.location}<br />
+                    {ngo.phone && <>📞 {ngo.phone}</>}<br />
+                    <a href={`/ngo/${ngo.id}`} className="popup-link">View NGO Page</a>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+
+          {displayRequests && requests
+            .filter(req => req.coordinates && !isNaN(req.coordinates.lat) && !isNaN(req.coordinates.lng))
+            .map(req => (
+              <Marker key={req.requestId} position={[req.coordinates.lat, req.coordinates.lng]} icon={requestIcon}>
+                <Popup>
+                  <div className="popup-card">
+                    <strong>{req.category}</strong><br />
+                    Quantity: {req.count}<br />
+                    Needed by: {req.dateNeeded}<br />
+                    {req.ngo && (
+                      <>
+                        NGO: <a href={`/ngo/${req.ngo.id}`} className="popup-link">{req.ngo.name}</a><br />
+                        Location: {req.ngo.location}<br />
+                        {req.ngo.phone && <>📞 {req.ngo.phone}</>}
+                      </>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
         </MapContainer>
       )}
     </div>
