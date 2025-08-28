@@ -349,16 +349,26 @@ export default function Donations() {
       }
       throw new Error(data?.error || 'Failed to accept');
     }
+// inside doAccept, after the fetchWithFallback(...) and the !res.ok checks
+// Success → if backend tells us exactly where to go, use it
+if (data?.nextAction?.type === 'message' && data?.nextAction?.url) {
+  setModalOpen(false);
+  navigate(data.nextAction.url);
+} else {
+  // Deep-link to the Messages page with the NGO as the other side
+  const url =
+    `/messages?withNgo=${encodeURIComponent(String(modalReq.ngoId))}` +
+    `&requestId=${encodeURIComponent(String(modalReq.requestId || ""))}` +
+    (modalNgo?.name ? `&withName=${encodeURIComponent(modalNgo.name)}` : "") +
+    (modalNgo?.logoUrl ? `&withAvatar=${encodeURIComponent(modalNgo.logoUrl)}` : "");
 
-    if (data?.nextAction?.type === 'message' && data?.nextAction?.url) {
-      setModalOpen(false);
-      navigate(data.nextAction.url);
-    } else {
-      setModalOpen(false);
-      alert('Accepted successfully.');
-    }
+  setModalOpen(false);
+  navigate(url);
+}
 
-    await loadAll();
+// Optionally refresh lists in the background
+await loadAll();
+
   }
 
   return (

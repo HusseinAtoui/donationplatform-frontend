@@ -12,9 +12,12 @@
   justify-content: center;
 }
 
+
 .message-icon svg {
   stroke: #10b981; /* green outline */
 }
+
+
 
 .message-icon-container.no-background:hover svg {
   stroke: #059669; /* slightly darker green on hover */
@@ -50,24 +53,34 @@
   justify-content: center;
 }
 
-/* the unread badge (red pill) */
+/* Badge */
 .notification-badge {
   position: absolute;
-  top: -6px;         /* tweak to your taste */
-  right: -8px;       /* tweak to your taste */
+  top: -4px; /* position slightly above the icon */
+  right: -4px; /* position slightly to the right of the icon */
   background: #ff4d4f;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
+  color: white;
+  font-size: 10px; /* smaller text */
+  font-weight: bold;
   padding: 2px 5px;
-  border-radius: 999px;
-  min-width: 18px;
-  line-height: 18px;
+  border-radius: 10px;
+  line-height: 1;
+  min-width: 16px;
   text-align: center;
-  border: 2px solid #fff; /* helps separate from navbar bg */
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
 }
-
 /* optional hover: darken the green outline a bit */
 .message-icon-container.no-background:hover svg path {
   stroke: #4aa26f;
+}
+/* Container */
+.message-icon-container {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  position: relative; /* allows badge positioning */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

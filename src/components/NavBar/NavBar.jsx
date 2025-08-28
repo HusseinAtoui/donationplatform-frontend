@@ -73,14 +73,13 @@ export default function NavBar() {
           <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`} onClick={closeMobileMenu}>Donations</Link>
           <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`} onClick={closeMobileMenu}>Our Partners</Link>
             
-           <Link to="/messages" className={`navbar__menu-item ${isActive('/messages') ? 'active' : ''}`} onClick={closeMobileMenu}>msg</Link>
+         
 
         </nav>
 
         {/* Right side: login/profile icon + hamburger */}
         <div className="navbar__actions">
-            {/* Message icon with unread count */}
-  <MessageIcon />
+  <MessageIcon hideIfNone />
           {/* KEEPING the same shape, SVG, and class */}
           <Link
             to="/login"

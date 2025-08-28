@@ -6,15 +6,22 @@ import './MessageIcon.css';
 
 const POLL_MS = 30000;
 
-const MessageIcon = () => {
+const MessageIcon = ({ hideIfNone = false }) => {
   const [unreadCount, setUnreadCount] = useState(0);
+  const [conversationCount, setConversationCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const meIdRef = useRef(null);
   const navigate = useNavigate();
 
+  // --- define handler so onClick works and 'navigate' is used ---
+  const handleClick = () => {
+    navigate('/messages');
+  };
+
   useEffect(() => {
     let alive = true;
+
     const init = async () => {
       try {
         setIsLoading(true);
@@ -31,6 +38,7 @@ const MessageIcon = () => {
     };
 
     init();
+
     const intervalId = setInterval(fetchUnreadCount, POLL_MS);
 
     const handleVisibility = () => {
@@ -52,14 +60,18 @@ const MessageIcon = () => {
       const meId = meIdRef.current;
       const storedRole = localStorage.getItem('role');
 
+      // total conversations (for hide-if-none)
+      setConversationCount(conversations.length);
+
+      // total unread
       const totalUnread = conversations.reduce((total, conv) => {
         if (meId) {
           if (conv.userId === meId) return total + (conv.userUnread || 0);
-          if (conv.ngoId === meId) return total + (conv.ngoUnread || 0);
+          if (conv.ngoId === meId)  return total + (conv.ngoUnread || 0);
           return total;
         }
         if (storedRole === 'user') return total + (conv.userUnread || 0);
-        if (storedRole === 'ngo') return total + (conv.ngoUnread || 0);
+        if (storedRole === 'ngo')  return total + (conv.ngoUnread || 0);
         return total + Math.max(conv.userUnread || 0, conv.ngoUnread || 0);
       }, 0);
 
@@ -71,9 +83,10 @@ const MessageIcon = () => {
     }
   };
 
-  const handleClick = () => {
-    navigate('/messages');
-  };
+  // Hide the icon if requested AND there are no conversations (after loading)
+  if (!isLoading && hideIfNone && conversationCount === 0) {
+    return null;
+  }
 
   return (
     <button
@@ -84,14 +97,14 @@ const MessageIcon = () => {
       title="Messages"
     >
       <div className="message-icon">
-        {/* Outline-only Instagram-style paper plane */}
+        {/* outline-only paper plane with green stroke */}
         <svg
           viewBox="0 0 24 24"
           width="24"
           height="24"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
           fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
           <path
             d="M22 2L11 13"
