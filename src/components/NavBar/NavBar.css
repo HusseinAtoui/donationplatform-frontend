@@ -178,3 +178,50 @@ body {
         display: flex;
     }
 }
+
+/* Right actions row: message icon + profile + hamburger */
+.navbar__actions {
+  margin-left: auto;            /* pushes actions to the far right */
+  display: flex;
+  align-items: center;          /* vertical center */
+  gap: 12px;                    /* space between icons */
+}
+
+/* Make both icons render as square clickable areas with no layout jiggle */
+.navbar__login-icon,
+.message-icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  line-height: 0;               /* removes inline baseline spacing */
+}
+
+/* If your profile icon is a green circle, keep it. The plane has no bg. */
+.navbar__login-icon {
+  border-radius: 50%;
+  background: #5FAB7D;          /* your existing style */
+  color: #fff;
+}
+
+/* Paper-plane: no background; green stroke; thin green ring to match brand */
+.message-icon-container {
+  background: transparent;      /* no green fill */
+  border: 2px solid #5FAB7D;    /* green ring so it visually "matches" */
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Normalize plane size */
+.message-icon-container svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Optional: badge positioning if you’re showing unread counts */
+.message-icon-container .notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+}

@@ -1,3 +1,4 @@
+/// pages/Messages/MessagesPage.jsx
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ConversationList from '../../components/chat/ConversationList';
@@ -16,42 +17,74 @@ import './messages.css';
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000/api';
 const CACHE_KEY = 'chat_profile_cache_v1';
 
-// ---- tiny cache helpers ----
-function loadCache() {
-  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch { return {}; }
+// ---------- tiny cache helpers ----------
+function loadCache() { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch { return {}; } }
+function saveCache(cache) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); } catch {} }
+function getCached(kind, id) { const c = loadCache(); return c?.[kind]?.[id] || null; }
+function setCached(kind, id, data) { const c = loadCache(); c[kind] = c[kind] || {}; c[kind][id] = { ...(c[kind][id] || {}), ...data }; saveCache(c); }
+
+// ---------- helpers ----------
+const isUUID = (s) => typeof s === 'string' &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
+
+const API_ORIGIN = (() => {
+  try { return new URL(API_BASE).origin; } catch { return window.location.origin; }
+})();
+function normalizeAvatarUrl(url) {
+  if (!url) return '';
+  if (/^(https?:)?\/\//i.test(url) || /^data:/i.test(url)) return url; // already absolute
+  const clean = String(url).replace(/^(\.\/|\/)+/, '');
+  return `${API_ORIGIN}/${clean}`;
 }
-function saveCache(cache) {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); } catch {}
-}
-function getCached(kind, id) {
-  const c = loadCache();
-  return c?.[kind]?.[id] || null;
-}
-function setCached(kind, id, data) {
-  const c = loadCache();
-  c[kind] = c[kind] || {};
-  c[kind][id] = { ...(c[kind][id] || {}), ...data };
-  saveCache(c);
+function validName(name, id) {
+  return Boolean(name && !isUUID(name) && name !== id);
 }
 
-// ---- public profile fetchers ----
 async function fetchUserPublic(id) {
   try {
-    const r = await fetch(`${API_BASE}/user/public/${encodeURIComponent(id)}`);
-    if (!r.ok) return null;
-    const j = await r.json();
-    return { name: j.name || '', avatar: j.avatarUrl || '' };
-  } catch { return null; }
+    const tries = [
+      `${API_BASE}/user/public/${encodeURIComponent(id)}`,
+      `${API_BASE}/user/public?id=${encodeURIComponent(id)}`,
+    ];
+    for (const url of tries) {
+      const r = await fetch(url);
+      if (!r.ok) continue;
+      const j = await r.json();
+      return { name: j.name || '', avatar: j.avatarUrl || '' };
+    }
+  } catch {}
+  return null;
 }
-
-// If you added /api/ngo/public/:id, implement this and call it when otherType==='ngo'
 async function fetchNgoPublic(id) {
   try {
-    const r = await fetch(`${API_BASE}/ngo/public/${encodeURIComponent(id)}`);
-    if (!r.ok) return null;
-    const j = await r.json();
-    return { name: j.name || '', avatar: j.logoUrl || j.avatarUrl || '' };
-  } catch { return null; }
+    const tries = [
+      `${API_BASE}/ngo/public/${encodeURIComponent(id)}`,
+      `${API_BASE}/ngo/public?id=${encodeURIComponent(id)}`,
+    ];
+    for (const url of tries) {
+      const r = await fetch(url);
+      if (!r.ok) continue;
+      const j = await r.json();
+      return { name: j.name || '', avatar: j.logoUrl || j.avatarUrl || '' };
+    }
+  } catch {}
+  return null;
+}
+
+/** Figure out "the other side" purely by comparing IDs — no role branching */
+function figureOther(c, meId) {
+  let otherId = null;
+  let otherKind = null;
+
+  if (c.userId === meId) { otherId = c.ngoId;  otherKind = 'ngo';  }
+  else if (c.ngoId === meId) { otherId = c.userId; otherKind = 'user'; }
+  else if (c.userId && c.userId !== meId) { otherId = c.userId; otherKind = 'user'; }
+  else { otherId = c.ngoId; otherKind = 'ngo'; }
+
+  const stampedName   = otherKind === 'ngo'  ? (c.ngoName || '')   : (c.userName || '');
+  const stampedAvatar = otherKind === 'ngo'  ? (c.ngoAvatar || '') : (c.userAvatar || '');
+
+  return { otherKind, otherId, stampedName, stampedAvatar };
 }
 
 export default function MessagesPage() {
@@ -82,60 +115,54 @@ export default function MessagesPage() {
         const meRes = await getMe();
         setMe(meRes);
 
-        // 1) pull raw list
+        // 1) load
         let convs = await listConversations();
+// 2) compute other side & seed display fields (from stamped + cache)
+convs = convs.map((c) => {
+  const { otherKind, otherId, stampedName, stampedAvatar } = figureOther(c, meRes.id);
+  const cached = getCached(otherKind, otherId) || {};
 
-        // 2) normalize + try cache immediately (no flicker)
-        convs = convs.map((c) => {
-          const otherType = meRes.role === 'ngo' ? 'user' : 'ngo';
-          const otherId   = otherType === 'user' ? c.userId : c.ngoId;
+  let name   = cached.name   || stampedName || c.name || '';
+  let avatar = cached.avatar || stampedAvatar || c.avatar || '';
 
-          // Prefer backend-stamped display fields if present
-          let name =
-            (otherType === 'user' ? c.userName : c.ngoName) ||
-            c.name || c.displayName || c.userName || c.ngoName || '';
-          let avatar =
-            (otherType === 'user' ? c.userAvatar : c.ngoAvatar) ||
-            c.avatar || c.avatarUrl || c.userAvatar || c.ngoAvatar || '';
+  // Never show the raw ID as the name in the list
+  if (!validName(name, otherId)) {
+    name = otherKind === 'ngo' ? 'Unknown NGO' : 'Unknown User';
+  }
 
-          // overlay from cache (wins if present)
-          const cached = getCached(otherType, otherId);
-          if (cached) {
-            name   = cached.name   || name;
-            avatar = cached.avatar || avatar;
+  // 👇 derive *my* unread for each conversation
+  const mineUnread = c.userId === meRes.id ? (c.userUnread || 0) : (c.ngoUnread || 0);
+
+  return {
+    ...c,
+    otherKind,
+    otherId,
+    displayName: name,
+    displayAvatar: normalizeAvatarUrl(avatar),
+    unread: mineUnread, // 👈 add this
+    lastMessage: typeof c.lastMessage === 'string'
+      ? { text: c.lastMessage }
+      : (c.lastMessage || null),
+  };
+});
+
+
+        // 3) hydrate any placeholder/UUID/equal-to-id names and fix avatars
+        const need = convs.filter(c => !validName(c.displayName, c.otherId));
+        await Promise.all(need.map(async (c) => {
+          const prof = c.otherKind === 'ngo'
+            ? await fetchNgoPublic(c.otherId)
+            : await fetchUserPublic(c.otherId);
+          if (prof) {
+            const newName = prof.name || c.displayName;
+            const newAvatar = normalizeAvatarUrl(prof.avatar || '');
+            if (validName(newName, c.otherId)) c.displayName = newName;
+            if (newAvatar && !c.displayAvatar) c.displayAvatar = newAvatar;
+            setCached(c.otherKind, c.otherId, { name: c.displayName, avatar: c.displayAvatar });
           }
+        }));
 
-          if (!name) name = otherId || c.id; // final fallback
-
-          return {
-            ...c,
-            otherType,
-            otherId,
-            name,
-            avatar,
-            lastMessage:
-              typeof c.lastMessage === 'string'
-                ? { text: c.lastMessage }
-                : (c.lastMessage || null),
-          };
-        });
-
-        // 3) hydrate any missing bits from server
-        const need = convs.filter((c) => !c.name || c.name === c.otherId || !c.avatar);
-        await Promise.all(
-          need.map(async (c) => {
-            const prof = c.otherType === 'user'
-              ? await fetchUserPublic(c.otherId)
-              : await fetchNgoPublic(c.otherId); // if not implemented, returns null
-            if (prof) {
-              if (!c.name   || c.name === c.otherId) c.name   = prof.name   || c.name;
-              if (!c.avatar)                           c.avatar = prof.avatar || c.avatar;
-              setCached(c.otherType, c.otherId, { name: c.name, avatar: c.avatar });
-            }
-          })
-        );
-
-        // 4) now render
+        // 4) sort & set
         convs.sort((a, b) => (b.lastTimestamp || '').localeCompare(a.lastTimestamp || ''));
         setConversations(convs);
 
@@ -154,10 +181,10 @@ export default function MessagesPage() {
     })();
   }, []);
 
-  // deep link from Admin: ?withUser/withNgo + optional withName/withAvatar/requestId
+  // deep link (?withUser= / ?withNgo=) — role-agnostic: start convo then figureOther()
   useEffect(() => {
     (async () => {
-      if (!me?.id || !me?.role) return;
+      if (!me?.id) return;
 
       const withUser   = searchParams.get('withUser');
       const withNgo    = searchParams.get('withNgo');
@@ -166,52 +193,46 @@ export default function MessagesPage() {
       const reqId      = searchParams.get('requestId') || '';
 
       let conv = null;
-      if (withUser && me.role === 'ngo')      conv = await startConversation({ userId: withUser });
-      else if (withNgo && me.role === 'user') conv = await startConversation({ ngoId: withNgo });
-      else return;
-
+      if (withUser) conv = await startConversation({ userId: withUser }).catch(() => null);
+      if (!conv && withNgo) conv = await startConversation({ ngoId: withNgo }).catch(() => null);
       if (!conv?.id) return;
 
-      const otherType = me.role === 'ngo' ? 'user' : 'ngo';
-      const otherId   = otherType === 'user' ? conv.userId : conv.ngoId;
+      const { otherKind, otherId, stampedName, stampedAvatar } = figureOther(conv, me.id);
 
-      // prefer explicit link params, then cache, then stamped/server
-      const cached = getCached(otherType, otherId) || {};
-      let name =
-        withName ||
-        cached.name ||
-        (otherType === 'user' ? conv.userName : conv.ngoName) ||
-        conv.name || conv.userName || conv.ngoName || otherId;
+      const cached = getCached(otherKind, otherId) || {};
+      let name   = withName   || cached.name   || stampedName || '';
+      let avatar = withAvatar || cached.avatar || stampedAvatar || '';
 
-      let avatar =
-        withAvatar ||
-        cached.avatar ||
-        (otherType === 'user' ? conv.userAvatar : conv.ngoAvatar) ||
-        conv.avatarUrl || '';
-
-      // fetch server if still thin
-      if (!withName || !withAvatar) {
-        const prof = otherType === 'user' ? await fetchUserPublic(otherId) : await fetchNgoPublic(otherId);
+      // If still invalid, hydrate from /public
+      if (!validName(name, otherId) || !avatar) {
+        const prof = otherKind === 'ngo' ? await fetchNgoPublic(otherId) : await fetchUserPublic(otherId);
         if (prof) {
-          if (!withName)   name   = prof.name   || name;
-          if (!withAvatar) avatar = prof.avatar || avatar;
+          if (!validName(name, otherId) && prof.name) name = prof.name;
+          if (!avatar && prof.avatar) avatar = prof.avatar;
         }
       }
 
-      setCached(otherType, otherId, { name, avatar });
+      // Final fallbacks + normalization
+      if (!validName(name, otherId)) name = otherKind === 'ngo' ? 'Unknown NGO' : 'Unknown User';
+      avatar = normalizeAvatarUrl(avatar);
 
-      const enriched = {
-        ...conv,
-        otherType,
-        otherId,
-        name,
-        avatar,
-        contextRequestId: reqId || undefined,
-        lastMessage:
-          typeof conv.lastMessage === 'string'
-            ? { text: conv.lastMessage }
-            : (conv.lastMessage || null),
-      };
+      setCached(otherKind, otherId, { name, avatar });
+// compute my unread for this conversation
+const mineUnread = conv.userId === me.id ? (conv.userUnread || 0) : (conv.ngoUnread || 0);
+
+     const enriched = {
+  ...conv,
+  otherKind,
+  otherId,
+  displayName: name,
+  displayAvatar: avatar,
+  unread: mineUnread, // 👈 add this
+  contextRequestId: reqId || undefined,
+  lastMessage: typeof conv.lastMessage === 'string'
+    ? { text: conv.lastMessage }
+    : (conv.lastMessage || null),
+};
+
 
       setConversations((prev) => {
         const idx = prev.findIndex((c) => c.id === enriched.id);
@@ -227,27 +248,97 @@ export default function MessagesPage() {
       setPaging((p) => ({ ...p, [enriched.id]: { nextCursor } }));
       await markRead(enriched.id).catch(() => {});
     })();
-  }, [me?.id, me?.role, searchParams]);
+  }, [me?.id, searchParams]);
 
-  // filter/search
+  // small poll to keep messages fresh
+  useEffect(() => {
+    if (!active?.id) return;
+    const iv = setInterval(async () => {
+      try {
+        const { messages, nextCursor } = await listMessages(active.id, { limit: 50 });
+        setActive(a => (a && a.id === active.id) ? { ...a, messages } : a);
+        setPaging(p => ({ ...p, [active.id]: { nextCursor } }));
+      } catch {}
+    }, 4000);
+    return () => clearInterval(iv);
+  }, [active?.id]);
+
+  // mark read on focus
+  useEffect(() => {
+    const onFocus = () => { if (active?.id) markRead(active.id).catch(() => {}); };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [active?.id]);
+
+  // search/filter
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return conversations;
-    return conversations.filter((c) => (c.name || '').toLowerCase().includes(q));
+    return conversations.filter((c) => (c.displayName || '').toLowerCase().includes(q));
   }, [conversations, search]);
 
-  // open conversation
-  const onSelectConv = useCallback(async (conv) => {
+  // open convo
+const onSelectConv = useCallback(async (conv) => {
+  try {
+    if (!conv?.id) return;
+    const { messages, nextCursor } = await listMessages(conv.id, { limit: 50 });
+    setActive({ ...conv, messages });
+    setPaging((p) => ({ ...p, [conv.id]: { nextCursor } }));
+    await markRead(conv.id).catch(() => {});
+
+    // 👇 immediately clear unread locally
+    setConversations(list => list.map(c =>
+      c.id === conv.id ? { ...c, unread: 0 } : c
+    ));
+  } catch (e) {
+    setErr(e.message || 'Failed to open conversation.');
+  }
+}, []);
+
+// poll the conversation list to refresh unread counters & last message
+useEffect(() => {
+  let alive = true;
+
+  const tick = async () => {
     try {
-      if (!conv?.id) return;
-      const { messages, nextCursor } = await listMessages(conv.id, { limit: 50 });
-      setActive({ ...conv, messages });
-      setPaging((p) => ({ ...p, [conv.id]: { nextCursor } }));
-      await markRead(conv.id).catch(() => {});
-    } catch (e) {
-      setErr(e.message || 'Failed to open conversation.');
-    }
-  }, []);
+      // need me.id to compute 'mineUnread'
+      if (!me?.id) return;
+      const latest = await listConversations();
+
+      // merge by id, keep ordering by lastTimestamp desc
+      setConversations(prev => {
+        const prevById = Object.fromEntries(prev.map(x => [x.id, x]));
+        const merged = latest.map(c => {
+          const existing = prevById[c.id] || {};
+          const { otherKind, otherId } = figureOther(c, me.id);
+          const mineUnread = c.userId === me.id ? (c.userUnread || 0) : (c.ngoUnread || 0);
+          return {
+            ...existing,
+            ...c,
+            otherKind,
+            otherId,
+            // keep any already normalized/stamped display fields if present
+            displayName: existing.displayName || c.displayName || existing.name || c.name || '',
+            displayAvatar: existing.displayAvatar || c.displayAvatar || existing.avatar || c.avatar || '',
+            unread: mineUnread,
+            lastMessage: typeof c.lastMessage === 'string'
+              ? { text: c.lastMessage }
+              : (c.lastMessage || null),
+          };
+        });
+
+        // sort newest first
+        merged.sort((a, b) => (b.lastTimestamp || '').localeCompare(a.lastTimestamp || ''));
+        return merged;
+      });
+    } catch (_) {}
+  };
+
+  // first run, then poll
+  tick();
+  const iv = setInterval(tick, 20000); // every 20s
+  return () => { alive = false; clearInterval(iv); };
+}, [me?.id]);
 
   // pagination
   const loadOlder = useCallback(async () => {
@@ -258,9 +349,7 @@ export default function MessagesPage() {
       const { messages, nextCursor } = await listMessages(active.id, { limit: 50, cursor });
       setActive((a) => ({ ...a, messages: [...messages, ...(a?.messages || [])] }));
       setPaging((p) => ({ ...p, [active.id]: { nextCursor } }));
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
   }, [active?.id, paging]);
 
   // send
@@ -279,13 +368,7 @@ export default function MessagesPage() {
               contentType: f.type || 'application/octet-stream',
               conversationId: active.id,
             });
-
-            // Include any required headers from server (e.g., x-amz-acl: public-read)
-            const headers = Object.assign(
-              { 'Content-Type': f.type || 'application/octet-stream' },
-              requiredHeaders || {}
-            );
-
+            const headers = Object.assign({ 'Content-Type': f.type || 'application/octet-stream' }, requiredHeaders || {});
             await fetch(uploadUrl, { method: 'PUT', headers, body: f });
             uploaded.push(file);
           }
@@ -319,9 +402,7 @@ export default function MessagesPage() {
   return (
     <div className="messages-page">
       <aside className="sidebar">
-        <div className="go-back" onClick={() => navigate('/')}>
-          &larr; Home
-        </div>
+        <div className="go-back" onClick={() => navigate('/')}>&larr; Home</div>
 
         <div className="search-box">
           <input
@@ -348,7 +429,7 @@ export default function MessagesPage() {
       <main className="main">
         {active ? (
           <ChatWindow
-            conversation={active}     // header should read conversation.name + conversation.avatar
+            conversation={active}     // uses displayName/displayAvatar + otherKind/otherId
             me={me}
             onSend={onSend}
             sending={sending}

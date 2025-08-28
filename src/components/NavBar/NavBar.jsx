@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './NavBar.css';
-
+import MessageIcon from '../MessagingIcon/MessageIcon';
 function decodeJwtPayload(token) {
   try {
     const base64 = token.split('.')[1];
@@ -79,6 +79,8 @@ export default function NavBar() {
 
         {/* Right side: login/profile icon + hamburger */}
         <div className="navbar__actions">
+            {/* Message icon with unread count */}
+  <MessageIcon />
           {/* KEEPING the same shape, SVG, and class */}
           <Link
             to="/login"
