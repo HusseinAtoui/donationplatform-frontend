@@ -34,6 +34,20 @@ function TextInput({ label, name, value, onChange, type = "text", placeholder, m
   );
 }
 
+// --- helper to robustly pick the accepter's USER id ---
+function getAccepterUserId(a) {
+  return (
+    a?.accepterId ||
+    a?.userId ||
+    a?.donorId ||
+    a?.accepter?.id ||
+    a?.accepter?._id ||
+    a?.donor?.id ||
+    a?.donor?._id ||
+    null
+  );
+}
+
 export default function AdminNGO() {
   const navigate = useNavigate();
 
@@ -244,27 +258,27 @@ export default function AdminNGO() {
     }
   }
 
-  // Acceptances actions
-async function markAcceptanceReceived(a) {
-  if (!ngo?.id) return;
-  const token = localStorage.getItem("token");
-  if (!token) return navigate("/login");
+  // --- Acceptances actions --------------------------------------------------
 
-  try {
-    // Just mark received — backend will also upsert inventory
-    const res1 = await fetch(
-      `${CONTENT_BASE}/acceptances/${encodeURIComponent(a.id || a._id)}/receive`,
-      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
-    );
-    const body = await res1.json().catch(() => ({}));
-    if (!res1.ok) throw new Error(body.error || "Failed to mark acceptance as received");
+  async function markAcceptanceReceived(a) {
+    if (!ngo?.id) return;
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/login");
 
-    await Promise.all([fetchAcceptances(ngo.id), fetchInventory(ngo.id), fetchRequests(ngo.id)]);
-    alert("Marked received and inventory updated.");
-  } catch (e) {
-    alert(e.message);
+    try {
+      const res1 = await fetch(
+        `${CONTENT_BASE}/acceptances/${encodeURIComponent(a.id || a._id)}/receive`,
+        { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+      );
+      const body = await res1.json().catch(() => ({}));
+      if (!res1.ok) throw new Error(body.error || "Failed to mark acceptance as received");
+
+      await Promise.all([fetchAcceptances(ngo.id), fetchInventory(ngo.id), fetchRequests(ngo.id)]);
+      alert("Marked received and inventory updated.");
+    } catch (e) {
+      alert(e.message);
+    }
   }
-}
 
   async function cancelAcceptance(a) {
     if (!ngo?.id) return;
@@ -284,19 +298,38 @@ async function markAcceptanceReceived(a) {
     } catch (e) {
       alert(e.message);
     }
+  }// keep your getAccepterUserId(a) helper as-is
+
+function messageAccepter(a) {
+  const type = String(a.accepterType || a.donorType || "").toLowerCase();
+  if (type === "ngo") {
+    alert("Messaging between NGOs isn’t supported. Ask the donor to accept as a user.");
+    return;
   }
 
-  function messageAccepter(a) {
-    const type = String(a.accepterType || "").toLowerCase();
-    if (type === "ngo") {
-      alert("Messaging between NGOs isn’t supported. Ask the donor to accept as a user.");
-      return;
-    }
-    const url = `/messages/start?withUser=${encodeURIComponent(a.accepterId)}&requestId=${encodeURIComponent(
-      a.requestId
-    )}`;
-    navigate(url);
+  const uid =
+    getAccepterUserId(a) ||
+    a.accepterId || a.userId || a.donorId; // extra safety
+
+  if (!uid) {
+    alert("No user id found on this acceptance.");
+    return;
   }
+
+  // best-available display name + avatar from the acceptance/request payload
+  const name =
+    a.accepterName || a.donorName || a.donor?.name || a.user?.name || "";
+  const avatar =
+    a.accepterAvatar || a.donor?.avatarUrl || a.donor?.photoURL || a.user?.avatarUrl || "";
+
+  const url =
+    `/messages?withUser=${encodeURIComponent(uid)}` +
+    `&requestId=${encodeURIComponent(a.requestId || "")}` +
+    (name ? `&withName=${encodeURIComponent(name)}` : "") +
+    (avatar ? `&withAvatar=${encodeURIComponent(avatar)}` : "");
+
+  navigate(url);
+}
 
   const filteredAcceptances = useMemo(() => {
     if (!acceptanceFilterRid) return acceptances;
@@ -413,38 +446,37 @@ async function markAcceptanceReceived(a) {
         <Section title="Current Inventory">
           <div className="table-wrap">
             <table className="table">
-<thead>
-  <tr>
-    <th>Category</th>
-    <th>Size</th>
-    <th>Gender</th>
-    <th>Location</th>
-    <th>Requested</th>
-    <th>Pledged</th>
-    <th>Received</th>
-    <th>Open</th>
-  </tr>
-</thead>
-<tbody>
-  {inventory.length === 0 && (
-    <tr>
-      <td colSpan={8} className="muted center">No inventory yet.</td>
-    </tr>
-  )}
-  {inventory.map((row, i) => (
-    <tr key={row.id || row._id || i}>
-      <td>{row.category || "—"}</td>
-      <td>{row.size || "—"}</td>
-      <td>{row.gender || "—"}</td>
-      <td>{row.location || "—"}</td>
-      <td>{row.requested ?? 0}</td>
-      <td>{row.pledged ?? 0}</td>
-      <td>{row.received ?? 0}</td>
-      <td><strong>{row.open ?? 0}</strong></td>
-    </tr>
-  ))}
-</tbody>
-
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Size</th>
+                  <th>Gender</th>
+                  <th>Location</th>
+                  <th>Requested</th>
+                  <th>Pledged</th>
+                  <th>Received</th>
+                  <th>Open</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inventory.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="muted center">No inventory yet.</td>
+                  </tr>
+                )}
+                {inventory.map((row, i) => (
+                  <tr key={row.id || row._id || i}>
+                    <td>{row.category || "—"}</td>
+                    <td>{row.size || "—"}</td>
+                    <td>{row.gender || "—"}</td>
+                    <td>{row.location || "—"}</td>
+                    <td>{row.requested ?? 0}</td>
+                    <td>{row.pledged ?? 0}</td>
+                    <td>{row.received ?? 0}</td>
+                    <td><strong>{row.open ?? 0}</strong></td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         </Section>
@@ -489,14 +521,10 @@ async function markAcceptanceReceived(a) {
                   return (
                     <tr key={rid} className={urgent ? "row-urgent" : ""}>
                       <td>{r.category || "—"}</td>
-                      <td>
-                        <strong>{total}</strong>
-                      </td>
+                      <td><strong>{total}</strong></td>
                       <td>{pledged}</td>
                       <td>{received}</td>
-                      <td>
-                        <strong>{remaining}</strong>
-                      </td>
+                      <td><strong>{remaining}</strong></td>
                       <td>{r.status || "Standard"}</td>
                       <td>{r.dateNeeded ? new Date(r.dateNeeded).toLocaleDateString() : "—"}</td>
                       <td>{r.location || "—"}</td>
@@ -561,14 +589,15 @@ async function markAcceptanceReceived(a) {
                   const status = (a.status || "").toLowerCase();
                   const type = (a.accepterType || a.donorType || "").toLowerCase();
                   const name = a.accepterName || a.donorName || a.donor?.name || "—";
+                  const uid = getAccepterUserId(a);
+                  const canMsg = type !== "ngo" && !!uid;
+
                   return (
-                    <tr key={a.id || a._id}>
+                    <tr key={a.id || a._id} title={uid ? `User ID: ${uid}` : "No user id"}>
                       <td>{name}</td>
                       <td className="caps">{type || "user"}</td>
                       <td>{rid}</td>
-                      <td>
-                        <strong>{a.quantity ?? 0}</strong>
-                      </td>
+                      <td><strong>{a.quantity ?? 0}</strong></td>
                       <td>{a.status || "accepted"}</td>
                       <td>{a.deliveryMethod || "—"}</td>
                       <td>{a.handoffWindow || "—"}</td>
@@ -576,21 +605,23 @@ async function markAcceptanceReceived(a) {
                       <td>{a.createdAt ? new Date(a.createdAt).toLocaleString() : "—"}</td>
                       <td className="right">
                         <div className="btn-group">
-                          {/* Make Message an outline button */}
-                          <button className="btn-outline" onClick={() => messageAccepter(a)}>
+                          <button
+                            className="btn-outline"
+                            disabled={!canMsg}
+                            onClick={() => messageAccepter(a)}
+                            title={!canMsg ? "No user id to message" : "Message donor"}
+                          >
                             Message
                           </button>
 
                           {status !== "received" ? (
                             <>
-                              {/* Make Received match Message, with green text/border */}
                               <button
                                 className="btn-outline"
                                 onClick={() => markAcceptanceReceived(a)}
                               >
                                 Received
                               </button>
-
                               <button className="small danger" onClick={() => cancelAcceptance(a)}>
                                 Cancel
                               </button>
@@ -600,7 +631,6 @@ async function markAcceptanceReceived(a) {
                           )}
                         </div>
                       </td>
-
                     </tr>
                   );
                 })}

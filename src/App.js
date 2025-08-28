@@ -12,17 +12,16 @@ import Donations from './pages/Donations/Donations';
 import NGOProfile from "./pages/NGOProfile/NGOProfile";
 import DonorProfile from "./pages/DonorProfile/DonorProfile";
 import DonationRequestDetailTest from './pages/DonationRequestDetailTest';
-import Guidelines from './pages/Guidelines/Guidelines'; 
+import Guidelines from './pages/Guidelines/Guidelines'; // import your new Guidelines page
 import AdminNGO from './pages/AdminNGO/adminngo.jsx'
 import NGOPublicProfile from './pages/NGOPublicProfile/NGOPublicProfile';
-import Map from './pages/Map/Map';
 import MessagesPage from './pages/Messages/MessagesPage';
-
+import Map from './pages/Map/Map';
 function AppContent() {
   const location = useLocation();
 
   // Define paths where NavBar should NOT appear
-  const hideNavPaths = ['/login', '/signup', '/signup/donor', '/signup/ngo', '/messages'];
+  const hideNavPaths = ['/login', '/signup', '/signup/donor', '/signup/ngo'];
 
   return (
     <>
@@ -40,9 +39,9 @@ function AppContent() {
         <Route path="/donation-test" element={<DonationRequestDetailTest />} />
         <Route path="/guide" element={<Guidelines />} />
         <Route path="/adminngo" element={<AdminNGO />} />
-        <Route path="/map" element={<Map />} />
-        <Route path="/ngo/:id" element={<NGOPublicProfile />} />
-        <Route path="/messages" element={<MessagesPage />} />
+        <Route path="/ngo/:id" element={<NGOPublicProfile />} />  
+           <Route path="/messages" element={<MessagesPage />} />
+               <Route path="/map" element={<Map />} />
       </Routes>
     </>
   );

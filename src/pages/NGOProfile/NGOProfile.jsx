@@ -27,7 +27,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
-
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000/api";
 const CONTENT_BASE = `${API_BASE}/home`; // must match Express mount
 
@@ -244,7 +243,6 @@ export default function NGOProfile() {
     });
     return null;
   }
-
 
   // requests
   const [requests, setRequests] = useState([]);
@@ -613,6 +611,12 @@ export default function NGOProfile() {
   const { name, email, phone, location, logoUrl, bio, summary } = profile;
   const avatar = avatarSrc || logoUrl || null;
 
+  // ---- FIX: always render a string for location ----
+  const displayLocation =
+    typeof location === "string"
+      ? location
+      : (location?.address || "");
+
   return (
     <div className="page">
       {/* Cover */}
@@ -683,7 +687,7 @@ export default function NGOProfile() {
             </div>
 
             <div className="contact-row">
-              <Chip icon={MapPin} text={location} />
+              <Chip icon={MapPin} text={displayLocation} />
               <Chip icon={Phone} text={phone} />
               <Chip icon={Mail} text={email} />
               <Chip icon={Clock} text={"Mon – Fri: 10AM – 6PM"} />
@@ -813,7 +817,6 @@ export default function NGOProfile() {
               </button>
             </div>
 
-
             <div>
               <label className="input-label">Size</label>
               <input
@@ -835,6 +838,7 @@ export default function NGOProfile() {
                 placeholder="e.g. 6-12"
               />
             </div>
+
             {showMap && (
               <div className="modal-backdrop" onClick={() => setShowMap(false)}>
                 <div

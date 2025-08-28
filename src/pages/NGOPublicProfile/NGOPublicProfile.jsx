@@ -1,3 +1,4 @@
+// src/pages/NGOPublicProfile/NGOPublicProfile.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
@@ -5,6 +6,13 @@ import "./NGOPublicProfile.css"; // optional styling
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000/api";
 const CONTENT_BASE = `${API_BASE}/home`;
+
+// Helper: normalize address to a string
+function addr(v) {
+  if (!v) return "—";
+  if (typeof v === "string") return v;
+  return v.address || "—";
+}
 
 function Chip({ icon: Icon, text }) {
   if (!text) return null;
@@ -38,7 +46,7 @@ function RequestCard({ req }) {
             <div className="req-name">{req.category || "Request"}</div>
             <div className="req-sub">
               <MapPin size={14} />
-              <span>{req.location || "—"}</span>
+              <span>{addr(req.location)}</span>
             </div>
           </div>
         </div>
@@ -70,6 +78,7 @@ export default function NGOPublicProfile() {
         if (res.ok) {
           ngoData = await res.json();
         } else {
+          // Fallback to list (if direct endpoint not available)
           const resAll = await fetch(`${API_BASE}/ngo/ngos`);
           if (!resAll.ok) throw new Error("Failed to fetch NGO");
           const all = await resAll.json();
@@ -112,7 +121,7 @@ export default function NGOPublicProfile() {
           <div className="header-main">
             <h1>{ngo.name}</h1>
             <div className="contact-row">
-              <Chip icon={MapPin} text={ngo.location} />
+              <Chip icon={MapPin} text={addr(ngo.location)} />
               <Chip icon={Phone} text={ngo.phone} />
               <Chip icon={Mail} text={ngo.email} />
               <Chip icon={Clock} text={"Mon – Fri: 10AM – 6PM"} />
@@ -130,44 +139,8 @@ export default function NGOPublicProfile() {
           </p>
         </div>
       </section>
-{/* Posts */}
-<section className="wrap">
-  <div className="posts-head"><h2>Posts</h2></div>
 
-  {posts.length === 0 ? (
-    <div className="card"><p className="muted">No posts yet.</p></div>
-  ) : (
-    posts.map((p) => (
-      <div key={p.postId || p.id} className="card post">
-        <div className="post-header">
-          <strong>{ngo.name}</strong>
-        </div>
-
-        <p>{p.text}</p>
-
-        {p.images?.length > 0 && (
-          <div className="grid">
-            {p.images.map((url, i) => (
-              <div key={i} className="ph">
-                <img
-                  src={url}
-                  alt={`post-${i}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="post-date" style={{ marginTop: 8, fontSize: 12, color: "#777" }}>
-          Posted on {new Date(p.createdAt || Date.now()).toLocaleDateString()}
-        </div>
-      </div>
-    ))
-  )}
-</section>
-
-      {/* Requests */}
+      {/* Requests — FIRST */}
       <section className="wrap">
         <div className="posts-head"><h2>Active Requests</h2></div>
         {requests.length === 0 ? (
@@ -178,6 +151,43 @@ export default function NGOPublicProfile() {
               <RequestCard key={r.requestId || r.id} req={r} />
             ))}
           </div>
+        )}
+      </section>
+
+      {/* Posts — AFTER */}
+      <section className="wrap">
+        <div className="posts-head"><h2>Posts</h2></div>
+
+        {posts.length === 0 ? (
+          <div className="card"><p className="muted">No posts yet.</p></div>
+        ) : (
+          posts.map((p) => (
+            <div key={p.postId || p.id} className="card post">
+              <div className="post-header">
+                <strong>{ngo.name}</strong>
+              </div>
+
+              <p>{p.text}</p>
+
+              {p.images?.length > 0 && (
+                <div className="grid">
+                  {p.images.map((url, i) => (
+                    <div key={i} className="ph">
+                      <img
+                        src={url}
+                        alt={`post-${i}`}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="post-date" style={{ marginTop: 8, fontSize: 12, color: "#777" }}>
+                Posted on {new Date(p.createdAt || Date.now()).toLocaleDateString()}
+              </div>
+            </div>
+          ))
         )}
       </section>
     </div>

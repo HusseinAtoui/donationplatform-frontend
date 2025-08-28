@@ -35,6 +35,13 @@ const requestIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+// Helper: normalize address to a string
+function addr(v) {
+  if (!v) return '—';
+  if (typeof v === 'string') return v;
+  return v.address || '—';
+}
+
 export default function MapView() {
   const [ngos, setNgos] = useState([]);
   const [requests, setRequests] = useState([]);
@@ -42,7 +49,8 @@ export default function MapView() {
   const [displayType, setDisplayType] = useState("both");
   const [selectedCategories, setSelectedCategories] = useState([]);
 
-  const apiUrl = process.env.REACT_APP_API_URL;
+  // Safe default if env var missing
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
   const categoryOptions = [
     { value: "jackets", label: "Jackets" },
@@ -64,8 +72,8 @@ export default function MapView() {
           }
         })
       ]);
-      setNgos(ngosRes.data);
-      setRequests(requestsRes.data);
+      setNgos(ngosRes.data || []);
+      setRequests(requestsRes.data || []);
     } catch (err) {
       console.error("Error fetching map data", err);
     } finally {
@@ -75,6 +83,7 @@ export default function MapView() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategories]);
 
   const displayNgos = displayType === "ngos" || displayType === "both";
@@ -106,8 +115,6 @@ export default function MapView() {
             className="map-category-select"
           />
         )}
-
-        {/* <button className="map-refresh-btn" onClick={fetchData}>Refresh</button> */}
       </div>
 
       {loading ? (
@@ -129,11 +136,13 @@ export default function MapView() {
           {displayNgos && ngos
             .filter(ngo => ngo.coordinates && !isNaN(ngo.coordinates.lat) && !isNaN(ngo.coordinates.lng))
             .map(ngo => (
-              <Marker key={ngo.id} position={[ngo.coordinates.lat, ngo.coordinates.lng]} icon={ngoIcon}>
+              <Marker key={ngo.id || `${ngo.coordinates.lat},${ngo.coordinates.lng}`}
+                      position={[ngo.coordinates.lat, ngo.coordinates.lng]}
+                      icon={ngoIcon}>
                 <Popup>
                   <div className="popup-card">
-                    <strong>{ngo.name}</strong><br />
-                    {ngo.location}<br />
+                    <strong>{ngo.name || 'NGO'}</strong><br />
+                    {addr(ngo.location)}<br />
                     {ngo.phone && <>📞 {ngo.phone}</>}<br />
                     <a href={`/ngo/${ngo.id}`} className="popup-link">View NGO Page</a>
                   </div>
@@ -144,16 +153,18 @@ export default function MapView() {
           {displayRequests && requests
             .filter(req => req.coordinates && !isNaN(req.coordinates.lat) && !isNaN(req.coordinates.lng))
             .map(req => (
-              <Marker key={req.requestId} position={[req.coordinates.lat, req.coordinates.lng]} icon={requestIcon}>
+              <Marker key={req.requestId || `${req.coordinates.lat},${req.coordinates.lng}`}
+                      position={[req.coordinates.lat, req.coordinates.lng]}
+                      icon={requestIcon}>
                 <Popup>
                   <div className="popup-card">
-                    <strong>{req.category}</strong><br />
-                    Quantity: {req.count}<br />
-                    Needed by: {req.dateNeeded}<br />
+                    <strong>{req.category || 'Request'}</strong><br />
+                    Quantity: {req.count ?? '—'}<br />
+                    Needed by: {req.dateNeeded || '—'}<br />
                     {req.ngo && (
                       <>
-                        NGO: <a href={`/ngo/${req.ngo.id}`} className="popup-link">{req.ngo.name}</a><br />
-                        Location: {req.ngo.location}<br />
+                        NGO: <a href={`/ngo/${req.ngo.id}`} className="popup-link">{req.ngo.name || 'NGO'}</a><br />
+                        Location: {addr(req.ngo.location)}<br />
                         {req.ngo.phone && <>📞 {req.ngo.phone}</>}
                       </>
                     )}
