@@ -348,13 +348,14 @@ export default function Donations() {
         return;
       }
       throw new Error(data?.error || 'Failed to accept');
-    }
-// inside doAccept, after the fetchWithFallback(...) and the !res.ok checks
-// Success → if backend tells us exactly where to go, use it
-if (data?.nextAction?.type === 'message' && data?.nextAction?.url) {
+    }if (data?.nextAction?.type === 'message' && data?.nextAction?.url) {
+  const fixed = data.nextAction.url.replace('/messages/start', '/messages');
   setModalOpen(false);
-  navigate(data.nextAction.url);
+  navigate(fixed);
 } else {
+  // your existing manual URL building for /messages?... 
+
+
   // Deep-link to the Messages page with the NGO as the other side
   const url =
     `/messages?withNgo=${encodeURIComponent(String(modalReq.ngoId))}` +

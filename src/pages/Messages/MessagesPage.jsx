@@ -12,6 +12,9 @@ import {
   markRead,
   presignAttachment,
 } from '../../api/messaging';
+import leoProfanity from 'leo-profanity';
+import Sentiment from 'sentiment';
+
 import './messages.css';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000/api';
@@ -24,6 +27,40 @@ function getCached(kind, id) { const c = loadCache(); return c?.[kind]?.[id] || 
 function setCached(kind, id, data) { const c = loadCache(); c[kind] = c[kind] || {}; c[kind][id] = { ...(c[kind][id] || {}), ...data }; saveCache(c); }
 
 // ---------- helpers ----------
+
+
+// ---- lightweight safety (profanity + sentiment) ----
+const sentiment = new Sentiment();
+// load default (EN) bad-words dictionary
+leoProfanity.loadDictionary();
+
+function moderateText(raw) {
+  if (!raw || typeof raw !== 'string') {
+    return { allowed: true, cleaned: raw, reason: '' };
+  }
+
+  // Mask profanity (e.g., sh**)
+  const cleaned = leoProfanity.clean(raw);
+
+  // Very negative tone? (tune threshold as you like)
+  const { score } = sentiment.analyze(raw);
+  // e.g., -4 and below we block and ask to rephrase
+  if (score <= -4) {
+    return {
+      allowed: false,
+      cleaned,
+      reason: 'Your message does not fit our community guidelines. \n Please rephrase and try again.',
+    };
+  }
+
+  // Allowed. If profanity was masked, we still send the masked text.
+  return {
+    allowed: true,
+    cleaned,
+    reason: cleaned !== raw ? 'Profanity was masked.' : '',
+  };
+}
+
 const isUUID = (s) => typeof s === 'string' &&
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
 
@@ -90,6 +127,7 @@ function figureOther(c, meId) {
 export default function MessagesPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+const [popup, setPopup] = useState({ show: false, message: '' });
 
   const [me, setMe] = useState(null);
   const [conversations, setConversations] = useState([]);
@@ -352,52 +390,68 @@ useEffect(() => {
     } catch (e) { console.error(e); }
   }, [active?.id, paging]);
 
-  // send
-  const onSend = useCallback(
-    async ({ text, files }) => {
-      if (!active?.id) return;
-      if (!text && (!files || !files.length)) return;
-      setSending(true);
-      try {
-        let attachments = [];
-        if (files?.length) {
-          const uploaded = [];
-          for (const f of files) {
-            const { uploadUrl, requiredHeaders, file } = await presignAttachment({
-              filename: f.name,
-              contentType: f.type || 'application/octet-stream',
-              conversationId: active.id,
-            });
-            const headers = Object.assign({ 'Content-Type': f.type || 'application/octet-stream' }, requiredHeaders || {});
-            await fetch(uploadUrl, { method: 'PUT', headers, body: f });
-            uploaded.push(file);
-          }
-          attachments = uploaded;
+// send
+const onSend = useCallback(
+  async ({ text, files }) => {
+    if (!active?.id) return;
+    if (!text && (!files || !files.length)) return;
+
+    setSending(true);
+    try {
+      // 🔒 Safety first
+      const { allowed, cleaned, reason } = moderateText(text);
+if (!allowed) {
+  setPopup({ show: true, message: reason || 'Please rephrase your message.' });
+  setSending(false);
+  return;
+}
+
+      const finalText = cleaned;
+
+      let attachments = [];
+      if (files?.length) {
+        const uploaded = [];
+        for (const f of files) {
+          const { uploadUrl, requiredHeaders, file } = await presignAttachment({
+            filename: f.name,
+            contentType: f.type || 'application/octet-stream',
+            conversationId: active.id,
+          });
+          const headers = Object.assign({ 'Content-Type': f.type || 'application/octet-stream' }, requiredHeaders || {});
+          await fetch(uploadUrl, { method: 'PUT', headers, body: f });
+          uploaded.push(file);
         }
-
-        const msg = await sendMessage(active.id, { text, attachments });
-        setActive((a) => ({ ...a, messages: [ ...(a?.messages || []), msg ] }));
-
-        setConversations((list) => {
-          const idx = list.findIndex((c) => c.id === active.id);
-          if (idx === -1) return list;
-          const copy = [...list];
-          copy[idx] = {
-            ...copy[idx],
-            lastMessage: { text: msg.text || (attachments.length ? '[attachment]' : '') },
-            lastTimestamp: msg.createdAt,
-          };
-          const [moved] = copy.splice(idx, 1);
-          return [moved, ...copy];
-        });
-      } catch (e) {
-        alert(e.message || 'Failed to send message.');
-      } finally {
-        setSending(false);
+        attachments = uploaded;
       }
-    },
-    [active?.id]
-  );
+
+      const msg = await sendMessage(active.id, { text: finalText, attachments });
+      setActive((a) => ({ ...a, messages: [ ...(a?.messages || []), msg ] }));
+
+      setConversations((list) => {
+        const idx = list.findIndex((c) => c.id === active.id);
+        if (idx === -1) return list;
+        const copy = [...list];
+        copy[idx] = {
+          ...copy[idx],
+          lastMessage: { text: msg.text || (attachments.length ? '[attachment]' : '') },
+          lastTimestamp: msg.createdAt,
+          // clear my unread for the active one if you want
+          unread: 0,
+        };
+        const [moved] = copy.splice(idx, 1);
+        return [moved, ...copy];
+      });
+
+      // optional: if (reason) toast it instead of alert:
+      // if (reason) console.info(reason);
+    } catch (e) {
+      alert(e.message || 'Failed to send message.');
+    } finally {
+      setSending(false);
+    }
+  },
+  [active?.id]
+);
 
   return (
     <div className="messages-page">
@@ -440,6 +494,15 @@ useEffect(() => {
           <div className="empty-hint">Select a conversation to start chatting</div>
         )}
       </main>
+      {popup.show && (
+  <div className="popup-overlay">
+    <div className="popup-box">
+      <p>{popup.message}</p>
+      <button onClick={() => setPopup({ show: false, message: '' })}>OK</button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
