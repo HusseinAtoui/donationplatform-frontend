@@ -55,8 +55,8 @@ export default function MapView() {
     try {
       setLoading(true);
       const [ngosRes, requestsRes] = await Promise.all([
-        axios.get(`${apiUrl}/api/map/ngos`),
-        axios.get(`${apiUrl}/api/map/requests`, {
+        axios.get(`${apiUrl}/map/ngos`),
+        axios.get(`${apiUrl}/map/requests`, {
           params: {
             category: selectedCategories.length
               ? selectedCategories.map(c => c.value).join(",")
