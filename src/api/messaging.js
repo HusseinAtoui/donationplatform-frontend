@@ -1,54 +1,76 @@
 // src/api/messaging.js
 const API_ROOT = process.env.REACT_APP_API_BASE || 'http://localhost:4000/api';
-// Try both /messages and /msg bases to match how the backend might be mounted.
 const BASES = [`${API_ROOT}/messages`];
+
+const AUTH_ERR = 'AUTH_FAIL';
 
 function getToken() {
   return localStorage.getItem('token') || '';
 }
-
 function getRole() {
-  return localStorage.getItem('role') || '';
+  return (localStorage.getItem('role') || '').toLowerCase();
 }
-
 function authHeaders(json = false) {
-  const h = { Authorization: `Bearer ${getToken()}` };
+  const token = getToken();
+  const h = { Authorization: `Bearer ${token}` };
   if (json) h['Content-Type'] = 'application/json';
   return h;
 }
+function ensureToken() {
+  const t = getToken();
+  if (!t) {
+    const err = new Error(AUTH_ERR);
+    err.code = AUTH_ERR;
+    throw err;
+  }
+}
 
-/** Try multiple URLs and return the first successful JSON response. */
+/** Fetch with auth that throws AUTH_FAIL on 401/403 and NO_AUTH when token missing */
+async function authedFetch(url, init = {}) {
+  ensureToken();
+  const res = await fetch(url, init);
+  if (res.status === 401 || res.status === 403) {
+    const err = new Error(AUTH_ERR);
+    err.code = AUTH_ERR;
+    err.status = res.status;
+    // Optional: read body for logging
+    try { err.body = await res.text(); } catch {}
+    throw err;
+  }
+  return res;
+}
+
+/** Try multiple URLs with authed fetch; return first successful JSON. */
 async function fetchFirstJson(urls, init) {
-  let lastStatus = 0;
-  let lastBody = '';
+  let lastErr;
   for (const url of urls) {
     try {
-      const res = await fetch(url, init);
+      const res = await authedFetch(url, init);
       if (res.ok) {
         try { return await res.json(); } catch { return null; }
+      } else {
+        lastErr = new Error(`HTTP ${res.status}`);
+        lastErr.status = res.status;
+        try { lastErr.body = await res.text(); } catch {}
       }
-      lastStatus = res.status;
-      try { lastBody = await res.text(); } catch { lastBody = ''; }
     } catch (e) {
-      lastStatus = 0;
-      lastBody = e?.message || 'network error';
+      // Bubble up auth failures immediately to stop loops
+      if (e && (e.code === AUTH_ERR || e.message === AUTH_ERR)) throw e;
+      lastErr = e;
     }
   }
-  const list = urls.map(u => {
-    try { return new URL(u).pathname; } catch { return u; }
-  }).join(' | ');
-  throw new Error(`All endpoints failed for: ${list} (last ${lastStatus}) ${lastBody}`);
+  if (lastErr) throw lastErr;
+  throw new Error('All endpoints failed');
 }
 
 /** Who am I? */
 export async function getMe() {
   const role = getRole();
-  const token = getToken();
+  ensureToken();
   const url = role === 'ngo' ? `${API_ROOT}/ngo/me` : `${API_ROOT}/user/me`;
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) throw new Error('Failed to load current user.');
+  const res = await authedFetch(url, { headers: authHeaders() });
   const data = await res.json();
-  // Normalize shape
+
   return {
     id: data.id || data._id || data.user?.id || data.profile?.id || data.ngo?.id,
     role: role || data.role || (data.ngo ? 'ngo' : 'user'),
@@ -60,12 +82,9 @@ export async function getMe() {
 
 /** Start or fetch a conversation */
 export async function startConversation({ ngoId, userId }) {
+  ensureToken();
   const body = { ...(ngoId ? { ngoId } : {}), ...(userId ? { userId } : {}) };
-  const init = {
-    method: 'POST',
-    headers: authHeaders(true),
-    body: JSON.stringify(body),
-  };
+  const init = { method: 'POST', headers: authHeaders(true), body: JSON.stringify(body) };
   const urls = BASES.map(b => `${b}/conversations/start`);
   const json = await fetchFirstJson(urls, init);
   return json?.conversation;
@@ -73,6 +92,7 @@ export async function startConversation({ ngoId, userId }) {
 
 /** List my conversations */
 export async function listConversations() {
+  ensureToken();
   const init = { headers: authHeaders() };
   const urls = BASES.map(b => `${b}/conversations`);
   const json = await fetchFirstJson(urls, init);
@@ -84,10 +104,12 @@ export async function listMessages(
   conversationId,
   { limit = 50, cursor = null, from = null } = {}
 ) {
+  ensureToken();
   const qs = new URLSearchParams();
   if (limit) qs.set('limit', String(limit));
   if (cursor) qs.set('cursor', cursor);
   if (from) qs.set('from', from);
+
   const init = { headers: authHeaders() };
   const urls = BASES.map(
     b => `${b}/conversations/${encodeURIComponent(conversationId)}/messages?${qs.toString()}`
@@ -98,6 +120,7 @@ export async function listMessages(
 
 /** Send a message */
 export async function sendMessage(conversationId, { text = '', attachments = [] }) {
+  ensureToken();
   const init = {
     method: 'POST',
     headers: authHeaders(true),
@@ -110,6 +133,7 @@ export async function sendMessage(conversationId, { text = '', attachments = [] 
 
 /** Mark a conversation as read for current actor */
 export async function markRead(conversationId) {
+  ensureToken();
   const init = { method: 'POST', headers: authHeaders(true), body: JSON.stringify({}) };
   const urls = BASES.map(b => `${b}/conversations/${encodeURIComponent(conversationId)}/read`);
   await fetchFirstJson(urls, init);
@@ -118,6 +142,7 @@ export async function markRead(conversationId) {
 
 /** Get S3 pre-signed URL for an attachment */
 export async function presignAttachment({ filename, contentType, conversationId }) {
+  ensureToken();
   const init = {
     method: 'POST',
     headers: authHeaders(true),
@@ -125,6 +150,5 @@ export async function presignAttachment({ filename, contentType, conversationId 
   };
   const urls = BASES.map(b => `${b}/attachments/presign`);
   const json = await fetchFirstJson(urls, init);
-  // Expecting: { uploadUrl, requiredHeaders, file: { key, url, contentType } }
-  return json;
+  return json; // { uploadUrl, requiredHeaders, file:{ key, url, contentType } }
 }

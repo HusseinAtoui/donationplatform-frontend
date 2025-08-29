@@ -150,21 +150,17 @@ function AcceptPledgeModal({ open, onClose, onSubmit, request, ngo }) {
 
           <div className="fi">
             <span>Delivery method</span>
-            <div className="delivery-options">
-              {['dropoff', 'pickup', 'shipping'].map(opt => (
-                <button
-                  key={opt}
-                  type="button"
-                  className={`chip ${deliveryMethod === opt ? 'active' : ''}`}
-                  onClick={() => setDeliveryMethod(opt)}
-                  disabled={busy}
-                >
-                  {opt === 'dropoff' && 'Drop-off'}
-                  {opt === 'pickup'  && 'NGO Pickup'}
-                  {opt === 'shipping' && 'Shipping / Courier'}
-                </button>
-              ))}
-            </div>
+      <select
+  value={deliveryMethod}
+  onChange={(e) => setDeliveryMethod(e.target.value)}
+  disabled={busy}
+  className="fi-input"
+>
+  <option value="dropoff">Drop-off</option>
+  <option value="pickup">NGO Pickup</option>
+  <option value="shipping">Shipping / Courier</option>
+</select>
+
           </div>
 
           <div className="grid-2">

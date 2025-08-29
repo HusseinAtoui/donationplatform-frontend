@@ -22,7 +22,10 @@ function isTokenValid(token) {
   }
   // If token has no exp, treat as valid (adjust if you prefer stricter)
   return true;
-}
+}const ROUTE_FOR_ROLE = {
+  ngo: '/ngoprofile',      // ensure this EXACTLY matches your Route path (case-sensitive)
+  donor: '/donorprofile',
+};
 
 export default function NavBar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,25 +41,16 @@ export default function NavBar() {
   }, [isMobileMenuOpen]);
 
   const isActive = (path) => location.pathname === path;
-
   // 👇 NEW: keep the same icon & class, only override click behavior
   const handleProfileIconClick = (e) => {
     e.preventDefault(); // prevent Link default nav
     const token = localStorage.getItem('token');
     const role = (localStorage.getItem('role') || '').toLowerCase();
-
-    if (isTokenValid(token)) {
-      if (role === 'ngo') {
-        navigate('/NGOProfile');
-      } else if (role === 'donor') {
-        navigate('/DonorProfile');
-      } else {
-        navigate('/login');
-      }
+  if (isTokenValid(token) && ROUTE_FOR_ROLE[role]) {
+      navigate(ROUTE_FOR_ROLE[role], { replace: true });
     } else {
-      navigate('/signup');
+      navigate('/login', { replace: true });
     }
-
     closeMobileMenu();
   };
 

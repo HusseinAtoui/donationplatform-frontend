@@ -268,63 +268,118 @@ export default function NGOProfile() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+// ---- Avatar uploading state and function ----
+const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+async function uploadAvatar(file) {
+  if (!profile?.id || !file) return;
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    navigate('/login');
+    return;
+  }
+
+  try {
+    setUploadingAvatar(true);
+
+    const form = new FormData();
+    form.append('logo', file); // multer expects "logo" field name
+
+    const res = await fetch(
+      `${API_BASE}/ngo/update/${encodeURIComponent(profile.id)}`,
+      {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      }
+    );
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Failed to upload profile picture');
+    }
+
+    // Refresh profile to pull the new logoUrl
+    const me = await fetch(`${API_BASE}/ngo/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (me.ok) {
+      const data = await me.json().catch(() => ({}));
+      if (data?.profile) setProfile(data.profile);
+    }
+  } catch (e) {
+    alert(e.message || 'Upload failed');
+  } finally {
+    setUploadingAvatar(false);
+  }
+}
 
   const pickFile = () => fileRef.current?.click();
-  const onAvatarChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith("image/")) return;
-    const url = URL.createObjectURL(file);
-    setAvatarSrc((prev) => {
-      if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
-      return url;
-    });
-    e.target.value = "";
-  };
+const onAvatarChange = (e) => {
+  const file = e.target.files?.[0];
+  if (!file || !file.type.startsWith('image/')) return;
+
+  // local preview
+  const url = URL.createObjectURL(file);
+  setAvatarSrc((prev) => {
+    if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
+    return url;
+  });
+
+  // upload to backend
+  uploadAvatar(file);
+
+  e.target.value = '';
+};
+
 
   useEffect(() => {
     return () => {
       if (avatarSrc?.startsWith("blob:")) URL.revokeObjectURL(avatarSrc);
     };
   }, [avatarSrc]);
+useEffect(() => {
+  let cancelled = false;
 
-  // Load profile (protected: /api/ngo/me)
-  useEffect(() => {
-    async function loadProfile() {
-      try {
-        setLoading(true);
-        setErr("");
-
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
-        }
-
-        const res = await fetch(`${API_BASE}/ngo/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (res.status === 401 || res.status === 403) {
-          localStorage.removeItem("token");
-          navigate("/login");
-          return;
-        }
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || "Failed to load profile");
-        }
-
-        const data = await res.json(); // { profile: {...} }
-        setProfile(data.profile);
-      } catch (e) {
-        setErr(e.message || "Error loading profile");
-      } finally {
-        setLoading(false);
-      }
+  async function loadProfile() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login', { replace: true });
+      return;
     }
 
-    loadProfile();
-  }, [navigate]);
+    try {
+      const res = await fetch(`${API_BASE}/ngo/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.status === 401 || res.status === 403 || res.status === 404) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to load profile');
+      }
+
+      const data = await res.json();
+      if (!cancelled) setProfile(data.profile);
+    } catch (e) {
+      // show an inline error, but DO NOT loop-redirect
+      if (!cancelled) setErr(e.message || 'Error loading profile');
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  }
+
+  loadProfile();
+  return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []); // <-- run once
 
   // Fetch posts for THIS NGO only
   const fetchPostsForNgo = useCallback(async (ngoId) => {
@@ -629,17 +684,16 @@ export default function NGOProfile() {
             <div className="avatar-lg">
               {avatar ? <img src={avatar} alt="NGO avatar" /> : <Camera size={28} />}
             </div>
-
-            {/* Local preview only */}
-            <button
-              type="button"
-              className="avatar-add"
-              onClick={pickFile}
-              aria-label="Change NGO picture"
-              title="Change picture"
-            >
-              <Plus size={50} strokeWidth={3} />
-            </button>
+<button
+  type="button"
+  className="avatar-add"
+  onClick={pickFile}
+  aria-label="Change NGO picture"
+  title={uploadingAvatar ? "Uploading…" : "Change picture"}
+  disabled={uploadingAvatar}
+>
+  <Plus size={50} strokeWidth={3} />
+</button>
 
             <input
               ref={fileRef}
