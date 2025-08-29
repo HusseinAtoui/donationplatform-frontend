@@ -4,8 +4,8 @@
 }
 
 .map-filters {
-  position: absolute;
-  top: 20px;
+  position: fixed;
+  top: 90px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--white);
@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  z-index: 1000;
+  z-index: 999;
   white-space: nowrap;
 }
 
@@ -74,4 +74,23 @@
 
 .popup-link:hover {
   text-decoration: underline;
+}
+
+
+@media (max-width: 480px) {
+  .map-filters {
+    min-width: 300px; /* smaller width on phones */
+    padding: 0.3rem 0.6rem; /* reduce padding */
+    flex-direction: column; /* stack items if needed */
+    gap: 0.5rem;
+  }
+
+  .map-category-select {
+    min-width: 120px; /* adjust select box */
+    flex-grow: 0;
+  }
+
+  .map-display-select {
+    font-size: 0.9rem; /* slightly smaller text */
+  }
 }
