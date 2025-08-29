@@ -7,6 +7,7 @@ import axios from "axios";
 import greyMarkerImage from '../../assets/grey-map-marker.png';
 import redMarkerImage from '../../assets/red-map-marker.png';
 import './Map.css';
+import { clothingCategories } from "../../constants/clothingcategories";
 
 // Fix for Leaflet marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -51,13 +52,6 @@ export default function MapView() {
 
   // Safe default if env var missing
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
-
-  const categoryOptions = [
-    { value: "jackets", label: "Jackets" },
-    { value: "shoes", label: "Shoes" },
-    { value: "pants", label: "Pants" },
-    { value: "hats", label: "Hats" }
-  ];
 
   const fetchData = async () => {
     try {
@@ -108,7 +102,7 @@ export default function MapView() {
         {displayType === "requests" && (
           <Select
             isMulti
-            options={categoryOptions}
+            options={clothingCategories.map(c => ({ value: c.value, label: c.label }))}
             value={selectedCategories}
             onChange={setSelectedCategories}
             placeholder="Filter categories..."

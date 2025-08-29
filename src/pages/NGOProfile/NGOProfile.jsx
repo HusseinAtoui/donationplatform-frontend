@@ -20,6 +20,7 @@ import {
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { clothingCategories } from "../../constants/clothingcategories";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -781,13 +782,19 @@ useEffect(() => {
           <div className="grid-two">
             <div>
               <label className="input-label">Category*</label>
-              <input
+              <select
                 className="signup-input"
                 name="category"
                 value={reqForm.category}
                 onChange={updateReqField}
-                placeholder="e.g. Women's Winter Coats"
-              />
+              >
+                <option value="">Select a category</option>
+                {clothingCategories.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
