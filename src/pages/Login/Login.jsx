@@ -38,6 +38,7 @@ export default function Login() {
   // ---- Notices from URL params ----
   const params = new URLSearchParams(location.search);
   const justVerified   = params.get('verified') === '1';
+  const verifyNeeded   = params.get('verify') === '1';
   const emailChanged   = params.get('emailChanged') === '1';
   const resetSent      = params.get('reset') === '1';
   const loggedOut      = params.get('loggedOut') === '1';
@@ -159,7 +160,7 @@ export default function Login() {
   function getGoogleAuthUrl() {
     return userType === 'NGO'
       ? `${API_BASE}/ngo/auth/google`
-      : `${API_BASE}/user/auth/google`;
+      : `${API_BASE}/user/auth/google/login`;
   }
 
   function handleGoogleLogin() {
@@ -181,13 +182,17 @@ export default function Login() {
         <h1 className="welcome-title">Welcome Back to TyebeTyebak!</h1>
 
         {/* ---- Success notices from URL flags ---- */}
-        {(justVerified || emailChanged || resetSent || loggedOut || accountDeleted) && (
+     {(justVerified || verifyNeeded || emailChanged || resetSent || loggedOut || accountDeleted) && (
           <div className="notice-stack" style={{ marginBottom: 12 }}>
             {justVerified && (
               <div className="notice" style={{ color: 'green' }}>
                 Your email is verified. Please log in.
               </div>
-            )}
+            )} {verifyNeeded && (
+     <div className="notice" style={{ color: 'orange' }}>
+       We sent a verification link to your email. Please verify to continue.
+     </div>
+   )}
             {emailChanged && (
               <div className="notice" style={{ color: 'green' }}>
                 Your email was updated successfully. Please log in with the new email.
@@ -252,8 +257,10 @@ export default function Login() {
             autoComplete="current-password"
           />
 
-          <p className="forgot-password">Forgot your password?</p>
 
+          <p className="forgot-password" role="button" tabIndex={0} onClick={() => navigate('/forgot-password')}>
+ Forgot your password?
+ </p>
           <button className="login-btn" onClick={handleLogin} disabled={loading} type="submit">
             {loading ? 'Logging in…' : 'LOGIN'}
           </button>

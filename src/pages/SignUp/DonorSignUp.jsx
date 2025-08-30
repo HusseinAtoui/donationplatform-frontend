@@ -22,6 +22,13 @@ export default function DonorSignUp() {
 
   // If backend ever redirects back here with ?token=&user=, capture it (optional)
   useEffect(() => {
+
+   // Prefill from login redirect (no existing account)
+ const params = new URLSearchParams(window.location.search);
+ const prefillEmail = params.get('email');
+ if (prefillEmail) {
+  setFormData((s) => ({ ...s, email: prefillEmail }));
+}
     const urlParams = new URLSearchParams(window.location.search);
     const tokenParam = urlParams.get('token');
     const userParam = urlParams.get('user');
@@ -47,7 +54,7 @@ export default function DonorSignUp() {
 
   // Kick off Google OAuth for donor
   const handleGoogleSignup = () => {
-    window.location.href = `${API_BASE}/api/user/auth/google`;
+  window.location.href = `${API_BASE}/api/user/auth/google/signup`;
   };
 
   const [formData, setFormData] = useState({
