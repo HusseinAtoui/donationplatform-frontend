@@ -314,7 +314,7 @@ export default function Donations() {
     const token = localStorage.getItem('token');
     if (!token) { navigate('/login'); return; }
 
-    const primary = `${API_URL}/api/home/requests/${encodeURIComponent(modalReq.requestId)}/accept`;
+    const primary = `${API_URL}/home/requests/${encodeURIComponent(modalReq.requestId)}/accept`;
     const fallback = `${API_URL}/home/requests/${encodeURIComponent(modalReq.requestId)}/accept`;
 
     const { res, data } = await fetchWithFallback(primary, fallback, {
