@@ -16,7 +16,7 @@ export default function OurPartners() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch(`${API_URL}/api/ngo/ngos`);
+        const res = await fetch(`${API_URL}/ngo/ngos`);
         if (!res.ok) throw new Error('Failed to fetch NGOs');
         const data = await res.json();
 
