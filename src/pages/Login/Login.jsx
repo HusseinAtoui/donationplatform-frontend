@@ -38,7 +38,8 @@ export default function Login() {
   // ---- Notices from URL params ----
   const params = new URLSearchParams(location.search);
   const justVerified   = params.get('verified') === '1';
-  const verifyNeeded   = params.get('verify') === '1';
+ const verifyParam    = params.get('verify');
+const verifyNeeded   = verifyParam === '1' || verifyParam === 'needed';
   const emailChanged   = params.get('emailChanged') === '1';
   const resetSent      = params.get('reset') === '1';
   const loggedOut      = params.get('loggedOut') === '1';
@@ -159,7 +160,7 @@ export default function Login() {
 
   function getGoogleAuthUrl() {
     return userType === 'NGO'
-      ? `${API_BASE}/ngo/auth/google`
+      ? `${API_BASE}/ngo/auth/google/login`
       : `${API_BASE}/user/auth/google/login`;
   }
 
