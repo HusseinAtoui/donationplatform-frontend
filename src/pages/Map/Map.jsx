@@ -131,8 +131,8 @@ export default function MapView() {
             .filter(ngo => ngo.coordinates && !isNaN(ngo.coordinates.lat) && !isNaN(ngo.coordinates.lng))
             .map(ngo => (
               <Marker key={ngo.id || `${ngo.coordinates.lat},${ngo.coordinates.lng}`}
-                      position={[ngo.coordinates.lat, ngo.coordinates.lng]}
-                      icon={ngoIcon}>
+                position={[ngo.coordinates.lat, ngo.coordinates.lng]}
+                icon={ngoIcon}>
                 <Popup>
                   <div className="popup-card">
                     <strong>{ngo.name || 'NGO'}</strong><br />
@@ -148,8 +148,8 @@ export default function MapView() {
             .filter(req => req.coordinates && !isNaN(req.coordinates.lat) && !isNaN(req.coordinates.lng))
             .map(req => (
               <Marker key={req.requestId || `${req.coordinates.lat},${req.coordinates.lng}`}
-                      position={[req.coordinates.lat, req.coordinates.lng]}
-                      icon={requestIcon}>
+                position={[req.coordinates.lat, req.coordinates.lng]}
+                icon={requestIcon}>
                 <Popup>
                   <div className="popup-card">
                     <strong>{req.category || 'Request'}</strong><br />
