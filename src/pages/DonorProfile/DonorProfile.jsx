@@ -20,10 +20,29 @@ import {
   ChevronDown,
 } from "lucide-react";
 
+// Normalize base to avoid trailing slashes
 // CRA env style; set REACT_APP_API_BASE=http://localhost:4000 (no trailing slash) in frontend .env
-const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000";
+const API_BASE = (process.env.REACT_APP_API_BASE || "http://localhost:4000").replace(/\/+$/, "");
 
-/* ------------ Small Chip component (kept) ------------ */
+/* ---------------- JWT helpers (strict) ---------------- */
+function decodeJwtPayload(token) {
+  try {
+    const base64 = token.split(".")[1];
+    const json = atob(base64.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(decodeURIComponent(escape(json)));
+  } catch {
+    return null;
+  }
+}
+
+function isTokenValid(token) {
+  if (!token) return false;
+  const payload = decodeJwtPayload(token);
+  if (!payload || typeof payload.exp !== "number") return false;
+  return payload.exp > Math.floor(Date.now() / 1000);
+}
+
+/* ------------ Small Chip component ------------ */
 function Chip({ icon: Icon, text }) {
   if (!text) return null;
   return (
@@ -36,7 +55,7 @@ function Chip({ icon: Icon, text }) {
   );
 }
 
-/* ------------ Settings Dropdown (mirrors NGO) ------------ */
+/* ------------ Settings Dropdown ------------ */
 function SettingsMenu({
   open,
   onClose,
@@ -86,14 +105,13 @@ function SettingsMenu({
           onDeleteAccount();
         }}
       >
-        <Trash2 size={16} style={{ marginRight: 8 }} />{" "}
-        {isDeleting ? "Deleting…" : "Delete Account"}
+        <Trash2 size={16} style={{ marginRight: 8 }} /> {isDeleting ? "Deleting…" : "Delete Account"}
       </button>
     </div>
   );
 }
 
-/* ------------ Edit Profile Modal (donor) ------------ */
+/* ------------ Edit Profile Modal ------------ */
 function EditProfileModal({ open, onClose, profile, onSave }) {
   const [form, setForm] = useState({
     name: "",
@@ -146,10 +164,8 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
       <div
         className="modal card edit-modal"
         onClick={(e) => e.stopPropagation()}
-        /* Make this a positioning context for the close button */
         style={{ position: "relative" }}
       >
-        {/* Small close "X" pinned to the upper-right of the modal/tab */}
         <button
           aria-label="Close"
           title="Close"
@@ -263,24 +279,41 @@ export default function DonorProfile() {
     };
   }, [avatarSrc]);
 
-  // Fetch donor profile
+  // Fetch donor profile (strict JWT + role = donor, no-store)
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
         setErr("");
 
-        const token = localStorage.getItem("token");
-        if (!token) {
+        const token = localStorage.getItem("token") || "";
+        const role = (localStorage.getItem("role") || "").toLowerCase();
+
+        if (!isTokenValid(token)) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
           navigate("/login");
+          return;
+        }
+
+        // donor-only guard (redirect NGO to its profile, others to login)
+        if (role !== "donor") {
+          if (role === "ngo") {
+            navigate("/ngoprofile");
+          } else {
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            navigate("/login");
+          }
           return;
         }
 
         const res = await fetch(`${API_BASE}/api/user/me`, {
           headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
         });
 
-        if (res.status === 401 || res.status === 403) {
+        if (res.status === 401 || res.status === 403 || res.status === 404) {
           localStorage.removeItem("token");
           localStorage.removeItem("role");
           navigate("/login");
@@ -289,9 +322,7 @@ export default function DonorProfile() {
 
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          throw new Error(
-            data?.error || `Failed to load profile (HTTP ${res.status}).`
-          );
+          throw new Error(data?.error || `Failed to load profile (HTTP ${res.status}).`);
         }
 
         const data = await res.json(); // { profile: { ... } }
@@ -380,9 +411,7 @@ export default function DonorProfile() {
     });
 
     if (res.status === 202) {
-      alert(
-        "We sent a verification link to your new email. Please confirm it to finish updating your account email."
-      );
+      alert("We sent a verification link to your new email. Please confirm it to finish updating your account email.");
       return;
     }
 

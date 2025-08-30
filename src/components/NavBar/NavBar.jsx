@@ -11,18 +11,14 @@ function decodeJwtPayload(token) {
   } catch {
     return null;
   }
-}
-
-function isTokenValid(token) {
+}function isTokenValid(token) {
   if (!token) return false;
   const payload = decodeJwtPayload(token);
-  if (payload && typeof payload.exp === 'number') {
-    const nowSec = Math.floor(Date.now() / 1000);
-    return payload.exp > nowSec;
-  }
-  // If token has no exp, treat as valid (adjust if you prefer stricter)
-  return true;
-}const ROUTE_FOR_ROLE = {
+  if (!payload || typeof payload.exp !== 'number') return false;
+  const nowSec = Math.floor(Date.now() / 1000);
+  return payload.exp > nowSec;
+}
+const ROUTE_FOR_ROLE = {
   ngo: '/ngoprofile',      // ensure this EXACTLY matches your Route path (case-sensitive)
   donor: '/donorprofile',
 };
@@ -43,16 +39,31 @@ export default function NavBar() {
   const isActive = (path) => location.pathname === path;
   // 👇 NEW: keep the same icon & class, only override click behavior
   const handleProfileIconClick = (e) => {
-    e.preventDefault(); // prevent Link default nav
-    const token = localStorage.getItem('token');
-    const role = (localStorage.getItem('role') || '').toLowerCase();
-  if (isTokenValid(token) && ROUTE_FOR_ROLE[role]) {
-      navigate(ROUTE_FOR_ROLE[role], { replace: true });
-    } else {
-      navigate('/login', { replace: true });
-    }
+  e.preventDefault();
+
+  const token = localStorage.getItem('token') || '';
+  const role = (localStorage.getItem('role') || '').toLowerCase();
+
+  if (!isTokenValid(token)) {
+    // stale/garbage/expired token -> force login
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/login', { replace: true });
     closeMobileMenu();
-  };
+    return;
+  }
+
+  const dest = ROUTE_FOR_ROLE[role];
+  if (!dest) {
+    // unknown role -> force login
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/login', { replace: true });
+  } else {
+    navigate(dest, { replace: true });
+  }
+  closeMobileMenu();
+};
 
   return (
     <>

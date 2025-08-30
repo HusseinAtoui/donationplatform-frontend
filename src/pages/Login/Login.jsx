@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Login.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000/api';
+// Normalize base to avoid trailing slashes
+const API_BASE = (process.env.REACT_APP_API_BASE || 'http://localhost:4000/api').replace(/\/+$/, '');
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style={{ marginRight: '10px' }}>
@@ -14,31 +15,36 @@ const GoogleIcon = () => (
   </svg>
 );
 
+function decodeJwt(token) {
+  try {
+    const payload = token.split('.')[1];
+    return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+  } catch {
+    return null;
+  }
+}
+
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [userType, setUserType] = useState('Donor'); // default can be 'NGO'
+  const [userType, setUserType] = useState('Donor'); // 'Donor' | 'NGO'
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const justVerified = new URLSearchParams(location.search).get('verified') === '1';
+  // ---- Notices from URL params ----
+  const params = new URLSearchParams(location.search);
+  const justVerified   = params.get('verified') === '1';
+  const emailChanged   = params.get('emailChanged') === '1';
+  const resetSent      = params.get('reset') === '1';
+  const loggedOut      = params.get('loggedOut') === '1';
+  const accountDeleted = params.get('deleted') === '1';
 
-  function decodeJwt(token) {
-    try {
-      const payload = token.split('.')[1];
-      return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-    } catch {
-      return null;
-    }
-  }
-
-  // ⬇️ Handle OAuth redirect (?token=&user=) from backend and store session
+  // Handle OAuth redirect (?token=&user=) from backend and store session
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
     const tokenFromOAuth = params.get('token');
     const userJson = params.get('user');
 
@@ -47,7 +53,9 @@ export default function Login() {
         localStorage.setItem('token', tokenFromOAuth);
 
         const decoded = decodeJwt(tokenFromOAuth);
-        const role = decoded?.role || 'user';
+        // backend may use "user" or "donor" — normalize to "donor"
+        let role = (decoded?.role || 'user').toLowerCase();
+        if (role === 'user') role = 'donor';
         localStorage.setItem('role', role);
 
         if (userJson) {
@@ -55,10 +63,9 @@ export default function Login() {
           localStorage.setItem('userData', JSON.stringify(user));
         }
 
-        const to =
-          role === 'ngo' ? '/NGOProfile' :
-          role === 'user' ? '/DonorProfile' :
-          '/';
+        const to = role === 'ngo' ? '/ngoprofile'
+                 : role === 'donor' ? '/donorprofile'
+                 : '/';
         navigate(to, { replace: true });
       } catch (e) {
         console.error('OAuth parse error:', e);
@@ -67,25 +74,25 @@ export default function Login() {
         localStorage.removeItem('userData');
       }
     }
-  }, [location.search, navigate]);
+  }, [location.search, navigate, params]);
 
-  // 🔐 If already authenticated (normal login path), route the user to the correct profile
+  // If already authenticated, route the user to the correct profile
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
     const decoded = decodeJwt(token);
-    const role = decoded?.role || localStorage.getItem('role');
+    let role = (decoded?.role || localStorage.getItem('role') || '').toLowerCase();
+    if (role === 'user') role = 'donor';
 
     if (role === 'ngo') {
-      navigate('/NGOProfile', { replace: true });
-    } else if (role === 'user') {
-      navigate('/DonorProfile', { replace: true });
+      navigate('/ngoprofile', { replace: true });
+    } else if (role === 'donor') {
+      navigate('/donorprofile', { replace: true });
     }
   }, [navigate]);
 
   async function loginTo(url, payload) {
-    console.log('[FE] POST', url, payload);
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -94,8 +101,6 @@ export default function Login() {
 
     let body = {};
     try { body = await res.json(); } catch (_) {}
-
-    console.log('[FE] login response', res.status, body);
     return { ok: res.ok, status: res.status, body };
   }
 
@@ -121,30 +126,26 @@ export default function Login() {
       let { ok, status, body } = await loginTo(primary, payload);
 
       if (!ok && status === 401 && body?.error === 'Invalid credentials.') {
-        console.log('[FE] trying fallback endpoint…');
         const r2 = await loginTo(fallback, payload);
         if (r2.ok) { ok = true; status = r2.status; body = r2.body; }
       }
 
-      if (!ok) {
-        throw new Error(body?.error || `Login failed (${status})`);
-      }
+      if (!ok) throw new Error(body?.error || `Login failed (${status})`);
 
       const { token } = body || {};
       if (!token) throw new Error('No token returned from server.');
 
       localStorage.setItem('token', token);
 
-      let role = userType.toLowerCase();
       const decoded = decodeJwt(token);
-      if (decoded?.role) role = decoded.role;
-
+      let role = (decoded?.role || userType).toLowerCase();
+      if (role === 'user') role = 'donor';
       localStorage.setItem('role', role);
 
       if (role === 'ngo') {
-        navigate('/NGOProfile');
-      } else if (role === 'user') {
-        navigate('/DonorProfile');
+        navigate('/ngoprofile');
+      } else if (role === 'donor') {
+        navigate('/donorprofile');
       } else {
         navigate('/');
       }
@@ -155,19 +156,16 @@ export default function Login() {
     }
   }
 
-  // Build correct Google OAuth URL for current userType
   function getGoogleAuthUrl() {
     return userType === 'NGO'
       ? `${API_BASE}/ngo/auth/google`
-      : `${API_BASE}/user/auth/google`; // donor Google OAuth
+      : `${API_BASE}/user/auth/google`;
   }
 
-  // ⬇️ Start Google OAuth for current user type
   function handleGoogleLogin() {
     window.location.href = getGoogleAuthUrl();
   }
 
-  // Keep: toggle-aware signup routing
   function goToSignup() {
     const path = userType === 'NGO' ? '/signup/ngo' : '/signup/donor';
     navigate(path);
@@ -182,9 +180,34 @@ export default function Login() {
 
         <h1 className="welcome-title">Welcome Back to TyebeTyebak!</h1>
 
-        {justVerified && (
-          <div className="notice" style={{ color: 'green', marginBottom: 12 }}>
-            Your email is verified. Please log in.
+        {/* ---- Success notices from URL flags ---- */}
+        {(justVerified || emailChanged || resetSent || loggedOut || accountDeleted) && (
+          <div className="notice-stack" style={{ marginBottom: 12 }}>
+            {justVerified && (
+              <div className="notice" style={{ color: 'green' }}>
+                Your email is verified. Please log in.
+              </div>
+            )}
+            {emailChanged && (
+              <div className="notice" style={{ color: 'green' }}>
+                Your email was updated successfully. Please log in with the new email.
+              </div>
+            )}
+            {resetSent && (
+              <div className="notice" style={{ color: 'green' }}>
+                Password reset link sent. Check your inbox.
+              </div>
+            )}
+            {loggedOut && (
+              <div className="notice" style={{ color: 'green' }}>
+                You’ve been logged out.
+              </div>
+            )}
+            {accountDeleted && (
+              <div className="notice" style={{ color: 'green' }}>
+                Your account was deleted.
+              </div>
+            )}
           </div>
         )}
 
