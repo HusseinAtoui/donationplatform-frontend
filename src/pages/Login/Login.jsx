@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './Login.css';
 
 // Normalize base to avoid trailing slashes
-const API_BASE = (process.env.REACT_APP_API_BASE || 'http://localhost:4000/api').replace(/\/+$/, '');
+const API_BASE = (process.env.REACT_APP_API_BASE || 'https://api.tyebetyebak.org/api').replace(/\/+$/, '');
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style={{ marginRight: '10px' }}>

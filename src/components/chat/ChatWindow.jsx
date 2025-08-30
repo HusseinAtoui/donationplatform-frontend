@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './ChatWindow.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000/api';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://api.tyebetyebak.org/api';
 const isUUID = (s) =>
   typeof s === 'string' &&
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);

@@ -248,8 +248,8 @@ export default function Donations() {
   async function loadAll() {
     try {
       const [{ res: reqRes, data: reqData }, { res: ngoRes, data: ngoData }] = await Promise.all([
-        fetchWithFallback(`${API_URL}/api/home/requests`, `${API_URL}/home/requests`),
-        fetchWithFallback(`${API_URL}/api/ngo/ngos`, `${API_URL}/ngo/ngos`),
+        fetchWithFallback(`${API_URL}/home/requests`, `${API_URL}/home/requests`),
+        fetchWithFallback(`${API_URL}/ngo/ngos`, `${API_URL}/ngo/ngos`),
       ]);
       if (!reqRes.ok || !ngoRes.ok) throw new Error('Failed to fetch');
       setRequests(Array.isArray(reqData) ? reqData : []);
