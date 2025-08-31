@@ -1,70 +1,91 @@
-# Getting Started with Create React App
+# TyebeTyebak Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the React frontend for the TyebeTyebak platform. It provides a user interface for NGO and user interactions, fetching data from the backend API.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 📝 Prerequisites
 
-### `npm start`
+* Node.js (v18+ recommended)
+* npm (v9+ recommended)
+* Optional: yarn
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## ⚡ Installation
 
-### `npm test`
+1. Clone the repository:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+git clone https://github.com/HusseinAtoui/donationplatform-frontend.git
+cd tyebetyebak-frontend
+```
 
-### `npm run build`
+2. Install dependencies:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🌐 Environment Variables
 
-### `npm run eject`
+Create a `.env` file in the root directory:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```env
+# Base API URL for backend
+REACT_APP_API_BASE=http://localhost:4000/api  # For local backend
+# Or for deployed backend
+# REACT_APP_API_BASE=https://api.tyebetyebak.org/api
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+> **Note:** Make sure to include `/api` at the end of the URL so all frontend API requests are prefixed correctly.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🚀 Running the App
 
-## Learn More
+Start the development server:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm start
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The app will be available at `http://localhost:3000`. Changes will reload automatically.
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 🏗️ Building for Production
 
-### Analyzing the Bundle Size
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The production-ready files will be in the `build/` folder. Deploy this folder to **S3, Netlify, Vercel, or any static hosting**.
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## ⚙️ API Endpoints
 
-### Advanced Configuration
+The frontend uses the base API configured in `.env`:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+* **Local backend:** `http://localhost:4000/api`
+* **Deployed backend:** `https://api.tyebetyebak.org/api`
 
-### Deployment
+Example usage in code:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```javascript
+const API_BASE = process.env.REACT_APP_API_BASE;
 
-### `npm run build` fails to minify
+fetch(`${API_BASE}/home/posts`)
+  .then(res => res.json())
+  .then(data => console.log(data));
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+## 🔧 Additional Notes
+
+* Make sure your backend is running and accessible from the frontend.
+* For SPA routing issues with S3 + CloudFront, configure CloudFront to serve `index.html` for unknown routes (404) to avoid refresh errors.
