@@ -5,7 +5,7 @@ import 'react-phone-input-2/lib/style.css';
 import './DonorSignUp.css';
 import { Eye, EyeOff } from 'lucide-react';
 
-const API_BASE = 'https://api.tyebetyebak.org';
+const API_BASE = 'https://api.tyebetyebak.org/api';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style={{ marginRight: '10px' }}>
