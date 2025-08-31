@@ -2,6 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './DonationRequestCard.css';
 
+// ---- NEW: location formatter ----
+function formatLocationForChip(loc) {
+  const s = (typeof loc === 'string' ? loc : (loc?.address || '')).trim();
+  if (!s) return '';
+  const beforeComma = s.split(',')[0]?.trim();
+  let display = beforeComma || s.split(/\s+/)[0] || '';
+  if (display.length > 30) display = display.slice(0, 30).trim() + '…';
+  return display;
+}
+
 export default function DonationRequestCard({
   ngoId,
   ngoName,
@@ -22,6 +32,7 @@ export default function DonationRequestCard({
               className="ngo-logo-placeholder"
               style={ngoLogo ? { backgroundImage: `url(${ngoLogo})` } : undefined}
             />
+            {/* NGO Name wraps naturally now */}
             <h3 className="ngo-name">{ngoName}</h3>
           </div>
 
@@ -31,7 +42,7 @@ export default function DonationRequestCard({
         </div>
 
         <div className="bottom-row">
-          <p className="ngo-location">📍 {location}</p>
+          <p className="ngo-location">📍 {formatLocationForChip(location)}</p>
           <p className="donation-description">{description}</p>
         </div>
       </div>
@@ -40,6 +51,5 @@ export default function DonationRequestCard({
         {bannerClass === 'urgent' ? 'Urgent' : 'Standard'}
       </div>
     </div>
-
   );
 }
