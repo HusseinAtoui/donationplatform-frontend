@@ -152,7 +152,7 @@ export default function NGOSignUp() {
       }
 
 
-      const res = await fetch(`${API_BASE}/ngo/create`, {
+      const res = await fetch(`${API_BASE}/api/ngo/create`, {
         method: 'POST',
         body: fd
       });
