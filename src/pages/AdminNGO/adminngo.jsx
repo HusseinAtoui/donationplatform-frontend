@@ -300,36 +300,36 @@ export default function AdminNGO() {
     }
   }// keep your getAccepterUserId(a) helper as-is
 
-function messageAccepter(a) {
-  const type = String(a.accepterType || a.donorType || "").toLowerCase();
-  if (type === "ngo") {
-    alert("Messaging between NGOs isn’t supported. Ask the donor to accept as a user.");
-    return;
+  function messageAccepter(a) {
+    const type = String(a.accepterType || a.donorType || "").toLowerCase();
+    if (type === "ngo") {
+      alert("Messaging between NGOs isn’t supported. Ask the donor to accept as a user.");
+      return;
+    }
+
+    const uid =
+      getAccepterUserId(a) ||
+      a.accepterId || a.userId || a.donorId; // extra safety
+
+    if (!uid) {
+      alert("No user id found on this acceptance.");
+      return;
+    }
+
+    // best-available display name + avatar from the acceptance/request payload
+    const name =
+      a.accepterName || a.donorName || a.donor?.name || a.user?.name || "";
+    const avatar =
+      a.accepterAvatar || a.donor?.avatarUrl || a.donor?.photoURL || a.user?.avatarUrl || "";
+
+    const url =
+      `/messages?withUser=${encodeURIComponent(uid)}` +
+      `&requestId=${encodeURIComponent(a.requestId || "")}` +
+      (name ? `&withName=${encodeURIComponent(name)}` : "") +
+      (avatar ? `&withAvatar=${encodeURIComponent(avatar)}` : "");
+
+    navigate(url);
   }
-
-  const uid =
-    getAccepterUserId(a) ||
-    a.accepterId || a.userId || a.donorId; // extra safety
-
-  if (!uid) {
-    alert("No user id found on this acceptance.");
-    return;
-  }
-
-  // best-available display name + avatar from the acceptance/request payload
-  const name =
-    a.accepterName || a.donorName || a.donor?.name || a.user?.name || "";
-  const avatar =
-    a.accepterAvatar || a.donor?.avatarUrl || a.donor?.photoURL || a.user?.avatarUrl || "";
-
-  const url =
-    `/messages?withUser=${encodeURIComponent(uid)}` +
-    `&requestId=${encodeURIComponent(a.requestId || "")}` +
-    (name ? `&withName=${encodeURIComponent(name)}` : "") +
-    (avatar ? `&withAvatar=${encodeURIComponent(avatar)}` : "");
-
-  navigate(url);
-}
 
   const filteredAcceptances = useMemo(() => {
     if (!acceptanceFilterRid) return acceptances;

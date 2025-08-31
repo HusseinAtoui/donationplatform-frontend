@@ -150,16 +150,16 @@ function AcceptPledgeModal({ open, onClose, onSubmit, request, ngo }) {
 
           <div className="fi">
             <span>Delivery method</span>
-      <select
-  value={deliveryMethod}
-  onChange={(e) => setDeliveryMethod(e.target.value)}
-  disabled={busy}
-  className="fi-input"
->
-  <option value="dropoff">Drop-off</option>
-  <option value="pickup">NGO Pickup</option>
-  <option value="shipping">Shipping / Courier</option>
-</select>
+            <select
+              value={deliveryMethod}
+              onChange={(e) => setDeliveryMethod(e.target.value)}
+              disabled={busy}
+              className="fi-input"
+            >
+              <option value="dropoff">Drop-off</option>
+              <option value="pickup">NGO Pickup</option>
+              <option value="shipping">Shipping / Courier</option>
+            </select>
 
           </div>
 
@@ -248,8 +248,8 @@ export default function Donations() {
   async function loadAll() {
     try {
       const [{ res: reqRes, data: reqData }, { res: ngoRes, data: ngoData }] = await Promise.all([
-        fetchWithFallback(`${API_URL}/home/requests`, `${API_URL}/home/requests`),
-        fetchWithFallback(`${API_URL}/ngo/ngos`, `${API_URL}/ngo/ngos`),
+        fetchWithFallback(`${API_URL}/api/home/requests`, `${API_URL}/home/requests`),
+        fetchWithFallback(`${API_URL}/api/ngo/ngos`, `${API_URL}/ngo/ngos`),
       ]);
       if (!reqRes.ok || !ngoRes.ok) throw new Error('Failed to fetch');
       setRequests(Array.isArray(reqData) ? reqData : []);
@@ -314,7 +314,7 @@ export default function Donations() {
     const token = localStorage.getItem('token');
     if (!token) { navigate('/login'); return; }
 
-    const primary = `${API_URL}/home/requests/${encodeURIComponent(modalReq.requestId)}/accept`;
+    const primary = `${API_URL}/api/home/requests/${encodeURIComponent(modalReq.requestId)}/accept`;
     const fallback = `${API_URL}/home/requests/${encodeURIComponent(modalReq.requestId)}/accept`;
 
     const { res, data } = await fetchWithFallback(primary, fallback, {
@@ -344,27 +344,27 @@ export default function Donations() {
         return;
       }
       throw new Error(data?.error || 'Failed to accept');
-    }if (data?.nextAction?.type === 'message' && data?.nextAction?.url) {
-  const fixed = data.nextAction.url.replace('/messages/start', '/messages');
-  setModalOpen(false);
-  navigate(fixed);
-} else {
-  // your existing manual URL building for /messages?... 
+    } if (data?.nextAction?.type === 'message' && data?.nextAction?.url) {
+      const fixed = data.nextAction.url.replace('/messages/start', '/messages');
+      setModalOpen(false);
+      navigate(fixed);
+    } else {
+      // your existing manual URL building for /messages?... 
 
 
-  // Deep-link to the Messages page with the NGO as the other side
-  const url =
-    `/messages?withNgo=${encodeURIComponent(String(modalReq.ngoId))}` +
-    `&requestId=${encodeURIComponent(String(modalReq.requestId || ""))}` +
-    (modalNgo?.name ? `&withName=${encodeURIComponent(modalNgo.name)}` : "") +
-    (modalNgo?.logoUrl ? `&withAvatar=${encodeURIComponent(modalNgo.logoUrl)}` : "");
+      // Deep-link to the Messages page with the NGO as the other side
+      const url =
+        `/messages?withNgo=${encodeURIComponent(String(modalReq.ngoId))}` +
+        `&requestId=${encodeURIComponent(String(modalReq.requestId || ""))}` +
+        (modalNgo?.name ? `&withName=${encodeURIComponent(modalNgo.name)}` : "") +
+        (modalNgo?.logoUrl ? `&withAvatar=${encodeURIComponent(modalNgo.logoUrl)}` : "");
 
-  setModalOpen(false);
-  navigate(url);
-}
+      setModalOpen(false);
+      navigate(url);
+    }
 
-// Optionally refresh lists in the background
-await loadAll();
+    // Optionally refresh lists in the background
+    await loadAll();
 
   }
 

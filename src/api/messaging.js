@@ -1,5 +1,5 @@
 // src/api/messaging.js
-const API_ROOT = 'https://api.tyebetyebak.org/api';
+const API_ROOT = process.env.REACT_APP_API_BASE || 'http://localhost:4000/api';
 const BASES = [`${API_ROOT}/messages`];
 
 const AUTH_ERR = 'AUTH_FAIL';

@@ -11,7 +11,7 @@ function decodeJwtPayload(token) {
   } catch {
     return null;
   }
-}function isTokenValid(token) {
+} function isTokenValid(token) {
   if (!token) return false;
   const payload = decodeJwtPayload(token);
   if (!payload || typeof payload.exp !== 'number') return false;
@@ -39,31 +39,31 @@ export default function NavBar() {
   const isActive = (path) => location.pathname === path;
   // 👇 NEW: keep the same icon & class, only override click behavior
   const handleProfileIconClick = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const token = localStorage.getItem('token') || '';
-  const role = (localStorage.getItem('role') || '').toLowerCase();
+    const token = localStorage.getItem('token') || '';
+    const role = (localStorage.getItem('role') || '').toLowerCase();
 
-  if (!isTokenValid(token)) {
-    // stale/garbage/expired token -> force login
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/login', { replace: true });
+    if (!isTokenValid(token)) {
+      // stale/garbage/expired token -> force login
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      navigate('/login', { replace: true });
+      closeMobileMenu();
+      return;
+    }
+
+    const dest = ROUTE_FOR_ROLE[role];
+    if (!dest) {
+      // unknown role -> force login
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      navigate('/login', { replace: true });
+    } else {
+      navigate(dest, { replace: true });
+    }
     closeMobileMenu();
-    return;
-  }
-
-  const dest = ROUTE_FOR_ROLE[role];
-  if (!dest) {
-    // unknown role -> force login
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/login', { replace: true });
-  } else {
-    navigate(dest, { replace: true });
-  }
-  closeMobileMenu();
-};
+  };
 
   return (
     <>
@@ -77,14 +77,14 @@ export default function NavBar() {
           <Link to="/map" className={`navbar__menu-item ${isActive('/map') ? 'active' : ''}`} onClick={closeMobileMenu}>Map</Link>
           <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`} onClick={closeMobileMenu}>Donations</Link>
           <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`} onClick={closeMobileMenu}>Our Partners</Link>
-            
-         
+
+
 
         </nav>
 
         {/* Right side: login/profile icon + hamburger */}
         <div className="navbar__actions">
-  <MessageIcon hideIfNone />
+          <MessageIcon hideIfNone />
           {/* KEEPING the same shape, SVG, and class */}
           <Link
             to="/login"
@@ -93,8 +93,8 @@ export default function NavBar() {
             onClick={handleProfileIconClick}
           >
             <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24"
-                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="7" r="4" />
               <path d="M5.5 21a8.38 8.38 0 0 1 13 0" />
             </svg>

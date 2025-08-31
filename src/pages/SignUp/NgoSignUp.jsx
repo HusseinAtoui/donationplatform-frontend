@@ -68,7 +68,7 @@ export default function NGOSignUp() {
 
   // >>> Google signup: added tiny handler to kick off OAuth
   const handleGoogleSignup = () => {
-    window.location.href = `${API_BASE}/ngo/auth/google/signup`;
+    window.location.href = `${API_BASE}/api/ngo/auth/google/signup`;
   };
   // <<< Google signup
 
@@ -153,7 +153,7 @@ export default function NGOSignUp() {
       }
 
 
-      const res = await fetch(`${API_BASE}/ngo/create`, {
+      const res = await fetch(`${API_BASE}/api/ngo/create`, {
         method: 'POST',
         body: fd
       });

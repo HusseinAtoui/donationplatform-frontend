@@ -54,7 +54,7 @@ export default function DonorSignUp() {
 
   // Kick off Google OAuth for donor
   const handleGoogleSignup = () => {
-  window.location.href = `${API_BASE}/user/auth/google/signup`;
+  window.location.href = `${API_BASE}/api/user/auth/google/signup`;
   };
 
   const [formData, setFormData] = useState({
@@ -114,7 +114,7 @@ export default function DonorSignUp() {
 
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/user/create`, {
+      const res = await fetch(`${API_BASE}/api/user/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
