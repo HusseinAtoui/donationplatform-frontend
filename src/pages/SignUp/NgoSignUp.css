@@ -466,13 +466,20 @@
 @media (max-width: 768px) {
   .signup-container {
     flex-direction: column;
+    height: auto;
+    /* allow container to expand */
+    overflow-y: auto;
+    /* scrollable vertically */
+    min-height: 100vh;
+    /* at least full viewport height */
   }
 
   .signup-left,
   .login-image {
     max-width: 100%;
     flex: none;
-    height: 50vh;
+    height: auto;
+    /* allow content to determine height */
     padding: 40px 30px;
   }
 }

@@ -18,9 +18,7 @@ const ngoIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-
 const defaultCenter = [33.8938, 35.5018]; // Beirut
-
 
 // ✅ unified API base (same style as NGOProfile)
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
@@ -39,7 +37,7 @@ export default function NGOSignUp() {
 
   // Map elements!
   const [showMap, setShowMap] = useState(false);
-  
+
   // ——— URL param handling only; no forced auth for public signup ———
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -123,6 +121,7 @@ export default function NGOSignUp() {
   const handleNext = () => {
     if (validatePage1()) setCurrentPage(2);
   };
+
   const handleBack = () => setCurrentPage(1);
 
   const handleSubmit = async (e) => {
@@ -437,7 +436,7 @@ export default function NGOSignUp() {
       </div>
 
       <div className="login-image" />
-      
+
 
       {showMap && (
         <CoordinatesPicker
