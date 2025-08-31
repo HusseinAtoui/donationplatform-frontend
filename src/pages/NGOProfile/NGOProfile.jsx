@@ -49,7 +49,7 @@ const CONTENT_BASE = `${API_BASE}/home`; // must match Express mount
 function Chip({ icon: Icon, text }) {
   if (!text) return null;
   return (
-    <div className="chip">
+    <div className="chip" title={text}>
       <span className="chip-icon">
         <Icon size={14} />
       </span>
@@ -271,7 +271,19 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
       </div>
     </div>
   );
+}function formatLocationForChip(loc) {
+  const s = (typeof loc === 'string' ? loc : (loc?.address || '')).trim();
+  if (!s) return '';
+
+  // Prefer the chunk before the first comma
+  const beforeComma = s.split(',')[0]?.trim();
+  let display = beforeComma || s.split(/\s+/)[0] || '';
+
+  // Hard cap in case the first chunk is still super long (rare)
+  if (display.length > 30) display = display.slice(0, 30).trim() + '…';
+  return display;
 }
+
 
 export default function NGOProfile() {
   const navigate = useNavigate();
@@ -713,10 +725,11 @@ useEffect(() => {
   const avatar = avatarSrc || logoUrl || null;
 
   // ---- FIX: always render a string for location ----
-  const displayLocation =
-    typeof location === "string"
-      ? location
-      : (location?.address || "");
+  // ---- FIX: always render a trimmed string for location (profile only) ----
+const rawLocation =
+  typeof location === "string" ? location : (location?.address || "");
+const displayLocation = formatLocationForChip(rawLocation);
+
 
   return (
     <div className="page">

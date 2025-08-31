@@ -694,3 +694,40 @@ textarea {
 .col-span-2 {
   grid-column: span 2;
 }
+/* ===== FORCE VERTICAL STACK, MINIMAL SPACE, DON'T BREAK HEADER GRID ===== */
+
+/* Make the whole page vertical */
+.page {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+
+/* Each section takes a full row */
+.page > .wrap {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  flex: 0 0 auto !important;
+  grid-column: 1 / -1 !important;
+  clear: both !important;
+}
+
+/* Preserve header-card grid layout (so Admin/Settings stay put) */
+.header-card {
+  display: grid !important; /* keep its grid */
+}
+
+/* Stack these major blocks; don't touch generic .card */
+.posts-head,
+.stack,
+.requests-row,
+footer {
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Tight spacing between sections */
+.page > .wrap + .wrap {
+  margin-top: 8px !important; /* set to 0 if you want it flush */
+}

@@ -17,6 +17,10 @@ import AdminNGO from './pages/AdminNGO/adminngo.jsx'
 import NGOPublicProfile from './pages/NGOPublicProfile/NGOPublicProfile';
 import MessagesPage from './pages/Messages/MessagesPage';
 import Map from './pages/Map/Map';
+import OnboardingNGOLocation from './pages/Onboarding/OnboardingNGOLocation';
+
+// ...
+
 function AppContent() {
   const location = useLocation();
 
@@ -42,6 +46,8 @@ function AppContent() {
         <Route path="/ngo/:id" element={<NGOPublicProfile />} />
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/map" element={<Map />} />
+        <Route path="/onboarding/ngo/location" element={<OnboardingNGOLocation />} />
+
       </Routes>
     </>
   );

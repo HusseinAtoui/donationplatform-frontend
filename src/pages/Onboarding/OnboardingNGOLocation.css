@@ -1,0 +1,269 @@
+/* =========================
+   OnboardingNGOLocation.css
+   ========================= */
+
+/* Root palette + spacing */
+:root{
+  --bg: #f7faf9;
+  --card-bg: #fff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --brand: #5fab7d;
+  --brand-hover: #549f72;
+
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(15,23,42,.04);
+  --gap: 16px;
+}
+
+/* Layout shell */
+.page{
+  min-height: 100dvh;
+  background: var(--bg);
+  display:flex;
+  align-items:flex-start;
+}
+
+.wrap{
+  width:100%;
+  max-width: 1100px;
+  margin: clamp(12px, 3vw, 28px) auto;
+  padding: 0 clamp(10px, 3vw, 18px);
+}
+
+/* Card */
+.card{
+  background: var(--card-bg);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(14px, 2.5vw, 22px);
+}
+
+.card h2{
+  margin:0 0 6px;
+  font-weight:800;
+  font-size: clamp(20px, 2.4vw, 28px);
+  color: var(--text);
+}
+
+.muted{
+  margin:0 0 18px;
+  color: var(--muted);
+  line-height:1.5;
+}
+
+/* Labels & inputs */
+.input-label{
+  display:block;
+  margin: 10px 0 6px;
+  font-size: clamp(12px,.9vw,13px);
+  font-weight:700;
+  color:#374151;
+}
+
+.signup-input{
+  width:100%;
+  padding: 12px 13px;
+  border:1px solid var(--border);
+  border-radius: 10px;
+  background:#fff;
+  color: var(--text);
+  outline:none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+  font-size: clamp(14px, 1.1vw, 16px);
+}
+
+/* Focus ring with fallback for browsers without color-mix */
+.signup-input:focus{
+  border-color: var(--brand);
+  /* fallback */
+  box-shadow: 0 0 0 3px rgba(95,171,125,.15);
+  /* modern */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+/* Map box: responsive heights by viewport size & orientation */
+.map-box{
+  width:100%;
+  height: 42vh;           /* default for small phones */
+  min-height: 260px;
+  max-height: 520px;
+  border-radius: 10px;
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+
+.leaflet-container{
+  height:100%;
+  width:100%;
+}
+
+/* Coordinates hint */
+.coords-hint{
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Button */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border:1px solid var(--brand);
+  background: var(--brand);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  transition: transform .06s ease, box-shadow .15s ease, background .15s ease;
+  touch-action: manipulation;
+}
+
+.btn:hover{
+  background: var(--brand-hover);
+  box-shadow: 0 8px 20px rgba(95,171,125,.20);
+}
+.btn:active{ transform: translateY(1px); }
+.btn:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+
+/* Safe-area support (iPhone notch) */
+@supports(padding:max(0px)){
+  .wrap{
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* --------- Breakpoints --------- */
+
+/* Large phones / small tablets */
+@media (min-width: 480px){
+  .map-box{ height: 45vh; min-height: 300px; max-height: 560px; }
+}
+
+/* Tablets */
+@media (min-width: 768px){
+  .map-box{ height: 50vh; min-height: 360px; max-height: 600px; }
+}
+
+/* Desktops */
+@media (min-width: 1024px){
+  .map-box{ height: 54vh; min-height: 380px; max-height: 640px; }
+}
+
+/* Landscape phones: give a bit more height */
+@media (orientation: landscape) and (max-height: 460px){
+  .map-box{ height: 62vh; min-height: 240px; }
+}
+
+/* Motion accessibility */
+@media (prefers-reduced-motion: reduce){
+  *{
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================
+   Geocod   ========================= */
+/* =========================
+   Geocoder search dropdown
+   ========================= */
+.geo-search{
+  position: relative;
+  /* sit above Leaflet panes (markers ~600, popups ~700) */
+  z-index: 1200;
+}
+
+.geo-results{
+  position: absolute;
+  /* open downward, but OVER the map */
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(15,23,42,.12);
+  width: 100%;
+  max-height: 50vh;
+  overflow-y: auto;
+  list-style: none;
+  padding: 6px 0;
+  margin: 0;
+  /* ensure we’re above tiles/markers/popups */
+  z-index: 1300;
+}
+
+.geo-item{
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.geo-item:hover,
+.geo-item.active{ background: #f3f4f6; }
+
+.geo-item.muted{
+  color: var(--muted);
+  cursor: default;
+}
+
+/* Nicer “Searching…” row */
+.geo-item.loading{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.geo-primary{
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.geo-secondary{
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.geo-distance{
+  margin-left: 4px;
+  color: #4b5563;
+}
+
+/* Minimal spinner for the loading row */
+.dot-spinner{
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  border-top-color: var(--brand);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+/* Make the results list a bit shorter on short viewports */
+@media (max-height: 640px) {
+  .geo-results { max-height: 40vh; }
+}
+
+/* Slightly larger touch targets for results on phones */
+@media (max-width: 420px) {
+  .geo-item { padding: 12px 14px; }
+  .signup-input { padding: 14px 14px; font-size: 16px; } /* helps iOS avoid zoom-on-focus */
+}
+
+/* When the keyboard is open on mobile, let the map give space */
+@media (max-width: 768px) {
+  .map-box { min-height: 220px; }
+}
