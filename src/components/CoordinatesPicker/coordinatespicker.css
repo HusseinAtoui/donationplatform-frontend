@@ -1,0 +1,111 @@
+/* --------------------------------------
+  MAP STYLES
+----------------------------------------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.map-searchbar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 1000;
+  width: 80%;
+  max-width: 400px;
+}
+
+.map-search-form {
+  display: flex;
+  gap: 6px;
+}
+
+.map-search-form input {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.map-search-form button {
+  padding: 6px 10px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.map-search-results {
+  margin-top: 6px;
+  list-style: none;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.map-search-results li {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.map-search-results li:hover {
+  background: #f0f0f0;
+}
+
+.map-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 650px;
+  width: 100%;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  border: 3px solid #f0f0f0;
+}
+
+.map-wrapper {
+  width: 100%;
+  aspect-ratio: 16 / 9; /* Keeps map proportional */
+  max-height: 70vh;
+  border-radius: 12px;
+  overflow: hidden; /* ensures map corners match radius */
+  border: 3px solid #e0e0e0;
+}
+
+.map-btn,
+.map-search-form button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: #5FAB7D;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.map-btn:hover,
+.map-search-form button:hover {
+  background-color: #4a9468;
+}
+
+.map-search-form input:focus {
+  border-color: #5FAB7D;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(95, 171, 125, 0.3);
+}

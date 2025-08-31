@@ -5,22 +5,9 @@ import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import './NgoSignUp.css';
 import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet-geosearch/dist/geosearch.css";
 import greyMarkerImage from '../../assets/grey-map-marker.png';
-
-// Fix Leaflet marker icon paths
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-});
+import { isValidLatLng, CoordinatesPicker } from '../../components/CoordinatesPicker/coordinatespicker'
 
 const ngoIcon = new L.Icon({
   iconUrl: greyMarkerImage,
@@ -31,7 +18,9 @@ const ngoIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+
 const defaultCenter = [33.8938, 35.5018]; // Beirut
+
 
 // ✅ unified API base (same style as NGOProfile)
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
@@ -46,114 +35,11 @@ const GoogleIcon = () => (
 );
 
 export default function NGOSignUp() {
+  const navigate = useNavigate();
 
   // Map elements!
-  const navigate = useNavigate();
   const [showMap, setShowMap] = useState(false);
   
-  function SearchBar({ onSelect }) {
-    const map = useMap();
-    const searchRef = React.useRef(null);
-    const [query, setQuery] = useState("");
-    const [results, setResults] = useState([]);
-
-    useEffect(() => {
-      if (searchRef.current) {
-        L.DomEvent.disableClickPropagation(searchRef.current);
-      }
-    }, []);
-
-    const handleSearch = async (e) => {
-      e.preventDefault();
-      if (!query.trim()) return;
-
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
-        );
-        let data = await res.json();
-
-        // ✅ choose reference point (marker or map center)
-        let refLat, refLng;
-        if (formData.coordinates.lat && formData.coordinates.lng) {
-          refLat = formData.coordinates.lat;
-          refLng = formData.coordinates.lng;
-        } else {
-          const center = map.getCenter();
-          refLat = center.lat;
-          refLng = center.lng;
-        }
-
-        // ✅ sort results by distance to reference point
-        data.sort((a, b) => {
-          const distA = Math.hypot(parseFloat(a.lat) - refLat, parseFloat(a.lon) - refLng);
-          const distB = Math.hypot(parseFloat(b.lat) - refLat, parseFloat(b.lon) - refLng);
-          return distA - distB;
-        });
-
-        setResults(data);
-      } catch (err) {
-        console.error("Search error:", err);
-      }
-    };
-
-    const handleSelect = (place) => {
-      const lat = parseFloat(place.lat);
-      const lng = parseFloat(place.lon);
-
-      onSelect({ lat, lng, label: place.display_name });
-      map.setView([lat, lng], 14);
-
-      setQuery("");
-      setResults([]);
-    };
-
-    return (
-      <div className="map-searchbar" ref={searchRef}>
-        <form onSubmit={handleSearch} className="map-search-form">
-          <input
-            type="text"
-            value={query}
-            placeholder="Search location"
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <button type="submit">Go</button>
-        </form>
-
-        {results.length > 0 && (
-          <ul className="map-search-results">
-            {results.map((place) => (
-              <li key={place.place_id} onClick={() => handleSelect(place)}>
-                {place.display_name}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    );
-  }
-
-
-
-  function LocationMarker() {
-    useMapEvents({
-      click(e) {
-        const { lat, lng } = e.latlng;
-        setFormData((prev) => ({
-          ...prev,
-          coordinates: { lat, lng }
-        }));
-      },
-    });
-
-    return formData.coordinates.lat ? (
-      <Marker 
-        position={[formData.coordinates.lat, formData.coordinates.lng]}
-        icon={ngoIcon}
-      />
-    ) : null;
-  }
-
   // ——— URL param handling only; no forced auth for public signup ———
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -375,7 +261,6 @@ export default function NGOSignUp() {
                     ? `${formData.coordinates.lat.toFixed(5)}, ${formData.coordinates.lng.toFixed(5)}`
                     : ''
                 }
-                readOnly
               />
               <button
                 type="button"
@@ -554,67 +439,26 @@ export default function NGOSignUp() {
       <div className="login-image" />
       
 
-      {/* Map elements */}
       {showMap && (
-        <div className="modal-backdrop" onClick={() => setShowMap(false)}>
-          <div className="map-card" onClick={(e) => e.stopPropagation()}>
-            <h3>Select Coordinates</h3>
-            <div 
-              className="map-wrapper"
-              ref={(el) => {
-                if (el) L.DomEvent.disableClickPropagation(el);
-              }}
-            >
-              <MapContainer
-                center={
-                  formData?.coordinates?.lat && formData?.coordinates?.lng
-                    ? [formData.coordinates.lat, formData.coordinates.lng]
-                    : defaultCenter
-                }
-                zoom={12}
-                style={{ width: "100%", height: "100%" }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/">OSM</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <SearchBar
-                  onSelect={({ lat, lng, label }) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      coordinates: { lat, lng },
-                      location: prev.location?.trim() ? prev.location : label,
-                    }));
-                  }}
-                />
-                <LocationMarker/>
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "16px",
-                    right: "16px",
-                    zIndex: 1000,
-                  }}
-                >
-                  <button
-                    type="button"
-                    className="map-btn"
-                    ref={(el) => {
-                      if (el) L.DomEvent.disableClickPropagation(el);
-                    }}
-                    onClick={(e) => {
-                      setShowMap(false);
-                    }}
-                  >
-                    Done
-                  </button>
-                </div>
-              </MapContainer>
-            </div>
-          </div>
-        </div>
+        <CoordinatesPicker
+          initialCoordinates={
+            isValidLatLng(formData.coordinates)
+              ? formData.coordinates
+              : defaultCenter
+          }
+          initialLocation={formData.location}
+          onSave={(coords, name) =>
+            setFormData({
+              ...formData,
+              coordinates: coords,
+              location: name || formData.location,
+            })
+          }
+          onClose={() => setShowMap(false)}
+          markerIcon={ngoIcon}
+        />
       )}
+
 
     </div>
   );

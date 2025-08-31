@@ -17,16 +17,31 @@ import {
   Pencil,
   ChevronDown
 } from "lucide-react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import greyMarkerImage from '../../assets/grey-map-marker.png';
+import redMarkerImage from '../../assets/red-map-marker.png';
+import { isValidLatLng, CoordinatesPicker } from '../../components/CoordinatesPicker/coordinatespicker'
 import { clothingCategories } from "../../constants/clothingcategories";
 
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+const ngoIcon = new L.Icon({
+  iconUrl: greyMarkerImage,
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 });
+
+const requestIcon = new L.Icon({
+  iconUrl: redMarkerImage,
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const defaultCenter = [33.8938, 35.5018]; // Beirut
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000/api";
 const CONTENT_BASE = `${API_BASE}/home`; // must match Express mount
@@ -126,9 +141,11 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
     phone: "",
     location: "",
     summary: "",
-    logoUrl: ""
+    logoUrl: "",
+    coordinates: { lat: null, lng: null }
   });
   const [saving, setSaving] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     if (open && profile) {
@@ -138,7 +155,8 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
         phone: profile.phone || "",
         location: profile.location?.address || profile.location || "",
         summary: profile.summary || profile.bio || "",
-        logoUrl: profile.logoUrl || ""
+        logoUrl: profile.logoUrl || "",
+        coordinates: profile.coordinates || { lat: null, lng: null }
       });
     }
   }, [open, profile]);
@@ -194,6 +212,26 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
               <label>Location</label>
               <input name="location" value={form.location} onChange={update} />
             </div>
+            <div>
+              <label className="input-label">Coordinates</label>
+              <input
+                className="signup-input"
+                value={
+                  form.coordinates?.lat && form.coordinates?.lng
+                    ? `${form.coordinates.lat.toFixed(4)}, ${form.coordinates.lng.toFixed(4)}`
+                    : ""
+                }
+                placeholder="Not selected"
+              />
+              <button
+                type="button"
+                className="btn"
+                style={{ marginTop: 8 }}
+                onClick={() => setShowMap(true)}
+              >
+                Select Coordinates on Map
+              </button>
+            </div>
             <div className="col-span-2">
               <label>Logo URL</label>
               <input name="logoUrl" value={form.logoUrl} onChange={update} placeholder="https://..." />
@@ -209,6 +247,26 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
               {saving ? "Saving…" : "Save Changes"}
             </button>
           </div>
+
+          {showMap && (
+            <CoordinatesPicker
+              initialCoordinates={
+                isValidLatLng(form.coordinates)
+                  ? form.coordinates
+                  : defaultCenter
+              }
+              initialLocation={form.location}
+              onSave={(coords, name) =>
+                setForm({
+                  ...form,
+                  coordinates: coords,
+                  location: name || form.location,
+                })
+              }
+              onClose={() => setShowMap(false)}
+              markerIcon={ngoIcon}
+            />
+          )}
         </form>
       </div>
     </div>
@@ -230,20 +288,6 @@ export default function NGOProfile() {
   const [creatingPost, setCreatingPost] = useState(false);
 
   const [showMap, setShowMap] = useState(false);
-
-  function LocationMarker() {
-    useMapEvents({
-      click(e) {
-        const { lat, lng } = e.latlng;
-        setReqForm((prev) => ({
-          ...prev,
-          coordinates: { lat, lng }
-        }));
-        setShowMap(false);
-      },
-    });
-    return null;
-  }
 
   // requests
   const [requests, setRequests] = useState([]);
@@ -596,6 +640,7 @@ useEffect(() => {
       location: updates.location?.trim(),
       summary: updates.summary ?? "",
       logoUrl: updates.logoUrl?.trim(),
+      coordinates: updates.coordinates ?? null,
     };
 
     const res = await fetch(`${API_BASE}/ngo/me`, {
@@ -865,7 +910,6 @@ useEffect(() => {
                     ? `${reqForm.coordinates.lat.toFixed(4)}, ${reqForm.coordinates.lng.toFixed(4)}`
                     : ""
                 }
-                readOnly
                 placeholder="Not selected"
               />
               <button
@@ -901,37 +945,23 @@ useEffect(() => {
             </div>
 
             {showMap && (
-              <div className="modal-backdrop" onClick={() => setShowMap(false)}>
-                <div
-                  className="modal card"
-                  style={{ maxWidth: 600 }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <h3>Select Coordinates</h3>
-                  <MapContainer
-                    center={[33.8938, 35.5018]} // default center
-                    zoom={12}
-                    style={{ height: "400px", width: "100%", marginTop: "8px" }}
-                  >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/">OSM</a>'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    {reqForm.coordinates?.lat && reqForm.coordinates?.lng && (
-                      <Marker position={[reqForm.coordinates.lat, reqForm.coordinates.lng]} />
-                    )}
-                    <LocationMarker />
-                  </MapContainer>
-                  <button
-                    type="button"
-                    className="btn"
-                    style={{ marginTop: 12 }}
-                    onClick={() => setShowMap(false)}
-                  >
-                    Done
-                  </button>
-                </div>
-              </div>
+              <CoordinatesPicker
+                initialCoordinates={
+                  isValidLatLng(reqForm.coordinates)
+                    ? reqForm.coordinates
+                    : defaultCenter
+                }
+                initialLocation={reqForm.location}
+                onSave={(coords, name) =>
+                  setReqForm({
+                    ...reqForm,
+                    coordinates: coords,
+                    location: name || reqForm.location,
+                  })
+                }
+                onClose={() => setShowMap(false)}
+                markerIcon={requestIcon}
+              />
             )}
           </div>
 
