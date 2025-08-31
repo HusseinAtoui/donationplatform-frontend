@@ -21,7 +21,7 @@ function AppContent() {
   const location = useLocation();
 
   // Define paths where NavBar should NOT appear
-  const hideNavPaths = ['/login', '/signup', '/signup/donor', '/signup/ngo','/messages'];
+  const hideNavPaths = ['/login', '/signup', '/signup/donor', '/signup/ngo', '/messages'];
 
   return (
     <>
@@ -39,9 +39,9 @@ function AppContent() {
         <Route path="/donation-test" element={<DonationRequestDetailTest />} />
         <Route path="/guide" element={<Guidelines />} />
         <Route path="/adminngo" element={<AdminNGO />} />
-        <Route path="/ngo/:id" element={<NGOPublicProfile />} />  
-           <Route path="/messages" element={<MessagesPage />} />
-               <Route path="/map" element={<Map />} />
+        <Route path="/ngo/:id" element={<NGOPublicProfile />} />
+        <Route path="/messages" element={<MessagesPage />} />
+        <Route path="/map" element={<Map />} />
       </Routes>
     </>
   );
