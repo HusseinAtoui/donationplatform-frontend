@@ -37,12 +37,12 @@ export default function Login() {
 
   // ---- Notices from URL params ----
   const params = new URLSearchParams(location.search);
-  const justVerified   = params.get('verified') === '1';
- const verifyParam    = params.get('verify');
-const verifyNeeded   = verifyParam === '1' || verifyParam === 'needed';
-  const emailChanged   = params.get('emailChanged') === '1';
-  const resetSent      = params.get('reset') === '1';
-  const loggedOut      = params.get('loggedOut') === '1';
+  const justVerified = params.get('verified') === '1';
+  const verifyParam = params.get('verify');
+  const verifyNeeded = verifyParam === '1' || verifyParam === 'needed';
+  const emailChanged = params.get('emailChanged') === '1';
+  const resetSent = params.get('reset') === '1';
+  const loggedOut = params.get('loggedOut') === '1';
   const accountDeleted = params.get('deleted') === '1';
 
   // Handle OAuth redirect (?token=&user=) from backend and store session
@@ -66,8 +66,8 @@ const verifyNeeded   = verifyParam === '1' || verifyParam === 'needed';
         }
 
         const to = role === 'ngo' ? '/ngoprofile'
-                 : role === 'donor' ? '/donorprofile'
-                 : '/';
+          : role === 'donor' ? '/donorprofile'
+            : '/';
         navigate(to, { replace: true });
       } catch (e) {
         console.error('OAuth parse error:', e);
@@ -102,7 +102,7 @@ const verifyNeeded   = verifyParam === '1' || verifyParam === 'needed';
     });
 
     let body = {};
-    try { body = await res.json(); } catch (_) {}
+    try { body = await res.json(); } catch (_) { }
     return { ok: res.ok, status: res.status, body };
   }
 
@@ -119,8 +119,8 @@ const verifyNeeded   = verifyParam === '1' || verifyParam === 'needed';
       setLoading(true);
 
       const donorUrl = `${API_BASE}/user/login`;
-      const ngoUrl   = `${API_BASE}/ngo/login`;
-      const primary  = userType === 'NGO' ? ngoUrl : donorUrl;
+      const ngoUrl = `${API_BASE}/ngo/login`;
+      const primary = userType === 'NGO' ? ngoUrl : donorUrl;
       const fallback = userType === 'NGO' ? donorUrl : ngoUrl;
 
       const payload = { identifier: identifier.trim(), password };
@@ -183,17 +183,17 @@ const verifyNeeded   = verifyParam === '1' || verifyParam === 'needed';
         <h1 className="welcome-title">Welcome Back to TyebeTyebak!</h1>
 
         {/* ---- Success notices from URL flags ---- */}
-     {(justVerified || verifyNeeded || emailChanged || resetSent || loggedOut || accountDeleted) && (
+        {(justVerified || verifyNeeded || emailChanged || resetSent || loggedOut || accountDeleted) && (
           <div className="notice-stack" style={{ marginBottom: 12 }}>
             {justVerified && (
               <div className="notice" style={{ color: 'green' }}>
                 Your email is verified. Please log in.
               </div>
             )} {verifyNeeded && (
-     <div className="notice" style={{ color: 'orange' }}>
-       We sent a verification link to your email. Please verify to continue.
-     </div>
-   )}
+              <div className="notice" style={{ color: 'orange' }}>
+                We sent a verification link to your email. Please verify to continue.
+              </div>
+            )}
             {emailChanged && (
               <div className="notice" style={{ color: 'green' }}>
                 Your email was updated successfully. Please log in with the new email.
@@ -260,8 +260,8 @@ const verifyNeeded   = verifyParam === '1' || verifyParam === 'needed';
 
 
           <p className="forgot-password" role="button" tabIndex={0} onClick={() => navigate('/forgot-password')}>
- Forgot your password?
- </p>
+            Forgot your password?
+          </p>
           <button className="login-btn" onClick={handleLogin} disabled={loading} type="submit">
             {loading ? 'Logging in…' : 'LOGIN'}
           </button>
