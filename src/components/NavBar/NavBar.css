@@ -1,193 +1,92 @@
 /* ------------------- GENERAL ------------------- */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
 body {
-    height: 100%;
-    overflow-x: hidden;
-    font-family: 'Poppins', sans-serif;
+  height: 100%;
+  overflow-x: hidden;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* ------------------- NAVBAR ------------------- */
 .navbar {
-    width: 100%;
-    padding: 20px 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 16px 12px rgba(0, 0, 0, 0.03);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+  width: 100%;
+  padding: 20px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25),
+    0px 16px 12px rgba(0, 0, 0, 0.03);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .navbar__logo {
-    font-size: 25px;
-    font-weight: 700;
-    color: #000;
+  font-size: 25px;
+  font-weight: 700;
+  color: #000;
+  flex-shrink: 0;
 }
 
 /* ------------------- MENU ------------------- */
 .navbar__menu {
-    display: flex;
-    gap: 24px;
-    align-items: center;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+
+  /* 🟢 Center only on desktop */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .navbar__menu-item {
-    font-size: 18px;
-    font-weight: 500;
-    color: #000;
-    text-decoration: none;
-    padding: 4px 10px;
-    transition: color 0.3s ease;
+  font-size: 18px;
+  font-weight: 500;
+  color: #000;
+  text-decoration: none;
+  padding: 4px 10px;
+  transition: color 0.3s ease;
 }
 
 .navbar__menu-item:hover,
 .navbar__menu-item.active {
-    color: #5FAB7D;
-    font-weight: 600;
+  color: #5FAB7D;
+  font-weight: 600;
 }
 
 /* ------------------- ACTIONS (login + hamburger) ------------------- */
 .navbar__actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .navbar__login-icon {
-    width: 40px;
-    height: 40px;
-    background: #5FAB7D;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s ease;
+  width: 40px;
+  height: 40px;
+  background: #5FAB7D;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .navbar__login-icon:hover {
-    background: #4a8b5a;
+  background: #4a8b5a;
 }
 
-/* ------------------- HAMBURGER ------------------- */
-.navbar__hamburger {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 30px;
-    height: 22px;
-    padding: 0;
-}
-
-.hamburger__line {
-    width: 100%;
-    height: 3px;
-    background-color: #5FAB7D;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
-
-/* Hamburger animation when open */
-.navbar__hamburger.open .hamburger__line:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.navbar__hamburger.open .hamburger__line:nth-child(2) {
-    opacity: 0;
-}
-
-.navbar__hamburger.open .hamburger__line:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
-}
-
-/* ------------------- MOBILE MENU ------------------- */
-.navbar__menu--open {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 250px;
-    height: 100vh;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    padding: 80px 24px 24px;
-    gap: 24px;
-    z-index: 10000;
-    transform: translateX(0);
-    transition: transform 0.3s ease;
-}
-
-/* ------------------- OVERLAY ------------------- */
-.navbar__overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 999;
-    /* BELOW the menu */
-}
-
-
-/* ------------------- RESPONSIVE ------------------- */
-@media (max-width: 768px) {
-    .navbar__menu {
-        display: none;
-        /* hidden by default */
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: 250px;
-        height: 100vh;
-        background: #fff;
-        flex-direction: column;
-        padding: 80px 24px 24px;
-        gap: 24px;
-        z-index: 10000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-    }
-
-    .navbar__menu.navbar__menu--open {
-        display: flex;
-        transform: translateX(0);
-    }
-
-    .navbar__hamburger {
-        display: flex;
-    }
-
-    .navbar__menu {
-        display: none;
-    }
-
-    .navbar__hamburger {
-        display: flex;
-    }
-}
-
-/* Right actions row: message icon + profile + hamburger */
-.navbar__actions {
-  margin-left: auto;            /* pushes actions to the far right */
-  display: flex;
-  align-items: center;          /* vertical center */
-  gap: 12px;                    /* space between icons */
-}
-
-/* Make both icons render as square clickable areas with no layout jiggle */
+/* ------------------- MESSAGE ICON ------------------- */
 .navbar__login-icon,
 .message-icon-container {
   display: inline-flex;
@@ -195,33 +94,111 @@ body {
   justify-content: center;
   width: 36px;
   height: 36px;
-  line-height: 0;               /* removes inline baseline spacing */
+  line-height: 0;
 }
 
-/* If your profile icon is a green circle, keep it. The plane has no bg. */
-.navbar__login-icon {
-  border-radius: 50%;
-  background: #5FAB7D;          /* your existing style */
-  color: #fff;
-}
-
-/* Paper-plane: no background; green stroke; thin green ring to match brand */
 .message-icon-container {
-  background: transparent;      /* no green fill */
-  border: 2px solid #5FAB7D;    /* green ring so it visually "matches" */
+  background: transparent;
+  border: 2px solid #5FAB7D;
   border-radius: 50%;
   cursor: pointer;
+  position: relative;
 }
 
-/* Normalize plane size */
 .message-icon-container svg {
   width: 22px;
   height: 22px;
 }
 
-/* Optional: badge positioning if you’re showing unread counts */
 .message-icon-container .notification-badge {
   position: absolute;
   top: -4px;
   right: -4px;
+}
+
+/* ------------------- HAMBURGER ------------------- */
+.navbar__hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 22px;
+  padding: 0;
+}
+
+.hamburger__line {
+  width: 100%;
+  height: 3px;
+  background-color: #5FAB7D;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.navbar__hamburger.open .hamburger__line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.navbar__hamburger.open .hamburger__line:nth-child(2) {
+  opacity: 0;
+}
+.navbar__hamburger.open .hamburger__line:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* ------------------- MOBILE MENU ------------------- */
+.navbar__menu--open {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 100vh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 24px 24px;
+  gap: 24px;
+  z-index: 10000;
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+}
+
+/* ------------------- OVERLAY ------------------- */
+.navbar__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+/* ------------------- RESPONSIVE ------------------- */
+@media (max-width: 768px) {
+  .navbar__menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100vh;
+    background: #fff;
+    flex-direction: column;
+    padding: 80px 24px 24px;
+    gap: 24px;
+    z-index: 10000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .navbar__menu.navbar__menu--open {
+    display: flex;
+    transform: translateX(0);
+  }
+
+  .navbar__hamburger {
+    display: flex;
+  }
 }
