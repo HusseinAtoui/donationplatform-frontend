@@ -15,20 +15,22 @@
 }
 
 .google-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px; /* space between icon and text */
-    width: 100%;
-    padding: 12px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: white;
-    cursor: pointer;
-    font-weight: 800;
-    color: #4285F4; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  /* space between icon and text */
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: white;
+  cursor: pointer;
+  font-weight: 800;
+  color: #4285F4;
 }
+
 .login-divider {
   display: flex;
   align-items: center;
@@ -177,7 +179,7 @@
 .phone-container {
   position: relative;
   width: 100%;
-   margin-bottom: 16px !important;
+  margin-bottom: 16px !important;
 }
 
 .phone-input {
@@ -344,24 +346,6 @@
   color: #333;
 }
 
-
-/* --------------------------------------
-  📱 RESPONSIVE STYLES
------------------------------------------ */
-@media (max-width: 768px) {
-  .signup-container {
-    flex-direction: column;
-  }
-
-  .signup-left,
-  .login-image {
-    max-width: 100%;
-    flex: none;
-    height: 50vh;
-    padding: 40px 30px;
-  }
-}
-
 /* --------------------------------------
   MAP STYLES
 ----------------------------------------- */
@@ -384,7 +368,7 @@
   background: white;
   padding: 8px;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   width: 80%;
   max-width: 400px;
@@ -443,10 +427,12 @@
 
 .map-wrapper {
   width: 100%;
-  aspect-ratio: 16 / 9; /* Keeps map proportional */
+  aspect-ratio: 16 / 9;
+  /* Keeps map proportional */
   max-height: 70vh;
   border-radius: 12px;
-  overflow: hidden; /* ensures map corners match radius */
+  overflow: hidden;
+  /* ensures map corners match radius */
   border: 3px solid #e0e0e0;
 }
 
@@ -472,4 +458,21 @@
   border-color: #5FAB7D;
   outline: none;
   box-shadow: 0 0 0 2px rgba(95, 171, 125, 0.3);
+}
+
+/* --------------------------------------
+  📱 RESPONSIVE STYLES
+----------------------------------------- */
+@media (max-width: 768px) {
+  .signup-container {
+    flex-direction: column;
+  }
+
+  .signup-left,
+  .login-image {
+    max-width: 100%;
+    flex: none;
+    height: 50vh;
+    padding: 40px 30px;
+  }
 }
