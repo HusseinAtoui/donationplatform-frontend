@@ -131,3 +131,10 @@
         text-align: center;
     }
 }
+
+@media (max-width: 480px) {
+    .signup-select-left {
+        padding-top: 50vh;
+        /* push content down near middle */
+    }
+}
