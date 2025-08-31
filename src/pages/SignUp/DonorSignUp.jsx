@@ -1,4 +1,3 @@
-// src/pages/DonorSignUp.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PhoneInput from 'react-phone-input-2';
@@ -20,18 +19,13 @@ const GoogleIcon = () => (
 export default function DonorSignUp() {
   const navigate = useNavigate();
 
-  // If backend ever redirects back here with ?token=&user=, capture it (optional)
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const prefillEmail = params.get('email');
+    if (prefillEmail) setFormData((s) => ({ ...s, email: prefillEmail }));
 
-   // Prefill from login redirect (no existing account)
- const params = new URLSearchParams(window.location.search);
- const prefillEmail = params.get('email');
- if (prefillEmail) {
-  setFormData((s) => ({ ...s, email: prefillEmail }));
-}
-    const urlParams = new URLSearchParams(window.location.search);
-    const tokenParam = urlParams.get('token');
-    const userParam = urlParams.get('user');
+    const tokenParam = params.get('token');
+    const userParam = params.get('user');
 
     if (tokenParam && userParam) {
       try {
@@ -39,10 +33,7 @@ export default function DonorSignUp() {
         localStorage.setItem('token', tokenParam);
         localStorage.setItem('role', 'user');
         localStorage.setItem('userData', JSON.stringify(userData));
-        // Clean the URL after storing
         window.history.replaceState({}, document.title, window.location.pathname);
-        // You can optionally navigate to the profile:
-        // navigate('/DonorProfile');
       } catch (error) {
         console.error('Error parsing user data from URL:', error);
         localStorage.removeItem('token');
@@ -52,9 +43,8 @@ export default function DonorSignUp() {
     }
   }, []);
 
-  // Kick off Google OAuth for donor
   const handleGoogleSignup = () => {
-  window.location.href = `${API_BASE}/api/user/auth/google/signup`;
+    window.location.href = `${API_BASE}/api/user/auth/google/signup`;
   };
 
   const [formData, setFormData] = useState({
@@ -79,12 +69,9 @@ export default function DonorSignUp() {
   };
 
   const validate = () => {
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
-      return 'Please enter your first and last name.';
-    }
+    if (!formData.firstName.trim() || !formData.lastName.trim()) return 'Please enter your first and last name.';
     if (!formData.email.trim()) return 'Please enter your email.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()))
-      return 'Please enter a valid email.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) return 'Please enter a valid email.';
     if (!formData.phone) return 'Please enter your phone number.';
     if (formData.password.length < 8) return 'Password must be at least 8 characters.';
     if (formData.password !== formData.confirmPassword) return 'Passwords do not match.';
@@ -95,16 +82,12 @@ export default function DonorSignUp() {
     e.preventDefault();
     setErr('');
     setOkMsg('');
-
     const v = validate();
-    if (v) {
-      setErr(v);
-      return;
-    }
+    if (v) return setErr(v);
 
     const payload = {
       email: formData.email.trim(),
-      phone: `+${String(formData.phone).replace(/\s+/g, '')}`, // E.164-ish
+      phone: `+${String(formData.phone).replace(/\s+/g, '')}`,
       name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
       location: '',
       avatarUrl: '',
@@ -119,14 +102,9 @@ export default function DonorSignUp() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.error || 'Signup failed.');
-      }
-
+      if (!res.ok) throw new Error(data?.error || 'Signup failed.');
       setOkMsg('Account created. Check your email to verify your account.');
-      // navigate('/verify-email');
     } catch (e2) {
       setErr(e2.message);
     } finally {
@@ -137,131 +115,127 @@ export default function DonorSignUp() {
   return (
     <div className="signup-container">
       <div className="signup-left">
-        <p className="return-text" onClick={() => navigate('/')} role="button" tabIndex={0}>
-          ← Back Home
-        </p>
+        <div className="scroll-wrapper">
+          <p className="return-text" onClick={() => navigate('/')} role="button" tabIndex={0}>
+            ← Back Home
+          </p>
 
-        <h1 className="signup-title">Create Your Donor Account</h1>
+          <h1 className="signup-title">Create Your Donor Account</h1>
 
-        {err && <div className="error-banner" role="alert">{err}</div>}
-        {okMsg && <div className="success-banner" role="status">{okMsg}</div>}
+          {err && <div className="error-banner" role="alert">{err}</div>}
+          {okMsg && <div className="success-banner" role="status">{okMsg}</div>}
 
-        <form onSubmit={handleSubmit} className="signup-form" noValidate>
-          <div className="name-row">
+          <form onSubmit={handleSubmit} className="signup-form" noValidate>
+            <div className="name-row">
+              <input
+                name="firstName"
+                placeholder="First Name"
+                autoComplete="given-name"
+                onChange={handleChange}
+                value={formData.firstName}
+                required
+              />
+              <input
+                name="lastName"
+                placeholder="Last Name"
+                autoComplete="family-name"
+                onChange={handleChange}
+                value={formData.lastName}
+                required
+              />
+            </div>
+
             <input
-              name="firstName"
-              placeholder="First Name"
-              autoComplete="given-name"
+              name="email"
+              type="email"
+              placeholder="Email"
+              autoComplete="email"
               onChange={handleChange}
-              value={formData.firstName}
+              value={formData.email}
               required
             />
-            <input
-              name="lastName"
-              placeholder="Last Name"
-              autoComplete="family-name"
-              onChange={handleChange}
-              value={formData.lastName}
-              required
-            />
+
+            <div className="input-group phone-containerDONOR">
+              <PhoneInput
+                country="lb"
+                value={formData.phone}
+                onChange={(phone) => setFormData((s) => ({ ...s, phone }))}
+                inputProps={{
+                  name: 'phone',
+                  required: true,
+                  className: 'phone-input',
+                  autoComplete: 'tel',
+                  placeholder: 'Phone Number',
+                }}
+                buttonClass="phone-button"
+              />
+            </div>
+
+            <div className="password-field">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                placeholder="Password"
+                onChange={handleChange}
+                value={formData.password}
+                autoComplete="new-password"
+                required
+              />
+              <span
+                className="toggle-password"
+                onClick={() => setShowPassword((s) => !s)}
+                role="button"
+                tabIndex={0}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </span>
+            </div>
+
+            <div className="password-field">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                onChange={handleChange}
+                value={formData.confirmPassword}
+                autoComplete="new-password"
+                required
+              />
+              <span
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword((s) => !s)}
+                role="button"
+                tabIndex={0}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </span>
+            </div>
+
+            <button type="submit" disabled={loading}>
+              {loading ? 'Creating...' : 'Sign Up'}
+            </button>
+          </form>
+
+          <div className="login-divider" style={{ marginTop: 16 }}>
+            <div className="line" />
+            <span>Or Sign Up with</span>
+            <div className="line" />
           </div>
 
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            autoComplete="email"
-            onChange={handleChange}
-            value={formData.email}
-            required
-          />
-
-          <div className="input-group phone-containerDONOR">
-            <PhoneInput
-              country="lb"
-              value={formData.phone}
-              onChange={(phone) => setFormData((s) => ({ ...s, phone }))}
-              inputProps={{
-                name: 'phone',
-                required: true,
-                className: 'phone-input',
-                autoComplete: 'tel',
-                placeholder: 'Phone Number',
-              }}
-              buttonClass="phone-button"
-            />
-          </div>
-
-          <div className="password-field">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              placeholder="Password"
-              onChange={handleChange}
-              value={formData.password}
-              autoComplete="new-password"
-              required
-            />
-            <span
-              className="toggle-password"
-              onClick={() => setShowPassword((s) => !s)}
-              role="button"
-              tabIndex={0}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </span>
-          </div>
-
-          <div className="password-field">
-            <input
-              type={showConfirmPassword ? 'text' : 'password'}
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              onChange={handleChange}
-              value={formData.confirmPassword}
-              autoComplete="new-password"
-              required
-            />
-            <span
-              className="toggle-password"
-              onClick={() => setShowConfirmPassword((s) => !s)}
-              role="button"
-              tabIndex={0}
-              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-            >
-              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </span>
-          </div>
-
-          <button type="submit" disabled={loading}>
-            {loading ? 'Creating...' : 'Sign Up'}
+          <button className="google-btn" onClick={handleGoogleSignup}>
+            <GoogleIcon />
+            Google
           </button>
-        </form>
 
-        {/* Divider + Google signup */}
-        <div className="login-divider" style={{ marginTop: 16 }}>
-          <div className="line" />
-          <span>Or Sign Up with</span>
-          <div className="line" />
+          <p className="login-prompt" style={{ marginTop: 16 }}>
+            Already have an account?{' '}
+            <span className="login-link" onClick={() => navigate('/login')} role="button" tabIndex={0}>
+              Login
+            </span>
+          </p>
         </div>
-
-        <button className="google-btn" onClick={handleGoogleSignup}>
-          <GoogleIcon />
-          Google
-        </button>
-
-        <p className="login-prompt" style={{ marginTop: 16 }}>
-          Already have an account?{' '}
-          <span
-            className="login-link"
-            onClick={() => navigate('/login')}
-            role="button"
-            tabIndex={0}
-          >
-            Login
-          </span>
-        </p>
       </div>
       <div className="login-image" />
     </div>
