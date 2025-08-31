@@ -5,7 +5,7 @@ import 'react-phone-input-2/lib/style.css';
 import './DonorSignUp.css';
 import { Eye, EyeOff } from 'lucide-react';
 
-const API_BASE = 'http://localhost:4000';
+const API_BASE = 'https://api.tyebetyebak.org';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style={{ marginRight: '10px' }}>
@@ -44,7 +44,7 @@ export default function DonorSignUp() {
   }, []);
 
   const handleGoogleSignup = () => {
-    window.location.href = `${API_BASE}/api/user/auth/google/signup`;
+    window.location.href = `${API_BASE}/user/auth/google/signup`;
   };
 
   const [formData, setFormData] = useState({
@@ -97,7 +97,7 @@ export default function DonorSignUp() {
 
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/api/user/create`, {
+      const res = await fetch(`${API_BASE}/user/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

@@ -308,7 +308,7 @@ export default function DonorProfile() {
           return;
         }
 
-        const res = await fetch(`${API_BASE}/api/user/me`, {
+        const res = await fetch(`${API_BASE}/user/me`, {
           headers: { Authorization: `Bearer ${token}` },
           cache: "no-store",
         });
@@ -367,7 +367,7 @@ export default function DonorProfile() {
 
     try {
       setDeleting(true);
-      const res = await fetch(`${API_BASE}/api/user/me`, {
+      const res = await fetch(`${API_BASE}/user/me`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
