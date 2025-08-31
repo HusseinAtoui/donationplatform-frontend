@@ -27,6 +27,20 @@
   margin: 0 auto;
   padding: 0 24px;
 }
+/* NGOPublicProfile.css (add or keep once) */
+.ngo-title {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.req-name {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
 
 .ngo-public .card {
   background: var(--white);

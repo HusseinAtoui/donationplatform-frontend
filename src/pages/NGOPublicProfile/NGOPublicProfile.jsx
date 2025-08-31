@@ -7,11 +7,25 @@ import "./NGOPublicProfile.css"; // optional styling
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000/api";
 const CONTENT_BASE = `${API_BASE}/home`;
 
-// Helper: normalize address to a string
-function addr(v) {
+/* --- NEW: shorten/normalize location text --- */
+function formatLocationForChip(loc) {
+  const s = (typeof loc === 'string' ? loc : (loc?.address || '')).trim();
+  if (!s) return '';
+  const beforeComma = s.split(',')[0]?.trim();
+  let display = beforeComma || s.split(/\s+/)[0] || '';
+  if (display.length > 30) display = display.slice(0, 30).trim() + '…';
+  return display;
+}
+
+// Helper: normalize address to a string (full), and short form for chip
+function fullAddr(v) {
   if (!v) return "—";
   if (typeof v === "string") return v;
   return v.address || "—";
+}
+function shortAddr(v) {
+  const out = formatLocationForChip(v);
+  return out || "—";
 }
 
 function Chip({ icon: Icon, text }) {
@@ -46,7 +60,8 @@ function RequestCard({ req }) {
             <div className="req-name">{req.category || "Request"}</div>
             <div className="req-sub">
               <MapPin size={14} />
-              <span>{addr(req.location)}</span>
+              {/* --- NEW: shortened location here --- */}
+              <span>{shortAddr(req.location)}</span>
             </div>
           </div>
         </div>
@@ -119,9 +134,11 @@ export default function NGOPublicProfile() {
           </div>
 
           <div className="header-main">
-            <h1>{ngo.name}</h1>
+            {/* --- NEW: give name a class to wrap nicely --- */}
+            <h1 className="ngo-title">{ngo.name}</h1>
             <div className="contact-row">
-              <Chip icon={MapPin} text={addr(ngo.location)} />
+              {/* --- NEW: use shortened location in chip --- */}
+              <Chip icon={MapPin} text={shortAddr(ngo.location)} />
               <Chip icon={Phone} text={ngo.phone} />
               <Chip icon={Mail} text={ngo.email} />
               <Chip icon={Clock} text={"Mon – Fri: 10AM – 6PM"} />
