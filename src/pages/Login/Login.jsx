@@ -169,9 +169,9 @@ export default function Login() {
   }
 
   function goToSignup() {
-    const path = userType === 'NGO' ? '/signup/ngo' : '/signup/donor';
-    navigate(path);
+    navigate('/signup');
   }
+
 
   return (
     <div className="login-container">
