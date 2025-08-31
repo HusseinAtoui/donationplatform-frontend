@@ -23,16 +23,29 @@
   margin-bottom: 16px;
 }
 
+/* Partner Name */
 .partner-name {
-  font-size: 16px;
   font-weight: 600;
-  color: #1C1C1C;
-  margin-bottom: 6px;
+  font-size: 16px;
+  color: #111827;
+  text-align: center;
+  line-height: 1.3;
+  white-space: normal;       /* allow wrapping */
+  word-break: break-word;    /* break very long words */
+  overflow-wrap: break-word;
+  width: 100%;
+  margin: 4px 0;
 }
 
+/* Partner Location */
 .partner-location {
   font-size: 14px;
-  color: #5FAB7D;
+  color: #6b7280;
+  text-align: center;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
 }
 /* The clickable NGO header inside the card */
 .ngo-info-link,

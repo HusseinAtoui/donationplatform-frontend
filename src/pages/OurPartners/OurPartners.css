@@ -87,6 +87,8 @@
   overflow: hidden;
   text-overflow: ellipsis; 
   width: 100%;
+   word-wrap: break-word; /* ✅ Allows long words to wrap */
+  white-space: normal;   /* ✅ Enables multiple lines */
 }
 
 /* Partner Location */
