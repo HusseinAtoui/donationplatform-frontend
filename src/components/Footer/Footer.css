@@ -77,7 +77,8 @@
 /* Links wrapper for horizontal alignment */
 .footer-links-wrapper {
     display: flex;
-    gap: 60px; /* space between link groups */
+    gap: 60px;
+    /* space between link groups */
 }
 
 /* Individual link groups */
@@ -154,3 +155,32 @@
         gap: 30px;
     }
 }
+
+@media (max-width: 425px) {
+  .footer-links-wrapper {
+    display: flex;
+    flex-direction: row;   /* groups beside each other */
+    justify-content: space-between;
+    flex-wrap: nowrap;     /* keep them on same row */
+    gap: 20px;
+    width: 100%;
+  }
+
+  .footer-links-group {
+    display: flex;
+    flex-direction: column; /* keep title + links stacked */
+    flex: 1;                /* share space evenly */
+    min-width: 140px;
+    text-align: left;
+  }
+
+  .footer-links-group h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .footer-links-group ul li a {
+    font-size: 14px;
+  }
+}
+
