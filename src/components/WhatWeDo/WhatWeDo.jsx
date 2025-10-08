@@ -44,21 +44,22 @@ export default function WhatWeDo() {
         "Track where your donation goes",
     ];
 
+    // Use vw for horizontal scaling
     const circlePositions = [
-        { left: '83px', top: '300px' },
-        { left: '490px', top: '290px' },
-        { left: '890px', top: '290px' },
-        { left: '1350px', top: '305px' },
+        { left: '7vw', top: '300px' },
+        { left: '33vw', top: '290px' },
+        { left: '60vw', top: '290px' },
+        { left: '86vw', top: '305px' },
     ];
 
     return (
-        <section className="whatwedo" id="what-we-do" >
+        <section className="whatwedo" id="what-we-do">
             <h2 className="whatwedo__title">What Do We Do!</h2>
             <p className="whatwedo__subtitle">All in one platform.</p>
 
             {/* Desktop layout with SVG */}
             <div className="whatwedo__desktop">
-                <LineSVG />
+                {/*<LineSVG />*/}
                 {steps.map((text, idx) => {
                     const circlePos = circlePositions[idx];
                     const textTop = parseInt(circlePos.top) + 90;
@@ -74,7 +75,7 @@ export default function WhatWeDo() {
                                     left: `calc(${circlePos.left} + 39.5px)`,
                                     width: '180px',
                                     transform: 'translateX(-50%)',
-                                    textAlign: 'center'
+                                    textAlign: 'center',
                                 }}
                             >
                                 {text}
@@ -84,18 +85,15 @@ export default function WhatWeDo() {
                 })}
             </div>
 
-            {/* Mobile layout with styled circles */}
+            {/* Mobile layout */}
             <div className="whatwedo__mobile">
                 {steps.map((text, idx) => (
                     <div key={idx} className="whatwedo__mobile-step">
-                        <div className="whatwedo__mobile-circle">
-                            {idx + 1}
-                        </div>
+                        <div className="whatwedo__mobile-circle">{idx + 1}</div>
                         <p className="whatwedo__mobile-text">{text}</p>
                     </div>
                 ))}
             </div>
-
         </section>
     );
 }
