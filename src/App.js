@@ -19,6 +19,7 @@ import MessagesPage from './pages/Messages/MessagesPage';
 import Map from './pages/Map/Map';
 import OnboardingNGOLocation from './pages/Onboarding/OnboardingNGOLocation';
 
+import Admin from './pages/Admin/Admin';
 // ...
 
 function AppContent() {
@@ -47,6 +48,7 @@ function AppContent() {
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/map" element={<Map />} />
         <Route path="/onboarding/ngo/location" element={<OnboardingNGOLocation />} />
+        <Route path="/admin" element={<Admin />} />
 
       </Routes>
     </>
