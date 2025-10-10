@@ -15,7 +15,8 @@ import {
   LogOut,
   Trash2,
   Pencil,
-  ChevronDown
+  ChevronDown,
+  Globe
 } from "lucide-react";
 import L from "leaflet";
 import greyMarkerImage from '../../assets/grey-map-marker.png';
@@ -31,6 +32,8 @@ const ngoIcon = new L.Icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
+// put this above your return (or inside component scope)
+const todayStr = new Date().toISOString().slice(0, 10);
 
 const requestIcon = new L.Icon({
   iconUrl: redMarkerImage,
@@ -46,10 +49,10 @@ const defaultCenter = [33.8938, 35.5018]; // Beirut
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000/api";
 const CONTENT_BASE = `${API_BASE}/home`; // must match Express mount
 
-function Chip({ icon: Icon, text }) {
+function Chip({ icon: Icon, text, title }) {
   if (!text) return null;
   return (
-    <div className="chip" title={text}>
+    <div className="chip" title={title || text}>
       <span className="chip-icon">
         <Icon size={14} />
       </span>
@@ -107,10 +110,15 @@ function SettingsMenu({
   onSignOut,
   onDeleteAccount,
   isDeleting = false
-}) {
+}, ref) {
   if (!open) return null;
   return (
-    <div className="settings-menu card" role="menu" style={{ position: "absolute", right: 0, top: "2.25rem", zIndex: 10, padding: 8, minWidth: 200 }}>
+    <div
+      ref={ref}
+      className="settings-menu card"
+      role="menu"
+      style={{ position: "absolute", right: 0, top: "2.25rem", zIndex: 10, padding: 8, minWidth: 200 }}
+    >
       {/* Renamed to Edit Profile and keeps opening the modal */}
       <button className="menu-item" onClick={() => { onEdit(); onClose(); }}>
         <Pencil size={16} style={{ marginRight: 8 }} /> Edit Profile
@@ -132,18 +140,28 @@ function SettingsMenu({
     </div>
   );
 }
-
-/* ------------ Edit Profile Modal ------------ */
+const SettingsMenuWithRef = React.forwardRef(SettingsMenu);
+/* ------------ Edit Profile Modal (map-only location, email verify, no chip order/logo url, no horizontal scroll) ------------ */
 function EditProfileModal({ open, onClose, profile, onSave }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
-    location: "",
+    location: "",                         // set from map picker only
     summary: "",
-    logoUrl: "",
-    coordinates: { lat: null, lng: null }
+    coordinates: { lat: null, lng: null}, // internal only; not displayed
+    workingHours: "",
+    social: { website: "", instagram: "", facebook: "" },
   });
+
+  // Email verification UI (visible only when email is changed)
+  const [emailChanged, setEmailChanged] = useState(false);
+  const [verifSending, setVerifSending] = useState(false);
+  const [verifSent, setVerifSent] = useState(false);
+  const [verifCode, setVerifCode] = useState("");
+  const [verifConfirming, setVerifConfirming] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
+
   const [saving, setSaving] = useState(false);
   const [showMap, setShowMap] = useState(false);
 
@@ -153,24 +171,109 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
         name: profile.name || "",
         email: profile.email || "",
         phone: profile.phone || "",
-        location: profile.location?.address || profile.location || "",
+        location: (typeof profile.location === "string"
+          ? profile.location
+          : (profile.location?.address || "")) || "",
         summary: profile.summary || profile.bio || "",
-        logoUrl: profile.logoUrl || "",
-        coordinates: profile.coordinates || { lat: null, lng: null }
+        coordinates: profile.coordinates || { lat: null, lng: null },
+        workingHours: profile.workingHours || "",
+        social: profile.social || { website: "", instagram: "", facebook: "" },
       });
+
+      // reset email verification state each time the modal opens
+      setEmailChanged(false);
+      setVerifSending(false);
+      setVerifSent(false);
+      setVerifCode("");
+      setVerifConfirming(false);
+      setEmailVerified(false);
     }
   }, [open, profile]);
 
   function update(e) {
     const { name, value } = e.target;
     setForm((s) => ({ ...s, [name]: value }));
+
+    if (name === "email") {
+      const changed = (value || "").trim() && (value || "").trim() !== (profile?.email || "");
+      setEmailChanged(changed);
+      if (!changed) {
+        setVerifSent(false);
+        setVerifCode("");
+        setEmailVerified(false);
+      }
+    }
+  }
+  function updateSocial(e) {
+    const { name, value } = e.target;
+    setForm((s) => ({ ...s, social: { ...s.social, [name]: value } }));
+  }
+
+  // Adjust these endpoints to your backend if they differ
+  async function requestEmailChange() {
+    try {
+      setVerifSending(true);
+      const res = await fetch(`${API_BASE}/auth/email/change/request`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newEmail: form.email }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Failed to send verification code");
+      }
+      setVerifSent(true);
+      alert("Verification code sent to the new email.");
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setVerifSending(false);
+    }
+  }
+
+  async function confirmEmailChange() {
+    try {
+      if (!verifCode.trim()) {
+        alert("Enter the verification code.");
+        return;
+      }
+      setVerifConfirming(true);
+      const res = await fetch(`${API_BASE}/auth/email/change/confirm`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: verifCode.trim() }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Invalid or expired code");
+      }
+      setEmailVerified(true);
+      alert("Email verified. Save Changes to apply.");
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setVerifConfirming(false);
+    }
   }
 
   async function handleSave(e) {
     e.preventDefault();
     setSaving(true);
     try {
-      await onSave(form);
+      // If user changed email but hasn't verified, keep old email
+      const outgoing = {
+        name: form.name?.trim(),
+        // apply new email only if verified
+        email: (!emailChanged || emailVerified) ? form.email?.trim() : (profile?.email || ""),
+        phone: form.phone?.trim(),
+        location: form.location?.trim(),
+        summary: form.summary ?? "",
+        coordinates: form.coordinates ?? null,
+        workingHours: form.workingHours || "",
+        social: form.social || { website: "", instagram: "", facebook: "" },
+      };
+
+      await onSave(outgoing);
       onClose();
     } catch (err) {
       alert(err?.message || "Failed to save profile");
@@ -182,46 +285,93 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
   if (!open) return null;
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose} style={{ overflowX: "hidden" }}>
       <div
         className="modal card edit-modal"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="editProfileTitle"
+        style={{
+          maxWidth: "720px",
+          width: "min(720px, 92vw)",
+          overflowX: "hidden", // prevent horizontal movement
+        }}
       >
         <div className="modal-header">
-          <h2>Edit NGO Profile</h2>
-          <button className="icon-btn close-btn" onClick={onClose}>
-            ✕
-          </button>
+          <h2 id="editProfileTitle">Edit NGO Profile</h2>
+          <button className="icon-btn close-btn" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
         <form onSubmit={handleSave} className="modal-form">
           <div className="form-grid">
             <div>
               <label>Name</label>
-              <input name="name" value={form.name} onChange={update} />
+              <input name="name" value={form.name} onChange={update} placeholder="Your organization name" />
             </div>
+
             <div>
               <label>Email</label>
-              <input type="email" name="email" value={form.email} onChange={update} />
+              <input type="email" name="email" value={form.email} onChange={update} placeholder="name@ngo.org" />
+              {emailChanged && (
+                <div style={{ marginTop: 8 }}>
+                  {!verifSent ? (
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={requestEmailChange}
+                      disabled={verifSending}
+                    >
+                      {verifSending ? "Sending code…" : "Send verification code"}
+                    </button>
+                  ) : (
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input
+                        value={verifCode}
+                        onChange={(e) => setVerifCode(e.target.value)}
+                        placeholder="Enter code"
+                      />
+                      <button
+                        type="button"
+                        className="btn"
+                        onClick={confirmEmailChange}
+                        disabled={verifConfirming}
+                      >
+                        {verifConfirming ? "Verifying…" : "Verify"}
+                      </button>
+                    </div>
+                  )}
+                  {emailVerified && (
+                    <p className="muted" style={{ marginTop: 6, color: "green" }}>
+                      Email verified ✓
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
+
             <div>
               <label>Phone</label>
-              <input name="phone" value={form.phone} onChange={update} />
+              <input name="phone" value={form.phone} onChange={update} placeholder="+961 ..." />
             </div>
             <div>
-              <label>Location</label>
-              <input name="location" value={form.location} onChange={update} />
-            </div>
-            <div>
-              <label className="input-label">Coordinates</label>
+              <label>Website</label>
               <input
-                className="signup-input"
-                value={
-                  form.coordinates?.lat && form.coordinates?.lng
-                    ? `${form.coordinates.lat.toFixed(4)}, ${form.coordinates.lng.toFixed(4)}`
-                    : ""
-                }
-                placeholder="Not selected"
+                name="website"
+                value={form.social.website}
+                onChange={updateSocial}
+                placeholder="https://…"
+              />
+            </div>
+
+            {/* Location: map-only (read-only input just displays chosen place name) */}
+            <div className="col-span-2">
+              <label>Location</label>
+              <input
+                name="location"
+                value={form.location}
+                readOnly
+                placeholder="Pick on map"
               />
               <button
                 type="button"
@@ -229,18 +379,52 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
                 style={{ marginTop: 8 }}
                 onClick={() => setShowMap(true)}
               >
-                Select Coordinates on Map
+                Select on Map
               </button>
             </div>
-            <div className="col-span-2">
-              <label>Logo URL</label>
-              <input name="logoUrl" value={form.logoUrl} onChange={update} placeholder="https://..." />
-            </div>
+
             <div className="col-span-2">
               <label>Summary / Bio</label>
-              <textarea rows={4} name="summary" value={form.summary} onChange={update} placeholder="Mission, activities, impact…" />
+              <textarea
+                rows={4}
+                name="summary"
+                value={form.summary}
+                onChange={update}
+                placeholder="Mission, activities, impact…"
+              />
             </div>
-          </div>
+
+            <div className="col-span-2">
+              <label>Working Hours</label>
+              <input
+                name="workingHours"
+                value={form.workingHours}
+                onChange={update}
+                placeholder="e.g., Mon–Fri 10:00–18:00"
+              />
+            </div>
+
+<div>
+  <label>Instagram</label>
+  <input
+    name="instagram"
+    value={form.social.instagram}
+    onChange={updateSocial}
+    placeholder="URL or @handle"
+  />
+</div>
+
+<div>
+  <label>Facebook</label>
+  <input
+    name="facebook"
+    value={form.social.facebook}
+    onChange={updateSocial}
+    placeholder="URL or @handle"
+  />
+</div>
+    </div>
+
 
           <div className="modal-actions">
             <button className="btn" type="submit" disabled={saving}>
@@ -248,6 +432,7 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
             </button>
           </div>
 
+          {/* Map picker writes back coords + human-readable name */}
           {showMap && (
             <CoordinatesPicker
               initialCoordinates={
@@ -257,11 +442,11 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
               }
               initialLocation={form.location}
               onSave={(coords, name) =>
-                setForm({
-                  ...form,
+                setForm((prev) => ({
+                  ...prev,
                   coordinates: coords,
-                  location: name || form.location,
-                })
+                  location: name || prev.location,
+                }))
               }
               onClose={() => setShowMap(false)}
               markerIcon={ngoIcon}
@@ -271,19 +456,23 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
       </div>
     </div>
   );
-}function formatLocationForChip(loc) {
+}
+
+
+function formatLocationForChip(loc) {
   const s = (typeof loc === 'string' ? loc : (loc?.address || '')).trim();
   if (!s) return '';
-
-  // Prefer the chunk before the first comma
   const beforeComma = s.split(',')[0]?.trim();
   let display = beforeComma || s.split(/\s+/)[0] || '';
-
-  // Hard cap in case the first chunk is still super long (rare)
   if (display.length > 30) display = display.slice(0, 30).trim() + '…';
   return display;
 }
 
+function fmtDateTime(ts) {
+  if (!ts) return "—";
+  const d = new Date(ts);
+  return Number.isNaN(+d) ? "—" : d.toLocaleString();
+}
 
 export default function NGOProfile() {
   const navigate = useNavigate();
@@ -323,120 +512,127 @@ export default function NGOProfile() {
 
   // settings & modal
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsRef = useRef(null); // NEW: ref-based outside click
   const [editOpen, setEditOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-// ---- Avatar uploading state and function ----
-const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
-async function uploadAvatar(file) {
-  if (!profile?.id || !file) return;
+  // ---- Avatar uploading state and function ----
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
-  const token = localStorage.getItem('token');
-  if (!token) {
-    navigate('/login');
-    return;
-  }
+  async function uploadAvatar(file) {
+    if (!profile?.id || !file) return;
 
-  try {
-    setUploadingAvatar(true);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
 
-    const form = new FormData();
-    form.append('logo', file); // multer expects "logo" field name
+    try {
+      setUploadingAvatar(true);
 
-    const res = await fetch(
-      `${API_BASE}/ngo/update/${encodeURIComponent(profile.id)}`,
-      {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
+      // simple client checks to improve UX
+      const MAX_MB = 5;
+      if (!file.type.startsWith('image/')) throw new Error('Only image files are allowed.');
+      if (file.size > MAX_MB * 1024 * 1024) throw new Error(`Max ${MAX_MB}MB per image`);
+
+      const form = new FormData();
+      form.append('logo', file); // multer expects "logo" field name
+
+      const res = await fetch(
+        `${API_BASE}/ngo/update/${encodeURIComponent(profile.id)}`,
+        {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}` },
+          body: form,
+        }
+      );
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to upload profile picture');
       }
-    );
 
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || 'Failed to upload profile picture');
+      // Refresh profile to pull the new logoUrl
+      const me = await fetch(`${API_BASE}/ngo/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (me.ok) {
+        const data = await me.json().catch(() => ({}));
+        if (data?.profile) setProfile(data.profile);
+      }
+    } catch (e) {
+      alert(e.message || 'Upload failed');
+    } finally {
+      setUploadingAvatar(false);
     }
-
-    // Refresh profile to pull the new logoUrl
-    const me = await fetch(`${API_BASE}/ngo/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (me.ok) {
-      const data = await me.json().catch(() => ({}));
-      if (data?.profile) setProfile(data.profile);
-    }
-  } catch (e) {
-    alert(e.message || 'Upload failed');
-  } finally {
-    setUploadingAvatar(false);
   }
-}
 
   const pickFile = () => fileRef.current?.click();
-const onAvatarChange = (e) => {
-  const file = e.target.files?.[0];
-  if (!file || !file.type.startsWith('image/')) return;
+  const onAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
 
-  // local preview
-  const url = URL.createObjectURL(file);
-  setAvatarSrc((prev) => {
-    if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
-    return url;
-  });
+    // local preview
+    const url = URL.createObjectURL(file);
+    setAvatarSrc((prev) => {
+      if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
+      return url;
+    });
 
-  // upload to backend
-  uploadAvatar(file);
+    // upload to backend
+    uploadAvatar(file);
 
-  e.target.value = '';
-};
-
+    e.target.value = '';
+  };
 
   useEffect(() => {
     return () => {
       if (avatarSrc?.startsWith("blob:")) URL.revokeObjectURL(avatarSrc);
     };
   }, [avatarSrc]);
-useEffect(() => {
-  let cancelled = false;
 
-  async function loadProfile() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login', { replace: true });
-      return;
-    }
+  useEffect(() => {
+    let cancelled = false;
 
-    try {
-      const res = await fetch(`${API_BASE}/ngo/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.status === 401 || res.status === 403 || res.status === 404) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
+    async function loadProfile() {
+      const token = localStorage.getItem('token');
+      if (!token) {
         navigate('/login', { replace: true });
         return;
       }
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Failed to load profile');
+      try {
+        const res = await fetch(`${API_BASE}/ngo/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 401 || res.status === 403 || res.status === 404) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('role');
+          navigate('/login', { replace: true });
+          return;
+        }
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.error || 'Failed to load profile');
+        }
+
+        const data = await res.json();
+        if (!cancelled) setProfile(data.profile);
+      } catch (e) {
+        // show an inline error, but DO NOT loop-redirect
+        if (!cancelled) setErr(e.message || 'Error loading profile');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      const data = await res.json();
-      if (!cancelled) setProfile(data.profile);
-    } catch (e) {
-      // show an inline error, but DO NOT loop-redirect
-      if (!cancelled) setErr(e.message || 'Error loading profile');
-    } finally {
-      if (!cancelled) setLoading(false);
     }
-  }
 
-  loadProfile();
-  return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []); // <-- run once
+    loadProfile();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // <-- run once
 
   // Fetch posts for THIS NGO only
   const fetchPostsForNgo = useCallback(async (ngoId) => {
@@ -447,6 +643,8 @@ useEffect(() => {
       );
       if (!res.ok) throw new Error("Failed to load posts");
       const data = await res.json();
+
+      // Defensive sort by createdAt
       data.sort(
         (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
       );
@@ -493,13 +691,29 @@ useEffect(() => {
       navigate("/login");
       return;
     }
-    if (!newText.trim()) return;
+    if (!newText.trim() && newFiles.length === 0) {
+      alert("Please add text or at least one image.");
+      return;
+    }
+
+    // Simple file validation (UX only; enforce on server too)
+    const MAX_MB = 5;
+    for (const f of newFiles) {
+      if (!f.type.startsWith("image/")) {
+        alert("Only images are allowed.");
+        return;
+      }
+      if (f.size > MAX_MB * 1024 * 1024) {
+        alert(`Each image must be ≤ ${MAX_MB}MB`);
+        return;
+      }
+    }
 
     try {
       setCreatingPost(true);
 
       const form = new FormData();
-      form.append("text", newText);
+      form.append("text", newText.trim());
       for (const f of newFiles) form.append("images", f);
 
       const res = await fetch(`${CONTENT_BASE}/posts`, {
@@ -548,16 +762,15 @@ useEffect(() => {
       coordinates: reqForm.coordinates,
     };
 
-    if (
-      !payload.category ||
-      !payload.count ||
-      !payload.status ||
-      !payload.dateNeeded ||
-      !payload.location
-    ) {
-      alert(
-        "Please fill the required fields (category, count, status, date, location)."
-      );
+    // NEW: stronger front-end validation for UX (server must also validate)
+    const errors = [];
+    if (!payload.category) errors.push("Category is required");
+    if (!Number.isInteger(payload.count) || payload.count <= 0) errors.push("Count must be a positive integer");
+    if (!payload.status) errors.push("Status is required");
+    if (!payload.dateNeeded || Number.isNaN(Date.parse(payload.dateNeeded))) errors.push("Valid date is required");
+    if (!payload.location) errors.push("Location is required");
+    if (errors.length) {
+      alert(errors[0]);
       return;
     }
 
@@ -653,6 +866,13 @@ useEffect(() => {
       summary: updates.summary ?? "",
       logoUrl: updates.logoUrl?.trim(),
       coordinates: updates.coordinates ?? null,
+
+      // NEW: extra editable fields (optional for backend)
+      workingHours: updates.workingHours || "",
+      social: updates.social || { website: "", instagram: "", facebook: "" },
+      chipOrder: Array.isArray(updates.chipOrder) && updates.chipOrder.length
+        ? updates.chipOrder
+        : ["location", "phone", "email", "hours"],
     };
 
     const res = await fetch(`${API_BASE}/ngo/me`, {
@@ -679,13 +899,13 @@ useEffect(() => {
     setProfile((p) => ({ ...p, ...(data.profile || payload) }));
   }
 
-  // close settings when clicking outside (simple capture)
+  // close settings when clicking outside (use ref instead of query selectors)
   useEffect(() => {
     function onDocClick(e) {
       const btn = document.querySelector(".Settings");
-      const menu = document.querySelector(".settings-menu");
-      if (!btn || !menu) return;
-      const clickedInside = btn.contains(e.target) || menu.contains(e.target);
+      const clickedInside =
+        (btn && btn.contains(e.target)) ||
+        (settingsRef.current && settingsRef.current.contains(e.target));
       if (!clickedInside) setSettingsOpen(false);
     }
     if (settingsOpen) document.addEventListener("mousedown", onDocClick);
@@ -721,15 +941,33 @@ useEffect(() => {
 
   if (!profile) return null;
 
-  const { name, email, phone, location, logoUrl, bio, summary } = profile;
+  const {
+    name,
+    email,
+    phone,
+    location,
+    logoUrl,
+    bio,
+    summary,
+    workingHours = "",
+    social = {},
+    chipOrder = ["location", "phone", "email", "hours"]
+  } = profile;
   const avatar = avatarSrc || logoUrl || null;
 
-  // ---- FIX: always render a string for location ----
   // ---- FIX: always render a trimmed string for location (profile only) ----
-const rawLocation =
-  typeof location === "string" ? location : (location?.address || "");
-const displayLocation = formatLocationForChip(rawLocation);
+  const rawLocation =
+    typeof location === "string" ? location : (location?.address || "");
+  const displayLocation = formatLocationForChip(rawLocation);
 
+  // Build chips dynamically (nothing hardcoded)
+  const chipMap = {
+    location: <Chip key="loc" icon={MapPin} text={displayLocation} title={rawLocation} />,
+    phone: <Chip key="ph" icon={Phone} text={phone} />,
+    email: <Chip key="em" icon={Mail} text={email} />,
+    hours: workingHours ? <Chip key="hr" icon={Clock} text={workingHours} /> : null,
+  };
+  const chips = chipOrder.map(k => chipMap[k]).filter(Boolean);
 
   return (
     <div className="page">
@@ -743,16 +981,16 @@ const displayLocation = formatLocationForChip(rawLocation);
             <div className="avatar-lg">
               {avatar ? <img src={avatar} alt="NGO avatar" /> : <Camera size={28} />}
             </div>
-<button
-  type="button"
-  className="avatar-add"
-  onClick={pickFile}
-  aria-label="Change NGO picture"
-  title={uploadingAvatar ? "Uploading…" : "Change picture"}
-  disabled={uploadingAvatar}
->
-  <Plus size={50} strokeWidth={3} />
-</button>
+            <button
+              type="button"
+              className="avatar-add"
+              onClick={pickFile}
+              aria-label="Change NGO picture"
+              title={uploadingAvatar ? "Uploading…" : "Change picture"}
+              disabled={uploadingAvatar}
+            >
+              <Plus size={50} strokeWidth={3} />
+            </button>
 
             <input
               ref={fileRef}
@@ -784,7 +1022,8 @@ const displayLocation = formatLocationForChip(rawLocation);
               <ChevronDown size={14} />
             </button>
 
-            <SettingsMenu
+            <SettingsMenuWithRef
+              ref={settingsRef}
               open={settingsOpen}
               onClose={() => setSettingsOpen(false)}
               onEdit={() => setEditOpen(true)}   // dropdown "Edit Profile" opens modal
@@ -800,11 +1039,10 @@ const displayLocation = formatLocationForChip(rawLocation);
             </div>
 
             <div className="contact-row">
-              <Chip icon={MapPin} text={displayLocation} />
-              <Chip icon={Phone} text={phone} />
-              <Chip icon={Mail} text={email} />
-              <Chip icon={Clock} text={"Mon – Fri: 10AM – 6PM"} />
+              {chips}
             </div>
+
+
           </div>
         </div>
       </section>
@@ -826,162 +1064,172 @@ const displayLocation = formatLocationForChip(rawLocation);
         <div className="posts-head">
           <h2>Requests</h2>
         </div>
+<form
+  className="card request-card"
+  onSubmit={handleCreateRequest}
+  style={{ marginBottom: 16, padding: 0 }}
+>
+  {/* Header */}
+  <div className="request-card__head">
+    <div className="request-card__title">
+      <Package size={18} />
+      <h3>Create a Request</h3>
+    </div>
+    <p className="request-card__hint">
+      Fill the essentials, then refine. You can always edit later.
+    </p>
+  </div>
 
-        {/* Create Request */}
-        <form
-          className="card create-request-card"
-          onSubmit={handleCreateRequest}
-          style={{ marginBottom: 16 }}
+  {/* Body */}
+  <div className="request-card__body">
+    <div className="rq-grid">
+      {/* Category */}
+      <label className="rq-field">
+        <span className="rq-label">Category<span className="rq-req">*</span></span>
+        <select
+          className="rq-input"
+          name="category"
+          value={reqForm.category}
+          onChange={updateReqField}
         >
-          <h3 style={{ marginBottom: 8 }}>
-            <Package size={18} style={{ verticalAlign: "text-bottom" }} /> Create a Request
-          </h3>
+          <option value="">Select a category</option>
+          {clothingCategories.map((c) => (
+            <option key={c.value} value={c.value}>{c.label}</option>
+          ))}
+        </select>
+        <span className="rq-help">What type of items are needed?</span>
+      </label>
 
-          <div className="grid-two">
-            <div>
-              <label className="input-label">Category*</label>
-              <select
-                className="signup-input"
-                name="category"
-                value={reqForm.category}
-                onChange={updateReqField}
-              >
-                <option value="">Select a category</option>
-                {clothingCategories.map((c) => (
-                  <option key={c.value} value={c.value}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+      {/* Count */}
+      <label className="rq-field">
+        <span className="rq-label">Count<span className="rq-req">*</span></span>
+        <input
+          className="rq-input"
+          name="count"
+          type="number"
+          min="1"
+          value={reqForm.count}
+          onChange={updateReqField}
+          placeholder="e.g. 50"
+        />
+        <span className="rq-help">How many items are required?</span>
+      </label>
 
-            <div>
-              <label className="input-label">Count*</label>
-              <input
-                className="signup-input"
-                name="count"
-                type="number"
-                min="1"
-                value={reqForm.count}
-                onChange={updateReqField}
-                placeholder="e.g. 50"
-              />
-            </div>
+      {/* Gender */}
+      <label className="rq-field">
+        <span className="rq-label">Gender</span>
+        <input
+          className="rq-input"
+          name="gender"
+          value={reqForm.gender}
+          onChange={updateReqField}
+          placeholder="Women / Men / Unisex / Kids"
+        />
+      </label>
 
-            <div>
-              <label className="input-label">Gender</label>
-              <input
-                className="signup-input"
-                name="gender"
-                value={reqForm.gender}
-                onChange={updateReqField}
-                placeholder="e.g. Women / Men / Unisex / Kids"
-              />
-            </div>
+      {/* Size */}
+      <label className="rq-field">
+        <span className="rq-label">Size</span>
+        <input
+          className="rq-input"
+          name="size"
+          value={reqForm.size}
+          onChange={updateReqField}
+          placeholder="S–XL / 6–12 yrs"
+        />
+      </label>
 
-            <div>
-              <label className="input-label">Status*</label>
-              <select
-                className="signup-input"
-                name="status"
-                value={reqForm.status}
-                onChange={updateReqField}
-              >
-                <option>Standard</option>
-                <option>Urgent</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="input-label">Needed By*</label>
-              <input
-                className="signup-input"
-                name="dateNeeded"
-                type="date"
-                value={reqForm.dateNeeded}
-                onChange={updateReqField}
-              />
-            </div>
-
-            <div>
-              <label className="input-label">Location*</label>
-              <input
-                className="signup-input"
-                name="location"
-                value={reqForm.location}
-                onChange={updateReqField}
-                placeholder="e.g. Beirut"
-              />
-            </div>
-
-            <div>
-              <label className="input-label">Coordinates</label>
-              <input
-                className="signup-input"
-                value={
-                  reqForm.coordinates?.lat && reqForm.coordinates?.lng
-                    ? `${reqForm.coordinates.lat.toFixed(4)}, ${reqForm.coordinates.lng.toFixed(4)}`
-                    : ""
-                }
-                placeholder="Not selected"
-              />
-              <button
-                type="button"
-                className="btn"
-                style={{ marginTop: 8 }}
-                onClick={() => setShowMap(true)}
-              >
-                Select Coordinates on Map
-              </button>
-            </div>
-
-            <div>
-              <label className="input-label">Size</label>
-              <input
-                className="signup-input"
-                name="size"
-                value={reqForm.size}
-                onChange={updateReqField}
-                placeholder="e.g. S-XL / 6-12 yrs"
-              />
-            </div>
-
-            <div>
-              <label className="input-label">Age Range</label>
-              <input
-                className="signup-input"
-                name="ageRange"
-                value={reqForm.ageRange}
-                onChange={updateReqField}
-                placeholder="e.g. 6-12"
-              />
-            </div>
-
-            {showMap && (
-              <CoordinatesPicker
-                initialCoordinates={
-                  isValidLatLng(reqForm.coordinates)
-                    ? reqForm.coordinates
-                    : defaultCenter
-                }
-                initialLocation={reqForm.location}
-                onSave={(coords, name) =>
-                  setReqForm({
-                    ...reqForm,
-                    coordinates: coords,
-                    location: name || reqForm.location,
-                  })
-                }
-                onClose={() => setShowMap(false)}
-                markerIcon={requestIcon}
-              />
-            )}
-          </div>
-
-          <button className="btn" type="submit" disabled={creatingReq}>
-            {creatingReq ? "Creating…" : "Create Request"}
+      {/* Status (pill toggle) */}
+      <div className="rq-field">
+        <span className="rq-label">Status<span className="rq-req">*</span></span>
+        <div className="rq-toggle">
+          <button
+            type="button"
+            className={`rq-toggle__btn ${reqForm.status === 'Standard' ? 'is-active' : ''}`}
+            onClick={() => updateReqField({ target: { name: 'status', value: 'Standard' } })}
+          >
+            Standard
           </button>
-        </form>
+          <button
+            type="button"
+            className={`rq-toggle__btn ${reqForm.status === 'Urgent' ? 'is-active' : ''}`}
+            onClick={() => updateReqField({ target: { name: 'status', value: 'Urgent' } })}
+          >
+            Urgent
+          </button>
+        </div>
+        <span className="rq-help">Urgent requests are highlighted for donors.</span>
+      </div>
+
+      {/* Needed By */}
+      <label className="rq-field">
+        <span className="rq-label">Needed By<span className="rq-req">*</span></span>
+        <input
+          className="rq-input"
+          name="dateNeeded"
+          type="date"
+          value={reqForm.dateNeeded}
+          onChange={updateReqField}
+          min={todayStr} 
+        />
+        <span className="rq-help">Deadline helps donors prioritize.</span>
+      </label>
+
+      {/* Location + pick on map inline */}
+      <div className="rq-field rq-col-2">
+        <span className="rq-label">Location<span className="rq-req">*</span></span>
+        <div className="rq-inline">
+          <input
+            className="rq-input"
+            name="location"
+            value={reqForm.location}
+            onChange={updateReqField}
+            placeholder="e.g. Beirut"
+                onClick={() => setShowMap(true)}
+          />
+
+        </div>
+        <span className="rq-help">Searchable place name donors will recognize.</span>
+      </div>
+
+
+      {/* Map picker */}
+      {showMap && (
+        <CoordinatesPicker
+          initialCoordinates={
+            isValidLatLng(reqForm.coordinates) ? reqForm.coordinates : defaultCenter
+          }
+          initialLocation={reqForm.location}
+          onSave={(coords, name) =>
+            setReqForm((prev) => ({
+              ...prev,
+              coordinates: coords,
+              location: name || prev.location,
+            }))
+          }
+          onClose={() => setShowMap(false)}
+          markerIcon={requestIcon}
+        />
+      )}
+    </div>
+  </div>
+
+  {/* Sticky footer actions */}
+  <div className="request-card__footer">
+    <button className="btn ghost" type="button" onClick={() =>
+      setReqForm({
+        category: "", count: "", gender: "", status: "Standard",
+        dateNeeded: "", location: "", size: "", ageRange: "",
+        coordinates: { lat: null, lng: null }
+      })
+    }>
+      Clear
+    </button>
+    <button className="btn" type="submit" disabled={creatingReq}>
+      {creatingReq ? "Creating…" : "Create Request"}
+    </button>
+  </div>
+</form>
 
         {/* Requests list — horizontal row */}
         <div className="requests-row">
@@ -1045,11 +1293,12 @@ const displayLocation = formatLocationForChip(rawLocation);
                     <div className="org">{name || "NGO"}</div>
                   </div>
                   <div className="date">
-                    {new Date(p.createdAt || Date.now()).toLocaleString()}
+                    {fmtDateTime(p.createdAt)}
                   </div>
                 </div>
 
-                <p className="muted">{p.text}</p>
+                {/* Render text as plain text to avoid XSS */}
+                <p className="muted" style={{ whiteSpace: "pre-wrap" }}>{p.text || ""}</p>
 
                 {!!p.images?.length && (
                   <div className="grid">
@@ -1058,6 +1307,7 @@ const displayLocation = formatLocationForChip(rawLocation);
                         <img
                           src={url}
                           alt={`post-${i}`}
+                          loading="lazy"
                           style={{
                             width: "100%",
                             height: "100%",
