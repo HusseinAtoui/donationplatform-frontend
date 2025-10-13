@@ -18,9 +18,40 @@
     text-align: center;
     font-weight: 500;
     color: #666;
-    margin-bottom: 50px;
+    margin-bottom: 40px;
 }
 
+/* --- Filter Buttons --- */
+.status-filter {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.filter-btn {
+    background: white;
+    border: 2px solid #5FAB7D;
+    color: #5FAB7D;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background-color: #5FAB7D;
+    color: white;
+}
+
+.filter-btn.active {
+    background-color: #5FAB7D;
+    color: white;
+    box-shadow: 0 4px 12px rgba(95, 171, 125, 0.3);
+}
+
+/* --- Cards --- */
 .admin-table {
     display: flex;
     flex-direction: column;
@@ -131,14 +162,50 @@
     background-color: #d32f2f;
 }
 
+.no-ngos {
+    text-align: center;
+    color: #777;
+    font-weight: 500;
+    margin-top: 40px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .admin-page {
         padding: 60px 20px;
     }
 
+    .status-filter {
+        flex-direction: column;
+        align-items: center;
+    }
+
     .ngo-actions {
         flex-direction: column;
         align-items: stretch;
     }
+}
+
+/* --- Search Bar --- */
+.admin-search {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.admin-search input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: 2px solid #5FAB7D;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.admin-search input:focus {
+    border-color: #ffc247;
+    box-shadow: 0 0 8px rgba(255, 194, 71, 0.3);
 }
