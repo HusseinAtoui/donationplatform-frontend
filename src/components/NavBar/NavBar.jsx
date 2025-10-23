@@ -68,12 +68,31 @@ export default function NavBar() {
   return (
     <>
       <header className="navbar">
-        <div className="navbar__logo">TyebeTyebak</div>
+<div className="navbar__logo">
+  <Link to="/" className="navbar__brand">
+    <img
+      src="/favicon.png"
+      alt="TyebeTyebak logo"
+      className="navbar__logo-img"
+    />
+    <span className="navbar__logo-text">TyebeTyebak</span>
+  </Link>
+</div>
+
+
 
         {/* Desktop + mobile menu */}
         <nav className={`navbar__menu ${isMobileMenuOpen ? 'navbar__menu--open' : ''}`}>
           <Link to="/" className={`navbar__menu-item ${isActive('/') ? 'active' : ''}`} onClick={closeMobileMenu}>Home</Link>
           <Link to="/guide" className={`navbar__menu-item ${isActive('/guide') ? 'active' : ''}`} onClick={closeMobileMenu}>Guide</Link>
+          <Link
+            to="/impact"
+            className={`navbar__menu-item ${['/impact', '/impact-updates'].includes(location.pathname) ? 'active' : ''}`}
+            onClick={closeMobileMenu}
+          >
+            Impact
+          </Link>
+          <Link to="/about" className={`navbar__menu-item ${isActive('/about') ? 'active' : ''}`} onClick={closeMobileMenu}>About</Link>
           <Link to="/map" className={`navbar__menu-item ${isActive('/map') ? 'active' : ''}`} onClick={closeMobileMenu}>Map</Link>
           <Link to="/donations" className={`navbar__menu-item ${isActive('/donations') ? 'active' : ''}`} onClick={closeMobileMenu}>Donations</Link>
           <Link to="/our-partners" className={`navbar__menu-item ${isActive('/our-partners') ? 'active' : ''}`} onClick={closeMobileMenu}>Our Partners</Link>

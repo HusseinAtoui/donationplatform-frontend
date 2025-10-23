@@ -1,6 +1,4 @@
-/* ============================
-   NGO Profile Page Styles
-   ============================ */
+/* ============================ NGO Profile Page Styles ============================ */
 :root {
   --nav-h: 72px;
   --wrap-w: 1150px;
@@ -23,10 +21,8 @@
   --add-btn: clamp(40px, 7vw, 64px);
 
   /* Tweak these two to match your exact look */
-  --avatar-lift: clamp(90px, 6vw, 96px);
-  /* rises more into the cover */
-  --actions-top: clamp(8px, 2.2vw, 22px);
-  /* vertical offset for Edit/gear from card top */
+  --avatar-lift: clamp(90px, 6vw, 96px); /* rises more into the cover */
+  --actions-top: clamp(8px, 2.2vw, 22px); /* vertical offset for Edit/gear from card top */
 }
 
 /* Page base */
@@ -46,7 +42,7 @@
 /* Cover */
 .cover {
   height: 360px;
-  background: var(--green);
+
   border-radius: var(--radius-lg);
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.05) inset;
 }
@@ -77,72 +73,47 @@
   align-items: start;
   overflow: visible;
 }
-
-/* Avatar */
+/* ---------- AVATAR (fix crop + sane sizing) ---------- */
 .avatar-holder {
   grid-area: avatar;
   position: relative;
-  width: var(--avatar);
-  height: var(--avatar);
-  justify-self: start;
-  margin-top: calc(-1 * var(--avatar-lift));
-  /* make it intrude into the cover */
-}
-.avatar-lg {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #e5f6e5; /* fallback color */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+
+  place-items: center;
 }
 
+.avatar-lg { border-radius: 50%; overflow: hidden; background:#fff; }
 .avatar-lg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit: cover;        /* <— fills the circle, no gaps */
+  object-position: center;
+  background:#fff;          /* hides any transparent pixels */
 }
 
+
+/* “+” button */
 .avatar-add {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 6px;
+  right: 6px;
   background: #fff;
   border-radius: 50%;
-  border: 2px solid #4caf50;
-  width: 40px;
-  height: 40px;
+
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
+.avatar-lg { border-radius:50%; overflow:hidden; background:#fff; }
+.avatar-img { width:100%; height:100%; display:block; object-position:center; background:#fff; }
+.avatar-img.cover  { object-fit: cover; }   /* fills (can crop) */
+.avatar-img.contain{ object-fit: contain; } /* shows all (can gap) */
 
 
-.avatar-add:hover {
-  background: var(--green);
-  color: #fff;
-}
-
-.avatar-add:focus-visible {
-  outline: 3px solid #cde7d6;
-  outline-offset: 2px;
-}
-
-.avatar-add svg,
-.avatar-add i,
-.avatar-add span {
-  width: 200%;
-  height: 200%;
-}
-
-.avatar-add svg {
-  stroke-width: 3;
-}
-
+/* Actions */
 .header-actions {
   grid-area: actions;
   align-self: start;
@@ -153,9 +124,8 @@
   margin-top: var(--actions-top);
 }
 
-.header-actions>* {
-  flex: 0 0 auto;
-  /* <— stop buttons from growing */
+.header-actions > * {
+  flex: 0 0 auto; /* <— stop buttons from growing */
 }
 
 /* Compact Edit pill (no full-width) */
@@ -170,7 +140,7 @@
 /* Edit Modal Enhancements */
 .edit-modal {
   max-height: 70%;
-  overflow-y: auto; 
+  overflow-y: auto;
   padding: 24px;
   border-radius: 16px;
   box-shadow: var(--shadow-card);
@@ -192,9 +162,8 @@
 
 .close-btn {
   position: absolute;
-  top: 0;
-  right: -100px;
-  /* adjust spacing from the right edge */
+  top: 8px; /* was 0 */
+  right: 12px; /* was -100px */
   font-size: 22px;
   color: var(--muted);
   background: none;
@@ -265,8 +234,7 @@ textarea {
 }
 
 .Settings:hover {
-  background: var(--green-600);
-  /* Darker green on hover */
+  background: var(--green-600); /* Darker green on hover */
   transform: translateY(-1px);
 }
 
@@ -286,8 +254,7 @@ textarea {
   text-align: left;
   cursor: pointer;
   font-size: 14px;
-  color: #333;
-  /* default */
+  color: #333; /* default */
 }
 
 .menu-item:hover {
@@ -296,23 +263,19 @@ textarea {
 
 /* Specific colors */
 .menu-item.admin {
-  color: #2563eb;
-  /* blue for Admin */
+  color: #2563eb; /* blue for Admin */
   font-weight: 500;
 }
 
 .menu-item.signout {
-  color: #16a34a;
-  /* green for Sign Out */
+  color: #16a34a; /* green for Sign Out */
   font-weight: 500;
 }
 
 .menu-item.danger {
-  color: #dc2626;
-  /* red for Delete */
+  color: #dc2626; /* red for Delete */
   font-weight: 600;
 }
-
 
 /* Header main (title + chips) */
 .header-main {
@@ -322,8 +285,7 @@ textarea {
 .title-row {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  /* no right items now */
+  justify-content: flex-start; /* no right items now */
   gap: 16px;
 }
 
@@ -398,12 +360,7 @@ textarea {
   gap: 10px;
 }
 
-.avatar-sm {
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  background: #e2f0e8;
-}
+
 
 .org {
   font-weight: 700;
@@ -432,7 +389,7 @@ textarea {
 }
 
 /* Generic spacing for other cards */
-.wrap>.card:not(.header-card) {
+.wrap > .card:not(.header-card) {
   margin-top: 16px;
   padding: 18px;
 }
@@ -490,20 +447,16 @@ textarea {
 
 /* Nudge the Create Request button down a bit only on this form */
 .create-request-card .btn {
-  margin-top: 12px;
-  /* move it slightly down */
+  margin-top: 12px; /* move it slightly down */
 }
 
 /* ============================
    Requests UI (grid, 3 per row)
    ============================ */
-
 .requests-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  /* 3 across */
-  gap: 20px;
-  /* space between cards */
+  grid-template-columns: repeat(3, 1fr); /* 3 across */
+  gap: 20px; /* space between cards */
 }
 
 .req-card {
@@ -514,7 +467,7 @@ textarea {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--white);
-  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .req-card:hover {
@@ -597,15 +550,13 @@ textarea {
 }
 
 .req-status.ok {
-  background: #cfeedd;
-  /* soft green */
+  background: #cfeedd; /* soft green */
   color: #245a33;
   border-color: #b9e2cc;
 }
 
 .req-status.danger {
-  background: #ffe1e1;
-  /* soft red */
+  background: #ffe1e1; /* soft red */
   color: #7a1f1f;
   border-color: #f6b1b1;
 }
@@ -694,6 +645,7 @@ textarea {
 .col-span-2 {
   grid-column: span 2;
 }
+
 /* ===== FORCE VERTICAL STACK, MINIMAL SPACE, DON'T BREAK HEADER GRID ===== */
 
 /* Make the whole page vertical */
@@ -730,4 +682,283 @@ footer {
 /* Tight spacing between sections */
 .page > .wrap + .wrap {
   margin-top: 8px !important; /* set to 0 if you want it flush */
+}
+
+/* Prevent any horizontal scrolling anywhere */
+html,
+body,
+.page,
+.modal-backdrop,
+.modal,
+.edit-modal {
+  overflow-x: hidden;
+}
+
+/* Edit modal grid: single column on small screens */
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .col-span-2 {
+    grid-column: 1 / -1; /* keep full-width fields full-width */
+  }
+}
+
+@supports (height: 100dvh) {
+  .modal-backdrop {
+    min-height: 100dvh; /* modern viewport unit */
+  }
+}
+
+/* Make the modal a positioning context */
+.edit-modal {
+  position: relative; /* important */
+}
+
+/* Header layout */
+.modal-header {
+  position: relative; /* so we can pad for the X */
+  padding: 12px 48px 12px 16px; /* right padding so title doesn’t sit under the X */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Center the title visually */
+.modal-header h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+/* The X button itself */
+.icon-btn.close-btn {
+  position: absolute;
+  top: 8px; /* tweak to taste */
+  right: 8px;
+  width: 36px; /* nice tap target */
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 2; /* stay above header content */
+}
+
+.icon-btn.close-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 640px) {
+  .modal-header {
+    padding-right: 44px;
+  }
+
+  .icon-btn.close-btn {
+    top: 6px;
+    right: 6px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* ===== Requests – modern form card ===== */
+.request-card {
+  overflow: hidden;
+}
+
+.request-card__head {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  display: grid;
+  gap: 4px;
+  background: linear-gradient(180deg, #f7faf9, #ffffff);
+}
+
+.request-card__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.request-card__title h3 {
+  margin: 0;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.request-card__hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.request-card__body {
+  padding: 16px 18px 6px;
+}
+
+.rq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+@media (max-width: 720px) {
+  .rq-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rq-field {
+  display: grid;
+  gap: 6px;
+}
+
+.rq-col-2 {
+  grid-column: span 2;
+}
+
+.rq-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rq-req {
+  color: #dc2626;
+  margin-left: 3px;
+}
+
+.rq-help {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rq-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  background: #fff;
+}
+
+.rq-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px rgba(110, 175, 134, 0.22);
+}
+
+.rq-inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.rq-btn {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rq-btn:hover {
+  background: #f7faf9;
+}
+
+.rq-btn--ghost {
+  background: transparent;
+}
+
+.rq-toggle {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.rq-toggle__btn {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+    color: #245a33;
+}
+
+.rq-toggle__btn.is-active {
+  background: #cfeedd;
+  border-color: #b9e2cc;
+  color: #245a33;
+}
+
+.rq-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rq-chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rq-chip:hover {
+  background: #f7faf9;
+}
+
+/* Sticky footer for actions */
+.request-card__footer {
+  position: sticky;
+  bottom: -1px; /* keep shadow */
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: #fff;
+}
+
+/* Buttons (use your existing .btn if you want) */
+.btn {
+  background: var(--green);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--green-600);
+}
+
+.btn.ghost {
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* ===== Requests list – denser, auto-fit cards ===== */
+.requests-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.req-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.req-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 }

@@ -1,10 +1,9 @@
 // src/pages/Login.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import './Login.css';
 
-// Normalize base to avoid trailing slashes
-const API_BASE = (process.env.REACT_APP_API_BASE || 'http://localhost:4000/api').replace(/\/+$/, '');
+const API_BASE = ('http://localhost:4000/api').replace(/\/+$/, '');
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style={{ marginRight: '10px' }}>
@@ -27,35 +26,65 @@ function decodeJwt(token) {
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
+  // actor comes from reset links: ?actor=ngo | user
+  const actorParam = (searchParams.get('actor') || '').toLowerCase();
+  const [actorHint, setActorHint] = useState(actorParam);
+
+  const resetToken = searchParams.get('token') || '';
+  const tokenLooksJwt = resetToken && resetToken.split('.').length === 3;
+  const initialIsReset = !!resetToken && (!tokenLooksJwt || !!actorParam);
+  const [view, setView] = useState(initialIsReset ? 'reset' : 'login');
+
+  // Login form state
   const [userType, setUserType] = useState('Donor'); // 'Donor' | 'NGO'
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // ---- Notices from URL params ----
-  const params = new URLSearchParams(location.search);
-  const justVerified = params.get('verified') === '1';
-  const verifyParam = params.get('verify');
-  const verifyNeeded = verifyParam === '1' || verifyParam === 'needed';
-  const emailChanged = params.get('emailChanged') === '1';
-  const resetSent = params.get('reset') === '1';
-  const loggedOut = params.get('loggedOut') === '1';
-  const accountDeleted = params.get('deleted') === '1';
+  // Forgot form state
+  const [fpEmail, setFpEmail] = useState('');
+  const [fpMsg, setFpMsg] = useState('');
+  const [fpStatus, setFpStatus] = useState('idle'); // 'idle' | 'ok' | 'error'
+  const [fpLoading, setFpLoading] = useState(false);
 
-  // Handle OAuth redirect (?token=&user=) from backend and store session
+  // Reset form state
+  const [rpPassword, setRpPassword] = useState('');
+  const [rpMsg, setRpMsg] = useState('');
+  const [rpLoading, setRpLoading] = useState(false);
+
+  // Notices from URL (read once per render via useSearchParams; no params object)
+  const justVerified     = searchParams.get('verified') === '1';
+  const verifyParam      = searchParams.get('verify');
+  const verifyNeeded     = verifyParam === '1' || verifyParam === 'needed';
+  const emailChanged     = searchParams.get('emailChanged') === '1';
+  const resetSent        = searchParams.get('reset') === '1';
+  const loggedOut        = searchParams.get('loggedOut') === '1';
+  const accountDeleted   = searchParams.get('deleted') === '1';
+  const awaitingApproval = searchParams.get('awaitingApproval') === '1';
+  const rejected         = searchParams.get('rejected') === '1';
+
   useEffect(() => {
-    const tokenFromOAuth = params.get('token');
-    const userJson = params.get('user');
+    // persist actor from link and keep view in sync if token/actor changes
+    if (actorParam) setActorHint(actorParam);
+    const looksJwt = resetToken && resetToken.split('.').length === 3;
+    setView(resetToken && (!looksJwt || !!actorParam) ? 'reset' : 'login');
+  }, [resetToken, actorParam]);
 
-    if (tokenFromOAuth) {
+  // Handle OAuth redirect (?token=<JWT>&user=...)
+  useEffect(() => {
+    // ✅ Build URLSearchParams INSIDE the effect; depend on location.search only.
+    const sp = new URLSearchParams(location.search);
+    const tokenFromOAuth = sp.get('token');
+    const userJson = sp.get('user');
+    const mightBeJwt = tokenFromOAuth && tokenFromOAuth.split('.').length === 3;
+
+    if (mightBeJwt) {
       try {
         localStorage.setItem('token', tokenFromOAuth);
-
         const decoded = decodeJwt(tokenFromOAuth);
-        // backend may use "user" or "donor" — normalize to "donor"
         let role = (decoded?.role || 'user').toLowerCase();
         if (role === 'user') role = 'donor';
         localStorage.setItem('role', role);
@@ -65,33 +94,29 @@ export default function Login() {
           localStorage.setItem('userData', JSON.stringify(user));
         }
 
-        const to = role === 'ngo' ? '/ngoprofile'
-          : role === 'donor' ? '/donorprofile'
-            : '/';
+        const to =
+          role === 'ngo'   ? '/ngoprofile' :
+          role === 'donor' ? '/donorprofile' :
+          role === 'admin' ? '/adminngo'    : '/';
         navigate(to, { replace: true });
-      } catch (e) {
-        console.error('OAuth parse error:', e);
+      } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('userData');
       }
     }
-  }, [location.search, navigate, params]);
+  }, [location.search, navigate]);
 
-  // If already authenticated, route the user to the correct profile
+  // If already authenticated, route them to their dashboard
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
-
     const decoded = decodeJwt(token);
     let role = (decoded?.role || localStorage.getItem('role') || '').toLowerCase();
     if (role === 'user') role = 'donor';
-
-    if (role === 'ngo') {
-      navigate('/ngoprofile', { replace: true });
-    } else if (role === 'donor') {
-      navigate('/donorprofile', { replace: true });
-    }
+    if (role === 'ngo') navigate('/ngoprofile', { replace: true });
+    else if (role === 'donor') navigate('/donorprofile', { replace: true });
+    else if (role === 'admin') navigate('/adminngo', { replace: true });
   }, [navigate]);
 
   async function loginTo(url, payload) {
@@ -100,12 +125,49 @@ export default function Login() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-
     let body = {};
-    try { body = await res.json(); } catch (_) { }
+    try { body = await res.json(); } catch {}
     return { ok: res.ok, status: res.status, body };
   }
 
+  // ----- Forgot Password -----
+  async function handleForgot(e) {
+    e?.preventDefault?.();
+    setFpMsg('');
+    setFpStatus('idle');
+
+    if (!fpEmail) {
+      setFpMsg('Please enter your email.');
+      setFpStatus('error');
+      return;
+    }
+
+    try {
+      setFpLoading(true);
+      // Try NGO first, then User. We return a generic success message either way.
+      const ngoRes = await fetch(`${API_BASE}/ngo/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: fpEmail.trim().toLowerCase() }),
+      });
+      if (!ngoRes.ok) {
+        await fetch(`${API_BASE}/user/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: fpEmail.trim().toLowerCase() }),
+        }).catch(() => {});
+      }
+      setFpMsg('If the email exists, a reset link has been sent.');
+      setFpStatus('ok');
+    } catch {
+      setFpMsg('Network error. Please try again.');
+      setFpStatus('error');
+    } finally {
+      setFpLoading(false);
+    }
+  }
+
+  // ----- Login (Donor/NGO; Admin piggybacks on NGO) -----
   async function handleLogin(e) {
     e?.preventDefault?.();
     setError('');
@@ -118,39 +180,63 @@ export default function Login() {
     try {
       setLoading(true);
 
-      const donorUrl = `${API_BASE}/user/login`;
-      const ngoUrl = `${API_BASE}/ngo/login`;
-      const primary = userType === 'NGO' ? ngoUrl : donorUrl;
-      const fallback = userType === 'NGO' ? donorUrl : ngoUrl;
+      if (userType === 'Donor') {
+        // normal donor route
+        const { ok, status, body } = await loginTo(`${API_BASE}/user/login`, {
+          identifier: identifier.trim(),
+          password
+        });
+        if (!ok) throw new Error(body?.error || `Login failed (${status})`);
+        const { token } = body || {};
+        if (!token) throw new Error('No token returned from server.');
+        localStorage.setItem('token', token);
+        const decoded = decodeJwt(token);
+        let role = (decoded?.role || 'donor').toLowerCase();
+        if (role === 'user') role = 'donor';
+        localStorage.setItem('role', role);
+        navigate('/donorprofile');
+        return;
+      }
 
+      // userType === 'NGO' → try NGO first
       const payload = { identifier: identifier.trim(), password };
 
-      let { ok, status, body } = await loginTo(primary, payload);
+      let r = await loginTo(`${API_BASE}/ngo/login`, payload);
 
-      if (!ok && status === 401 && body?.error === 'Invalid credentials.') {
-        const r2 = await loginTo(fallback, payload);
-        if (r2.ok) { ok = true; status = r2.status; body = r2.body; }
+      // If bad creds against NGO, transparently try ADMIN login
+      if (!r.ok && r.status === 401 && r.body?.error === 'Invalid credentials.') {
+        const admin = await loginTo(`${API_BASE}/ngo/admin/login`, {
+          email: identifier.trim().toLowerCase(),
+          password
+        });
+
+        if (admin.ok) {
+          const { token } = admin.body || {};
+          if (!token) throw new Error('No token returned from server.');
+          localStorage.setItem('token', token);
+          localStorage.setItem('role', 'admin');
+          navigate('/adminngo');
+          return;
+        }
+
+        // (optional) last fallback: maybe the user picked NGO but is a donor
+        r = await loginTo(`${API_BASE}/user/login`, payload);
       }
 
-      if (!ok) throw new Error(body?.error || `Login failed (${status})`);
+      if (!r.ok) {
+        // bubble up helpful NGO review messages
+        if (r.status === 403 && r.body?.error) throw new Error(r.body.error);
+        throw new Error(r.body?.error || `Login failed (${r.status})`);
+      }
 
-      const { token } = body || {};
+      // Successful NGO login
+      const { token } = r.body || {};
       if (!token) throw new Error('No token returned from server.');
-
       localStorage.setItem('token', token);
-
       const decoded = decodeJwt(token);
-      let role = (decoded?.role || userType).toLowerCase();
-      if (role === 'user') role = 'donor';
+      let role = (decoded?.role || 'ngo').toLowerCase();
       localStorage.setItem('role', role);
-
-      if (role === 'ngo') {
-        navigate('/ngoprofile');
-      } else if (role === 'donor') {
-        navigate('/donorprofile');
-      } else {
-        navigate('/');
-      }
+      navigate('/ngoprofile');
     } catch (e) {
       setError(e.message);
     } finally {
@@ -158,21 +244,49 @@ export default function Login() {
     }
   }
 
-  function getGoogleAuthUrl() {
-    return userType === 'NGO'
-      ? `${API_BASE}/ngo/auth/google/login`
-      : `${API_BASE}/user/auth/google/login`;
+  // ----- Reset Password -----
+  async function handleReset(e) {
+    e.preventDefault();
+    setRpMsg('');
+
+    if (!resetToken) { setRpMsg('Missing or invalid reset token.'); return; }
+    if (!rpPassword) { setRpMsg('Please enter a new password.'); return; }
+
+    try {
+      setRpLoading(true);
+
+      let endpoints = [];
+      if (actorHint === 'ngo') endpoints = [`${API_BASE}/ngo/reset-password`];
+      else if (actorHint === 'user') endpoints = [`${API_BASE}/user/reset-password`];
+      else endpoints = [`${API_BASE}/ngo/reset-password`, `${API_BASE}/user/reset-password`];
+
+      let success = false, lastError = '';
+      for (const url of endpoints) {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: resetToken, password: rpPassword }),
+        });
+        let data = {};
+        try { data = await res.json(); } catch {}
+        if (res.ok) { success = true; break; }
+        else lastError = data?.error || 'Reset failed.';
+      }
+
+      if (success) {
+        setRpMsg('Password reset successful! Redirecting to login…');
+        setTimeout(() => { setView('login'); navigate('/login', { replace: true }); }, 1500);
+      } else {
+        setRpMsg(lastError || 'Reset failed.');
+      }
+    } catch {
+      setRpMsg('Network error.');
+    } finally {
+      setRpLoading(false);
+    }
   }
 
-  function handleGoogleLogin() {
-    window.location.href = getGoogleAuthUrl();
-  }
-
-  function goToSignup() {
-    navigate('/signup');
-  }
-
-
+  // ----- UI -----
   return (
     <div className="login-container">
       <div className="login-left">
@@ -180,118 +294,179 @@ export default function Login() {
           ← Return Home
         </p>
 
-        <h1 className="welcome-title">Welcome Back to TyebeTyebak!</h1>
+        <h1 className="welcome-title">
+          {view === 'login' ? 'Welcome Back to TyebeTyebak!' : ' '}
+        </h1>
 
-        {/* ---- Success notices from URL flags ---- */}
-        {(justVerified || verifyNeeded || emailChanged || resetSent || loggedOut || accountDeleted) && (
+        {/* Notices */}
+        {view === 'login' && (justVerified || verifyNeeded || emailChanged || resetSent || loggedOut || accountDeleted || awaitingApproval || rejected) && (
           <div className="notice-stack" style={{ marginBottom: 12 }}>
-            {justVerified && (
-              <div className="notice" style={{ color: 'green' }}>
-                Your email is verified. Please log in.
-              </div>
-            )} {verifyNeeded && (
-              <div className="notice" style={{ color: 'orange' }}>
-                We sent a verification link to your email. Please verify to continue.
-              </div>
-            )}
-            {emailChanged && (
-              <div className="notice" style={{ color: 'green' }}>
-                Your email was updated successfully. Please log in with the new email.
-              </div>
-            )}
-            {resetSent && (
-              <div className="notice" style={{ color: 'green' }}>
-                Password reset link sent. Check your inbox.
-              </div>
-            )}
-            {loggedOut && (
-              <div className="notice" style={{ color: 'green' }}>
-                You’ve been logged out.
-              </div>
-            )}
-            {accountDeleted && (
-              <div className="notice" style={{ color: 'green' }}>
-                Your account was deleted.
-              </div>
-            )}
+            {justVerified     && <div className="notice" style={{ color: 'green'  }}>Your email is verified. Please log in.</div>}
+            {verifyNeeded     && <div className="notice" style={{ color: 'orange' }}>We sent a verification link to your email. Please verify to continue.</div>}
+            {emailChanged     && <div className="notice" style={{ color: 'green'  }}>Your email was updated successfully. Please log in with the new email.</div>}
+            {resetSent        && <div className="notice" style={{ color: 'green'  }}>Password reset link sent. Check your inbox.</div>}
+            {loggedOut        && <div className="notice" style={{ color: 'green'  }}>You’ve been logged out.</div>}
+            {accountDeleted   && <div className="notice" style={{ color: 'green'  }}>Your account was deleted.</div>}
+            {awaitingApproval && <div className="notice" style={{ color: 'orange' }}>Your NGO application is awaiting admin approval.</div>}
+            {rejected         && <div className="notice" style={{ color: 'crimson' }}>Your NGO application was rejected.</div>}
           </div>
         )}
 
-        <p className="login-as-label">Log in as:</p>
-        <div className="user-type-toggle">
-          <button
-            className={`user-type-btn ${userType === 'Donor' ? 'active' : ''}`}
-            onClick={() => setUserType('Donor')}
-            type="button"
-          >
-            Donor
-          </button>
-          <button
-            className={`user-type-btn ${userType === 'NGO' ? 'active' : ''}`}
-            onClick={() => setUserType('NGO')}
-            type="button"
-          >
-            NGO
-          </button>
-        </div>
+        {/* ===== Views ===== */}
+        {view === 'login' && (
+          <>
+            <p className="login-as-label">Log in as:</p>
+            <div className="user-type-toggle">
+              <button
+                className={`user-type-btn ${userType === 'Donor' ? 'active' : ''}`}
+                onClick={() => setUserType('Donor')}
+                type="button"
+              >
+                Donor
+              </button>
+              <button
+                className={`user-type-btn ${userType === 'NGO' ? 'active' : ''}`}
+                onClick={() => setUserType('NGO')}
+                type="button"
+              >
+                NGO
+              </button>
+            </div>
 
-        <form onSubmit={handleLogin}>
-          <label className="input-label">
-            {userType === 'Donor' ? 'Email or Phone' : 'Email'}
-          </label>
-          <input
-            className="login-input"
-            type={userType === 'Donor' ? 'text' : 'email'}
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            placeholder={userType === 'Donor' ? 'e.g. user@example.com or +9617...' : 'user@example.com'}
-            autoComplete="username"
-          />
+            <form onSubmit={handleLogin}>
+              <label className="input-label">{userType === 'Donor' ? 'Email or Phone' : 'Email'}</label>
+              <input
+                className="login-input"
+                type={userType === 'Donor' ? 'text' : 'email'}
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder={userType === 'Donor' ? 'e.g. user@example.com or +9617...' : 'user@example.com'}
+                autoComplete="username"
+              />
 
-          <label className="input-label">Password</label>
-          <input
-            className="login-input"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleLogin(e)}
-            autoComplete="current-password"
-          />
+              <label className="input-label">Password</label>
+              <input
+                className="login-input"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleLogin(e)}
+                autoComplete="current-password"
+              />
 
+              <p className="forgot-password" role="button" tabIndex={0} onClick={() => setView('forgot')}>
+                Forgot your password?
+              </p>
+              <button className="login-btn" disabled={loading} type="submit">
+                {loading ? 'Logging in…' : 'LOGIN'}
+              </button>
+            </form>
 
-          <p className="forgot-password" role="button" tabIndex={0} onClick={() => navigate('/forgot-password')}>
-            Forgot your password?
-          </p>
-          <button className="login-btn" onClick={handleLogin} disabled={loading} type="submit">
-            {loading ? 'Logging in…' : 'LOGIN'}
-          </button>
-        </form>
+            {error && <div style={{ color: 'crimson', marginTop: 10 }}>{error}</div>}
 
-        {error && <div style={{ color: 'crimson', marginTop: 10 }}>{error}</div>}
+            <p className="signup-prompt">
+              Don't have an account{' '}
+              <span
+                className="signup-link"
+                onClick={() => navigate('/signup')}
+                role="button"
+                tabIndex={0}
+                style={{ cursor: 'pointer' }}
+              >
+                Sign Up
+              </span>
+            </p>
 
-        <p className="signup-prompt">
-          Don't have an account{' '}
-          <span
-            className="signup-link"
-            onClick={goToSignup}
-            role="button"
-            tabIndex={0}
-            style={{ cursor: 'pointer' }}
-          >
-            Sign Up
-          </span>
-        </p>
+            <div className="login-divider">
+              <div className="line" />
+              <span>Or Login with</span>
+              <div className="line" />
+            </div>
 
-        <div className="login-divider">
-          <div className="line" />
-          <span>Or Login with</span>
-          <div className="line" />
-        </div>
+            {/* Google OAuth for Donor/NGO only (admins use email+password via NGO tab) */}
+            <button
+              className="google-btn"
+              onClick={() => {
+                const url = userType === 'NGO'
+                  ? `${API_BASE}/ngo/auth/google/login`
+                  : `${API_BASE}/user/auth/google/login`;
+                window.location.href = url;
+              }}
+            >
+              <GoogleIcon /> Google
+            </button>
+          </>
+        )}
 
-        <button className="google-btn" onClick={handleGoogleLogin}>
-          <GoogleIcon />
-          Google
-        </button>
+        {view === 'forgot' && (
+          <div className="auth-card">
+            <h2 className="forgot-heading">Forgot Password</h2>
+            <p className="subtle-text">Enter your email and we’ll send you a secure reset link.</p>
+
+            <form onSubmit={handleForgot}>
+              <label className="input-label">Email</label>
+
+              {/* FLEX wrapper = perfect vertical centering */}
+              <div className="input-with-icon">
+                <svg className="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6zm2 .5v.4l8 5 8-5v-.4L12 11 4 6.5z" />
+                </svg>
+                <input
+                  className="login-input"
+                  type="email"
+                  value={fpEmail}
+                  onChange={(e) => setFpEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
+
+              {fpMsg && (
+                <div className={`alert ${fpStatus === 'ok' ? 'alert-success' : 'alert-error'}`}>
+                  {fpMsg}
+                </div>
+              )}
+
+              <div className="stack gap-8">
+                <button className="login-btn" type="submit" disabled={fpLoading}>
+                  {fpLoading ? 'Sending…' : 'Send Reset Link'}
+                </button>
+              </div>
+
+              <p className="ghost-link" onClick={() => setView('login')}>
+                Back To Login
+              </p>
+            </form>
+          </div>
+        )}
+
+        {view === 'reset' && (
+          <div className="auth-card">
+            <h2 className="forgot-heading">Reset Password</h2>
+            <p className="subtle-text">Set a new password for your account.</p>
+            <form onSubmit={handleReset}>
+              <label className="input-label">New Password</label>
+              <input
+                className="login-input"
+                type="password"
+                value={rpPassword}
+                onChange={(e) => setRpPassword(e.target.value)}
+                placeholder="Enter a new password"
+                required
+              />
+
+              {rpMsg && (
+                <div className={`alert ${rpMsg.startsWith('Password reset successful') ? 'alert-success' : 'alert-error'}`}>
+                  {rpMsg}
+                </div>
+              )}
+
+              <button className="login-btn" type="submit" disabled={rpLoading}>
+                {rpLoading ? 'Resetting…' : 'Reset Password'}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
 
       <div className="login-image" />

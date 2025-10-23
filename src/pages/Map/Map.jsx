@@ -1,46 +1,67 @@
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
-import L from 'leaflet';
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect } from "react";
 import Select from "react-select";
 import axios from "axios";
-import greyMarkerImage from '../../assets/grey-map-marker.png';
-import redMarkerImage from '../../assets/red-map-marker.png';
-import './Map.css';
+import "./Map.css";
 import { clothingCategories } from "../../constants/clothingcategories";
 
-// Fix for Leaflet marker icons
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-const ngoIcon = new L.Icon({
-  iconUrl: greyMarkerImage,
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-const requestIcon = new L.Icon({
-  iconUrl: redMarkerImage,
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
+// -----------------------------
 // Helper: normalize address to a string
 function addr(v) {
-  if (!v) return '—';
-  if (typeof v === 'string') return v;
-  return v.address || '—';
+  if (!v) return "—";
+  if (typeof v === "string") return v;
+  return v.address || "—";
 }
+
+// -----------------------------
+// SVG Pin Icon Factory (DivIcon)
+const makePinIcon = ({
+  fill = "#DC2626", // main color
+  stroke = "#FFFFFF", // outline
+  size = 36 // width; height scales (≈ 1.45x)
+} = {}) => {
+  const html = `
+    <svg width="${size}" height="${size * 1.45}" viewBox="0 0 36 52" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <!-- pin body -->
+      <path d="M18 1c9.389 0 17 7.611 17 17 0 11.5-17 35-17 35S1 29.5 1 18C1 8.611 8.611 1 18 1z"
+            fill="${fill}" stroke="${stroke}" stroke-width="2"/>
+      <!-- inner dot -->
+      <circle cx="18" cy="18" r="6" fill="white" opacity="0.9"/>
+    </svg>
+  `;
+  return new L.DivIcon({
+    className: "tt-pin",
+    html,
+    iconSize: [size, size * 1.45],
+    iconAnchor: [size / 2, size * 1.35], // tip of the pin
+    popupAnchor: [0, -size * 1.2]
+  });
+};
+
+// Color presets
+const iconNGO = makePinIcon({ fill: "#111827", stroke: "#FFFFFF" });       // black
+const iconRequestUrgent = makePinIcon({ fill: "#DC2626", stroke: "#FFFFFF" }); // red
+const iconRequestNormal = makePinIcon({ fill: "#16A34A", stroke: "#FFFFFF" }); // green
+
+// -----------------------------
+// Urgency helper
+// Uses req.isUrgent/urgent when present; otherwise urgent if dateNeeded <= 3 days from now.
+const isRequestUrgent = (req) => {
+  if (typeof req.isUrgent === "boolean") return req.isUrgent;
+  if (typeof req.urgent === "boolean") return req.urgent;
+
+  if (req.dateNeeded) {
+    const now = new Date();
+    const needed = new Date(req.dateNeeded);
+    const days = Math.floor((needed - now) / (24 * 60 * 60 * 1000));
+    return days <= 3;
+  }
+  return false;
+};
+
+// -----------------------------
 
 export default function MapView() {
   const [ngos, setNgos] = useState([]);
@@ -50,7 +71,7 @@ export default function MapView() {
   const [selectedCategories, setSelectedCategories] = useState([]);
 
   // Safe default if env var missing
-  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+  const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
 
   const fetchData = async () => {
     try {
@@ -60,7 +81,7 @@ export default function MapView() {
         axios.get(`${apiUrl}/map/requests`, {
           params: {
             category: selectedCategories.length
-              ? selectedCategories.map(c => c.value).join(",")
+              ? selectedCategories.map((c) => c.value).join(",")
               : "any"
           }
         })
@@ -89,7 +110,7 @@ export default function MapView() {
           Display:
           <select
             value={displayType}
-            onChange={e => setDisplayType(e.target.value)}
+            onChange={(e) => setDisplayType(e.target.value)}
             className="map-display-select"
           >
             <option value="both">NGOs & Requests</option>
@@ -101,7 +122,10 @@ export default function MapView() {
         {displayType === "requests" && (
           <Select
             isMulti
-            options={clothingCategories.map(c => ({ value: c.value, label: c.label }))}
+            options={clothingCategories.map((c) => ({
+              value: c.value,
+              label: c.label
+            }))}
             value={selectedCategories}
             onChange={setSelectedCategories}
             placeholder="Filter categories..."
@@ -126,45 +150,92 @@ export default function MapView() {
 
           <ZoomControl position="bottomright" />
 
-          {displayNgos && ngos
-            .filter(ngo => ngo.coordinates && !isNaN(ngo.coordinates.lat) && !isNaN(ngo.coordinates.lng))
-            .map(ngo => (
-              <Marker key={ngo.id || `${ngo.coordinates.lat},${ngo.coordinates.lng}`}
-                position={[ngo.coordinates.lat, ngo.coordinates.lng]}
-                icon={ngoIcon}>
-                <Popup>
-                  <div className="popup-card">
-                    <strong>{ngo.name || 'NGO'}</strong><br />
-                    {addr(ngo.location)}<br />
-                    {ngo.phone && <>📞 {ngo.phone}</>}<br />
-                    <a href={`/ngo/${ngo.id}`} className="popup-link">View NGO Page</a>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
+          {/* NGOs (black pins) */}
+          {displayNgos &&
+            ngos
+              .filter(
+                (ngo) =>
+                  ngo.coordinates &&
+                  !isNaN(ngo.coordinates.lat) &&
+                  !isNaN(ngo.coordinates.lng)
+              )
+              .map((ngo) => (
+                <Marker
+                  key={ngo.id || `${ngo.coordinates.lat},${ngo.coordinates.lng}`}
+                  position={[ngo.coordinates.lat, ngo.coordinates.lng]}
+                  icon={iconNGO}
+                  riseOnHover
+                  riseOffset={250}
+                >
+                  <Popup>
+                    <div className="popup-card">
+                      <strong>{ngo.name || "NGO"}</strong>
+                      <br />
+                      {addr(ngo.location)}
+                      <br />
+                      {ngo.phone && <>📞 {ngo.phone}</>}
+                      <br />
+                      <a href={`/ngo/${ngo.id}`} className="popup-link">
+                        View NGO Page
+                      </a>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
 
-          {displayRequests && requests
-            .filter(req => req.coordinates && !isNaN(req.coordinates.lat) && !isNaN(req.coordinates.lng))
-            .map(req => (
-              <Marker key={req.requestId || `${req.coordinates.lat},${req.coordinates.lng}`}
-                position={[req.coordinates.lat, req.coordinates.lng]}
-                icon={requestIcon}>
-                <Popup>
-                  <div className="popup-card">
-                    <strong>{req.category || 'Request'}</strong><br />
-                    Quantity: {req.count ?? '—'}<br />
-                    Needed by: {req.dateNeeded || '—'}<br />
-                    {req.ngo && (
-                      <>
-                        NGO: <a href={`/ngo/${req.ngo.id}`} className="popup-link">{req.ngo.name || 'NGO'}</a><br />
-                        Location: {addr(req.ngo.location)}<br />
-                        {req.ngo.phone && <>📞 {req.ngo.phone}</>}
-                      </>
-                    )}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
+          {/* Requests (red if urgent, green otherwise) */}
+          {displayRequests &&
+            requests
+              .filter(
+                (req) =>
+                  req.coordinates &&
+                  !isNaN(req.coordinates.lat) &&
+                  !isNaN(req.coordinates.lng)
+              )
+              .map((req) => {
+                const icon = isRequestUrgent(req)
+                  ? iconRequestUrgent
+                  : iconRequestNormal;
+
+                return (
+                  <Marker
+                    key={
+                      req.requestId ||
+                      `${req.coordinates.lat},${req.coordinates.lng}`
+                    }
+                    position={[req.coordinates.lat, req.coordinates.lng]}
+                    icon={icon}
+                    riseOnHover
+                    riseOffset={250}
+                  >
+                    <Popup>
+                      <div className="popup-card">
+                        <strong>{req.category || "Request"}</strong>
+                        <br />
+                        Quantity: {req.count ?? "—"}
+                        <br />
+                        Needed by: {req.dateNeeded || "—"}
+                        <br />
+                        {req.ngo && (
+                          <>
+                            NGO:{" "}
+                            <a
+                              href={`/ngo/${req.ngo.id}`}
+                              className="popup-link"
+                            >
+                              {req.ngo.name || "NGO"}
+                            </a>
+                            <br />
+                            Location: {addr(req.ngo.location)}
+                            <br />
+                            {req.ngo.phone && <>📞 {req.ngo.phone}</>}
+                          </>
+                        )}
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
         </MapContainer>
       )}
     </div>

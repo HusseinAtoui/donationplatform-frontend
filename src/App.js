@@ -18,8 +18,13 @@ import NGOPublicProfile from './pages/NGOPublicProfile/NGOPublicProfile';
 import MessagesPage from './pages/Messages/MessagesPage';
 import Map from './pages/Map/Map';
 import OnboardingNGOLocation from './pages/Onboarding/OnboardingNGOLocation';
+<<<<<<< Updated upstream
 import TestPopup from "./pages/TestPopup/TestPopup";
 import Admin from './pages/Admin/Admin';
+=======
+import AboutUs from './pages/About/AboutUs';
+import ImpactUpdates from './pages/ImpactUpdates/ImpactUpdates';
+>>>>>>> Stashed changes
 
 
 function AppContent() {
@@ -48,8 +53,14 @@ function AppContent() {
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/map" element={<Map />} />
         <Route path="/onboarding/ngo/location" element={<OnboardingNGOLocation />} />
+<<<<<<< Updated upstream
         <Route path="/admin" element={<Admin />} />
         <Route path="/test-popup" element={<TestPopup />} />
+=======
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/impact" element={<ImpactUpdates />} />
+        <Route path="/impact-updates" element={<ImpactUpdates />} />
+>>>>>>> Stashed changes
 
       </Routes>
     </>

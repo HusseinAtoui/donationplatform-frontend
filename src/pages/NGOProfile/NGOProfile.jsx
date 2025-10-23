@@ -18,6 +18,8 @@ import {
   ChevronDown
 } from "lucide-react";
 import L from "leaflet";
+import { Instagram, Facebook } from "lucide-react";
+
 import greyMarkerImage from '../../assets/grey-map-marker.png';
 import redMarkerImage from '../../assets/red-map-marker.png';
 import { isValidLatLng, CoordinatesPicker } from '../../components/CoordinatesPicker/coordinatespicker'
@@ -45,8 +47,89 @@ const defaultCenter = [33.8938, 35.5018]; // Beirut
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000/api";
 const CONTENT_BASE = `${API_BASE}/home`; // must match Express mount
+function Avatar({ src, onPick, uploading }) {
+  const [fit, setFit] = React.useState("cover"); // default = no gaps
 
-function Chip({ icon: Icon, text }) {
+  const handleLoad = (e) => {
+    const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+    if (!w || !h) return;                       // keep "cover" if unknown
+    const ratio = w / h;
+    // basically square? show it all; otherwise fill the circle
+    setFit(ratio > 0.95 && ratio < 1.05 ? "contain" : "cover");
+  };
+
+  return (
+    <div
+      className="avatar-holder"
+      style={{
+        position: "relative",
+        width: "clamp(120px, 18vw, 160px)",
+        height: "clamp(120px, 18vw, 160px)",
+        borderRadius: "50%",
+        padding: "8px",              // ring thickness
+        background: "#fff",          // hard white ring so green never shows
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        className="avatar-lg"
+        style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: "50%",
+          overflow: "hidden",
+          background: "#fff",        // if PNG has transparency, keep white
+          position: "relative",
+        }}
+      >
+        {src ? (
+          <img
+            src={src}
+            alt="NGO avatar"
+            onLoad={handleLoad}
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "block",
+              objectFit: fit,         // "cover" or "contain" chosen at runtime
+              objectPosition: "center",
+              background: "#fff",
+            }}
+          />
+        ) : (
+          <Camera size={28} />
+        )}
+      </div>
+
+      {/* + button */}
+      <button
+        type="button"
+        className="avatar-add"
+        onClick={onPick}
+        aria-label="Change NGO picture"
+        title={uploading ? "Uploading…" : "Change picture"}
+        disabled={uploading}
+        style={{
+          position: "absolute",
+          right: 8,
+          bottom: 8,
+          width: 44,
+          height: 44,
+          borderRadius: "50%",
+          background: "#fff",
+          border: "2px solid #6eaf86",
+          display: "grid",
+          placeItems: "center",
+          boxShadow: "0 10px 24px rgba(0,0,0,.08)",
+        }}
+      >
+        <Plus size={22} />
+      </button>
+    </div>
+  );
+}
+
+function Chip({ icon: Icon, text, title }) {
   if (!text) return null;
   return (
     <div className="chip" title={text}>
@@ -164,7 +247,85 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
   function update(e) {
     const { name, value } = e.target;
     setForm((s) => ({ ...s, [name]: value }));
+
+    if (name === "email") {
+      const changed = (value || "").trim() && (value || "").trim() !== (profile?.email || "");
+      setEmailChanged(changed);
+      if (!changed) {
+        setVerifSent(false);
+        setVerifCode("");
+        setEmailVerified(false);
+      }
+    }
   }
+  function updateSocial(e) {
+    const { name, value } = e.target;
+    setForm((s) => ({ ...s, social: { ...s.social, [name]: value } }));
+  }
+
+  // Adjust these endpoints to your backend if they differ
+  async function requestEmailChange() {
+    try {
+setVerifSending(true);
+const token = localStorage.getItem('token');
+
+  const res = await fetch(`${API_BASE}/ngo/auth/email/change/request`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  },
+  body: JSON.stringify({ newEmail: form.email }),
+});
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Failed to send verification code");
+      }
+      setVerifSent(true);
+      alert("Verification code sent to the new email.");
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setVerifSending(false);
+    }
+  }
+async function confirmEmailChange() {
+  try {
+    if (!verifCode.trim()) {
+      alert("Enter the verification code.");
+      return;
+    }
+    setVerifConfirming(true);
+
+    const token = localStorage.getItem('token');
+
+const res = await fetch(`${API_BASE}/ngo/auth/email/change/confirm`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({ code: verifCode.trim() }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || "Invalid or expired code");
+    }
+
+    setEmailVerified(true);
+    alert("Email verified! You’ll be signed out to refresh your session.");
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    window.location.assign('/login');
+
+  } catch (e) {
+    alert(e.message);
+  } finally {
+    setVerifConfirming(false);
+  }
+}
 
   async function handleSave(e) {
     e.preventDefault();
@@ -647,7 +808,7 @@ useEffect(() => {
 
     const payload = {
       name: updates.name?.trim(),
-      email: updates.email?.trim(),
+ 
       phone: updates.phone?.trim(),
       location: updates.location?.trim(),
       summary: updates.summary ?? "",
@@ -820,6 +981,49 @@ const displayLocation = formatLocationForChip(rawLocation);
           </p>
         </div>
       </section>
+      <section className="wrap">
+  <div className="card">
+    <h2>Contact & Hours</h2>
+    <div className="contact-info" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      {workingHours && (
+        <p>
+          <Clock size={16} style={{ marginRight: 8 }} />
+          <strong>Working Hours:</strong> {workingHours}
+        </p>
+      )}
+      {social?.website && (
+        <p>
+          <Globe size={16} style={{ marginRight: 8 }} />
+          <a href={social.website.startsWith('http') ? social.website : `https://${social.website}`}
+             target="_blank" rel="noreferrer">
+            {social.website.replace(/^https?:\/\//, '')}
+          </a>
+        </p>
+      )}
+      {social?.instagram && (
+        <p>
+          <Instagram size={16} style={{ marginRight: 8 }} />
+          <a href={social.instagram.startsWith('http')
+            ? social.instagram
+            : `https://instagram.com/${social.instagram.replace(/^@/, '')}`}
+            target="_blank" rel="noreferrer">
+            @{social.instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/^@/, '')}
+          </a>
+        </p>
+      )}
+      {social?.facebook && (
+        <p>
+          <Facebook size={16} style={{ marginRight: 8 }} />
+          <a href={social.facebook.startsWith('http') ? social.facebook : `https://${social.facebook}`}
+             target="_blank" rel="noreferrer">
+            {social.facebook.replace(/^https?:\/\//, '')}
+          </a>
+        </p>
+      )}
+    </div>
+  </div>
+</section>
+
 
       {/* Requests */}
       <section className="wrap">

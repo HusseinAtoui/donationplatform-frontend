@@ -103,7 +103,7 @@ const ContactSection = () => {
         <div className="contact-info-items">
           <div className="info-item"><div className="icon-bg"><FiMapPin /></div><span>American University of Beirut</span></div>
           <div className="info-item"><div className="icon-bg"><FiMail /></div><span>tyebtyebak@gmail.com</span></div>
-          <div className="info-item"><div className="icon-bg"><FiPhone /></div><span>+775 378-6348</span></div>
+          <div className="info-item"><div className="icon-bg"><FiPhone /></div><span>+961 81 917 649</span></div>
           <div className="info-item"><div className="icon-bg"><FiClock /></div><span>Mon - Fri: 10AM - 10PM</span></div>
         </div>
       </div>

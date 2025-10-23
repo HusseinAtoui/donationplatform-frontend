@@ -1,7 +1,7 @@
 // src/pages/NGOPublicProfile/NGOPublicProfile.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Globe } from "lucide-react";
 import "./NGOPublicProfile.css"; // optional styling
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000/api";
@@ -28,10 +28,10 @@ function shortAddr(v) {
   return out || "—";
 }
 
-function Chip({ icon: Icon, text }) {
+function Chip({ icon: Icon, text, title }) {
   if (!text) return null;
   return (
-    <div className="chip">
+    <div className="chip" title={title || text}>
       <span className="chip-icon"><Icon size={14} /></span>
       <span className="chip-text">{text}</span>
     </div>
@@ -88,7 +88,8 @@ export default function NGOPublicProfile() {
         setErr("");
 
         // Fetch NGO info
-        let res = await fetch(`${API_BASE}/ngo/${id}`);
+        // Prefer explicit public endpoint exposed by backend
+        let res = await fetch(`${API_BASE}/ngo/public/${id}`);
         let ngoData;
         if (res.ok) {
           ngoData = await res.json();
@@ -123,7 +124,7 @@ export default function NGOPublicProfile() {
   if (!ngo) return null;
 
   return (
-    <div className="page">
+    <div className="page ngo-public">
       {/* Header */}
       <section className="wrap">
         <div className="card header-card">
@@ -138,10 +139,12 @@ export default function NGOPublicProfile() {
             <h1 className="ngo-title">{ngo.name}</h1>
             <div className="contact-row">
               {/* --- NEW: use shortened location in chip --- */}
-              <Chip icon={MapPin} text={shortAddr(ngo.location)} />
+              <Chip icon={MapPin} text={shortAddr(ngo.location)} title={fullAddr(ngo.location)} />
               <Chip icon={Phone} text={ngo.phone} />
               <Chip icon={Mail} text={ngo.email} />
-              <Chip icon={Clock} text={"Mon – Fri: 10AM – 6PM"} />
+              {ngo.workingHours ? (
+                <Chip icon={Clock} text={ngo.workingHours} />
+              ) : null}
             </div>
           </div>
         </div>
@@ -157,7 +160,7 @@ export default function NGOPublicProfile() {
         </div>
       </section>
 
-      {/* Requests — FIRST */}
+      {/* Requests – FIRST */}
       <section className="wrap">
         <div className="posts-head"><h2>Active Requests</h2></div>
         {requests.length === 0 ? (
@@ -171,7 +174,62 @@ export default function NGOPublicProfile() {
         )}
       </section>
 
-      {/* Posts — AFTER */}
+      {/* Contact & Hours */}
+      <section className="wrap">
+        <div className="card">
+          <h2>Contact & Hours</h2>
+          <div className="contact-info" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {ngo.workingHours && (
+              <p>
+                <Clock size={16} style={{ marginRight: 8 }} />
+                <strong>Working Hours:</strong> {ngo.workingHours}
+              </p>
+            )}
+            {ngo?.social?.website && (
+              <p>
+                <Globe size={16} style={{ marginRight: 8 }} />
+                <a
+                  href={ngo.social.website.startsWith("http") ? ngo.social.website : `https://${ngo.social.website}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {ngo.social.website.replace(/^https?:\/\//, "")}
+                </a>
+              </p>
+            )}
+            {ngo?.social?.instagram && (
+              <p>
+                <Instagram size={16} style={{ marginRight: 8 }} />
+                <a
+                  href={ngo.social.instagram.startsWith("http")
+                    ? ngo.social.instagram
+                    : `https://instagram.com/${ngo.social.instagram.replace(/^@/, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  @{ngo.social.instagram
+                    .replace(/^https?:\/\/(www\.)?instagram\.com\//, "")
+                    .replace(/^@/, "")}
+                </a>
+              </p>
+            )}
+            {ngo?.social?.facebook && (
+              <p>
+                <Facebook size={16} style={{ marginRight: 8 }} />
+                <a
+                  href={ngo.social.facebook.startsWith("http") ? ngo.social.facebook : `https://${ngo.social.facebook}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {ngo.social.facebook.replace(/^https?:\/\//, "")}
+                </a>
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Posts – AFTER */}
       <section className="wrap">
         <div className="posts-head"><h2>Posts</h2></div>
 

@@ -21,7 +21,7 @@ const ngoIcon = new L.Icon({
 const defaultCenter = [33.8938, 35.5018]; // Beirut
 
 // ✅ unified API base (same style as NGOProfile)
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
+const API_BASE = 'http://localhost:4000/api';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style={{ marginRight: '10px' }}>

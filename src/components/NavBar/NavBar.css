@@ -33,6 +33,36 @@ body {
     color: #000;
     flex-shrink: 0;
 }
+.navbar__logo-img {
+  height: 30px;           /* adjust as needed */
+  width: auto;
+  object-fit: contain;
+  cursor: pointer;
+}
+/* NavBar.css */
+header.navbar .navbar__logo img.navbar__logo-img {
+  height: 60px!important;   /* temporary hammer if something else overrides */
+  width: auto;
+  object-fit: contain;
+  display: block;
+  vertical-align: middle;
+}
+/* remove the extra high-specificity + !important block you added earlier */
+
+.navbar__logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;   /* no purple underline on the link */
+}
+
+/* set the size you actually want */
+.navbar__logo-img {
+  height: 32px;            /* change to 20–40px to taste */
+  width: auto;
+  object-fit: contain;
+  display: block;          /* avoids stray descender gap/underline */
+  vertical-align: middle;
+}
 
 /* ------------------- MENU ------------------- */
 .navbar__menu {
@@ -203,4 +233,48 @@ body {
     .navbar__hamburger {
         display: flex;
     }
+}
+/* --- Brand layout: image + text side-by-side --- */
+.navbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;              /* space between logo and text */
+  text-decoration: none;  /* make the whole brand clickable without underline */
+}
+
+/* Force the final size (override the earlier 60px !important rule) */
+header.navbar .navbar__logo img.navbar__logo-img {
+  height: 60 !important; /* pick 24–36px to taste */
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Brand text beside the logo */
+.navbar__logo-text {
+  font-size: 22px;   /* same feel as before */
+  font-weight: 700;
+  color: #000;
+  line-height: 1;
+  letter-spacing: 0.5px;
+  white-space: nowrap;     /* prevents wrapping to next line */
+  transition: color 0.2s ease;
+}
+
+.navbar__brand:hover .navbar__logo-text {
+  color: #5FAB7D;
+}
+
+/* Make sure the container itself can sit inline nicely */
+.navbar__logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Optional: slightly smaller text on mobile */
+@media (max-width: 768px) {
+  .navbar__logo-text {
+    font-size: 18px;
+  }
 }
