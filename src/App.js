@@ -49,12 +49,11 @@ function AppContent() {
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/map" element={<Map />} />
         <Route path="/onboarding/ngo/location" element={<OnboardingNGOLocation />} />
-
         <Route path="/about" element={<AboutUs />} />
         <Route path="/impact" element={<ImpactUpdates />} />
         <Route path="/impact-updates" element={<ImpactUpdates />} />
 
- 
+
 
       </Routes>
     </>

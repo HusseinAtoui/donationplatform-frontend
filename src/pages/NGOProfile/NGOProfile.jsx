@@ -276,17 +276,17 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
   // Adjust these endpoints to your backend if they differ
   async function requestEmailChange() {
     try {
-setVerifSending(true);
-const token = localStorage.getItem('token');
+      setVerifSending(true);
+      const token = localStorage.getItem('token');
 
-  const res = await fetch(`${API_BASE}/ngo/auth/email/change/request`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {})
-  },
-  body: JSON.stringify({ newEmail: form.email }),
-});
+      const res = await fetch(`${API_BASE}/ngo/auth/email/change/request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ newEmail: form.email }),
+      });
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -300,42 +300,42 @@ const token = localStorage.getItem('token');
       setVerifSending(false);
     }
   }
-async function confirmEmailChange() {
-  try {
-    if (!verifCode.trim()) {
-      alert("Enter the verification code.");
-      return;
+  async function confirmEmailChange() {
+    try {
+      if (!verifCode.trim()) {
+        alert("Enter the verification code.");
+        return;
+      }
+      setVerifConfirming(true);
+
+      const token = localStorage.getItem('token');
+
+      const res = await fetch(`${API_BASE}/ngo/auth/email/change/confirm`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ code: verifCode.trim() }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Invalid or expired code");
+      }
+
+      setEmailVerified(true);
+      alert("Email verified! You’ll be signed out to refresh your session.");
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      window.location.assign('/login');
+
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setVerifConfirming(false);
     }
-    setVerifConfirming(true);
-
-    const token = localStorage.getItem('token');
-
-const res = await fetch(`${API_BASE}/ngo/auth/email/change/confirm`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-      },
-      body: JSON.stringify({ code: verifCode.trim() }),
-    });
-
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || "Invalid or expired code");
-    }
-
-    setEmailVerified(true);
-    alert("Email verified! You’ll be signed out to refresh your session.");
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    window.location.assign('/login');
-
-  } catch (e) {
-    alert(e.message);
-  } finally {
-    setVerifConfirming(false);
   }
-}
 
   async function handleSave(e) {
     e.preventDefault();
@@ -440,10 +440,9 @@ const res = await fetch(`${API_BASE}/ngo/auth/email/change/confirm`, {
           )}
         </form>
       </div>
-    </div>  );
-} 
-
-function formatLocationForChip(loc) {
+    </div>
+  );
+}function formatLocationForChip(loc) {
   const s = (typeof loc === 'string' ? loc : (loc?.address || '')).trim();
   if (!s) return '';
 
@@ -497,70 +496,70 @@ export default function NGOProfile() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-// ---- Avatar uploading state and function ----
-const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  // ---- Avatar uploading state and function ----
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
-async function uploadAvatar(file) {
-  if (!profile?.id || !file) return;
+  async function uploadAvatar(file) {
+    if (!profile?.id || !file) return;
 
-  const token = localStorage.getItem('token');
-  if (!token) {
-    navigate('/login');
-    return;
-  }
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
 
-  try {
-    setUploadingAvatar(true);
+    try {
+      setUploadingAvatar(true);
 
-    const form = new FormData();
-    form.append('logo', file); // multer expects "logo" field name
+      const form = new FormData();
+      form.append('logo', file); // multer expects "logo" field name
 
-    const res = await fetch(
-      `${API_BASE}/ngo/update/${encodeURIComponent(profile.id)}`,
-      {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
+      const res = await fetch(
+        `${API_BASE}/ngo/update/${encodeURIComponent(profile.id)}`,
+        {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}` },
+          body: form,
+        }
+      );
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to upload profile picture');
       }
-    );
 
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || 'Failed to upload profile picture');
+      // Refresh profile to pull the new logoUrl
+      const me = await fetch(`${API_BASE}/ngo/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (me.ok) {
+        const data = await me.json().catch(() => ({}));
+        if (data?.profile) setProfile(data.profile);
+      }
+    } catch (e) {
+      alert(e.message || 'Upload failed');
+    } finally {
+      setUploadingAvatar(false);
     }
-
-    // Refresh profile to pull the new logoUrl
-    const me = await fetch(`${API_BASE}/ngo/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (me.ok) {
-      const data = await me.json().catch(() => ({}));
-      if (data?.profile) setProfile(data.profile);
-    }
-  } catch (e) {
-    alert(e.message || 'Upload failed');
-  } finally {
-    setUploadingAvatar(false);
   }
-}
 
   const pickFile = () => fileRef.current?.click();
-const onAvatarChange = (e) => {
-  const file = e.target.files?.[0];
-  if (!file || !file.type.startsWith('image/')) return;
+  const onAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
 
-  // local preview
-  const url = URL.createObjectURL(file);
-  setAvatarSrc((prev) => {
-    if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
-    return url;
-  });
+    // local preview
+    const url = URL.createObjectURL(file);
+    setAvatarSrc((prev) => {
+      if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
+      return url;
+    });
 
-  // upload to backend
-  uploadAvatar(file);
+    // upload to backend
+    uploadAvatar(file);
 
-  e.target.value = '';
-};
+    e.target.value = '';
+  };
 
 
   useEffect(() => {
@@ -568,47 +567,47 @@ const onAvatarChange = (e) => {
       if (avatarSrc?.startsWith("blob:")) URL.revokeObjectURL(avatarSrc);
     };
   }, [avatarSrc]);
-useEffect(() => {
-  let cancelled = false;
+  useEffect(() => {
+    let cancelled = false;
 
-  async function loadProfile() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login', { replace: true });
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_BASE}/ngo/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.status === 401 || res.status === 403 || res.status === 404) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
+    async function loadProfile() {
+      const token = localStorage.getItem('token');
+      if (!token) {
         navigate('/login', { replace: true });
         return;
       }
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Failed to load profile');
+      try {
+        const res = await fetch(`${API_BASE}/ngo/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 401 || res.status === 403 || res.status === 404) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('role');
+          navigate('/login', { replace: true });
+          return;
+        }
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.error || 'Failed to load profile');
+        }
+
+        const data = await res.json();
+        if (!cancelled) setProfile(data.profile);
+      } catch (e) {
+        // show an inline error, but DO NOT loop-redirect
+        if (!cancelled) setErr(e.message || 'Error loading profile');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      const data = await res.json();
-      if (!cancelled) setProfile(data.profile);
-    } catch (e) {
-      // show an inline error, but DO NOT loop-redirect
-      if (!cancelled) setErr(e.message || 'Error loading profile');
-    } finally {
-      if (!cancelled) setLoading(false);
     }
-  }
 
-  loadProfile();
-  return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []); // <-- run once
+    loadProfile();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // <-- run once
 
   // Fetch posts for THIS NGO only
   const fetchPostsForNgo = useCallback(async (ngoId) => {
@@ -819,7 +818,7 @@ useEffect(() => {
 
     const payload = {
       name: updates.name?.trim(),
- 
+
       phone: updates.phone?.trim(),
       location: updates.location?.trim(),
       summary: updates.summary ?? "",
@@ -898,9 +897,9 @@ useEffect(() => {
 
   // ---- FIX: always render a string for location ----
   // ---- FIX: always render a trimmed string for location (profile only) ----
-const rawLocation =
-  typeof location === "string" ? location : (location?.address || "");
-const displayLocation = formatLocationForChip(rawLocation);
+  const rawLocation =
+    typeof location === "string" ? location : (location?.address || "");
+  const displayLocation = formatLocationForChip(rawLocation);
 
 
   return (
@@ -915,16 +914,16 @@ const displayLocation = formatLocationForChip(rawLocation);
             <div className="avatar-lg">
               {avatar ? <img src={avatar} alt="NGO avatar" /> : <Camera size={28} />}
             </div>
-<button
-  type="button"
-  className="avatar-add"
-  onClick={pickFile}
-  aria-label="Change NGO picture"
-  title={uploadingAvatar ? "Uploading…" : "Change picture"}
-  disabled={uploadingAvatar}
->
-  <Plus size={50} strokeWidth={3} />
-</button>
+            <button
+              type="button"
+              className="avatar-add"
+              onClick={pickFile}
+              aria-label="Change NGO picture"
+              title={uploadingAvatar ? "Uploading…" : "Change picture"}
+              disabled={uploadingAvatar}
+            >
+              <Plus size={50} strokeWidth={3} />
+            </button>
 
             <input
               ref={fileRef}
@@ -993,47 +992,47 @@ const displayLocation = formatLocationForChip(rawLocation);
         </div>
       </section>
       <section className="wrap">
-  <div className="card">
-    <h2>Contact & Hours</h2>
-    <div className="contact-info" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-      {workingHours && (
-        <p>
-          <Clock size={16} style={{ marginRight: 8 }} />
-          <strong>Working Hours:</strong> {workingHours}
-        </p>
-      )}
-      {social?.website && (
-        <p>
-          <Globe size={16} style={{ marginRight: 8 }} />
-          <a href={social.website.startsWith('http') ? social.website : `https://${social.website}`}
-             target="_blank" rel="noreferrer">
-            {social.website.replace(/^https?:\/\//, '')}
-          </a>
-        </p>
-      )}
-      {social?.instagram && (
-        <p>
-          <Instagram size={16} style={{ marginRight: 8 }} />
-          <a href={social.instagram.startsWith('http')
-            ? social.instagram
-            : `https://instagram.com/${social.instagram.replace(/^@/, '')}`}
-            target="_blank" rel="noreferrer">
-            @{social.instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/^@/, '')}
-          </a>
-        </p>
-      )}
-      {social?.facebook && (
-        <p>
-          <Facebook size={16} style={{ marginRight: 8 }} />
-          <a href={social.facebook.startsWith('http') ? social.facebook : `https://${social.facebook}`}
-             target="_blank" rel="noreferrer">
-            {social.facebook.replace(/^https?:\/\//, '')}
-          </a>
-        </p>
-      )}
-    </div>
-  </div>
-</section>
+        <div className="card">
+          <h2>Contact & Hours</h2>
+          <div className="contact-info" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {workingHours && (
+              <p>
+                <Clock size={16} style={{ marginRight: 8 }} />
+                <strong>Working Hours:</strong> {workingHours}
+              </p>
+            )}
+            {social?.website && (
+              <p>
+                <Globe size={16} style={{ marginRight: 8 }} />
+                <a href={social.website.startsWith('http') ? social.website : `https://${social.website}`}
+                  target="_blank" rel="noreferrer">
+                  {social.website.replace(/^https?:\/\//, '')}
+                </a>
+              </p>
+            )}
+            {social?.instagram && (
+              <p>
+                <Instagram size={16} style={{ marginRight: 8 }} />
+                <a href={social.instagram.startsWith('http')
+                  ? social.instagram
+                  : `https://instagram.com/${social.instagram.replace(/^@/, '')}`}
+                  target="_blank" rel="noreferrer">
+                  @{social.instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/^@/, '')}
+                </a>
+              </p>
+            )}
+            {social?.facebook && (
+              <p>
+                <Facebook size={16} style={{ marginRight: 8 }} />
+                <a href={social.facebook.startsWith('http') ? social.facebook : `https://${social.facebook}`}
+                  target="_blank" rel="noreferrer">
+                  {social.facebook.replace(/^https?:\/\//, '')}
+                </a>
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
 
       {/* Requests */}
