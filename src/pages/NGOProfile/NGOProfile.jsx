@@ -15,10 +15,13 @@ import {
   LogOut,
   Trash2,
   Pencil,
-  ChevronDown
+  ChevronDown,
+  Globe,
+  Instagram,
+  Facebook,
 } from "lucide-react";
 import L from "leaflet";
-import { Instagram, Facebook } from "lucide-react";
+
 
 import greyMarkerImage from '../../assets/grey-map-marker.png';
 import redMarkerImage from '../../assets/red-map-marker.png';
@@ -229,6 +232,13 @@ function EditProfileModal({ open, onClose, profile, onSave }) {
   });
   const [saving, setSaving] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  // Email verification / helper states (defined to satisfy modal logic + ESLint)
+  const [emailChanged, setEmailChanged] = useState(false);
+  const [verifSent, setVerifSent] = useState(false);
+  const [verifCode, setVerifCode] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [verifSending, setVerifSending] = useState(false);
+  const [verifConfirming, setVerifConfirming] = useState(false);
 
   useEffect(() => {
     if (open && profile) {
@@ -430,9 +440,10 @@ const res = await fetch(`${API_BASE}/ngo/auth/email/change/confirm`, {
           )}
         </form>
       </div>
-    </div>
-  );
-}function formatLocationForChip(loc) {
+    </div>  );
+} 
+
+function formatLocationForChip(loc) {
   const s = (typeof loc === 'string' ? loc : (loc?.address || '')).trim();
   if (!s) return '';
 
@@ -882,7 +893,7 @@ useEffect(() => {
 
   if (!profile) return null;
 
-  const { name, email, phone, location, logoUrl, bio, summary } = profile;
+  const { name, email, phone, location, logoUrl, bio, summary, social = {}, workingHours } = profile;
   const avatar = avatarSrc || logoUrl || null;
 
   // ---- FIX: always render a string for location ----
