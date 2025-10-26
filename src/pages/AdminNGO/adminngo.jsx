@@ -83,6 +83,15 @@ export default function AdminNGO() {
           navigate("/login");
           return;
         }
+
+        // quick client-side role check (decode JWT when available or fall back to stored role)
+        function decodeJwt(t) {
+          try {
+            const payload = t.split('.')[1];
+            return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+          } catch { return null; }
+        }
+
         const res = await fetch(`${API_BASE}/ngo/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -96,7 +105,17 @@ export default function AdminNGO() {
           throw new Error(body.error || "Failed to load NGO profile");
         }
         const data = await res.json();
-        setNgo(data.profile);
+        // server should enforce admin permissions, but also guard here using the returned profile
+        const prof = data.profile || {};
+        const role = (prof.role || '').toLowerCase();
+        if (role !== 'admin') {
+          // not an admin — clear auth and redirect
+          localStorage.removeItem('token');
+          localStorage.removeItem('role');
+          navigate('/login');
+          return;
+        }
+        setNgo(prof);
       } catch (e) {
         setErr(e.message || "Error loading profile");
       } finally {

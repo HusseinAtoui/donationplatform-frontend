@@ -604,10 +604,10 @@ export default function NGOProfile() {
       }
     }
 
-    loadProfile();
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // <-- run once
+  loadProfile();
+  return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []); // <-- run once
 
   // Fetch posts for THIS NGO only
   const fetchPostsForNgo = useCallback(async (ngoId) => {
@@ -895,6 +895,8 @@ export default function NGOProfile() {
   const { name, email, phone, location, logoUrl, bio, summary, social = {}, workingHours } = profile;
   const avatar = avatarSrc || logoUrl || null;
 
+  // NOTE: admin UI removed — do not expose admin shortcut here
+
   // ---- FIX: always render a string for location ----
   // ---- FIX: always render a trimmed string for location (profile only) ----
   const rawLocation =
@@ -935,14 +937,7 @@ export default function NGOProfile() {
           </div>
 
           <div className="header-actions" style={{ position: "relative" }}>
-            {/* Changed: top button now goes to Admin page */}
-            <button
-              className="EDITbtn"
-              onClick={() => navigate('/adminngo')}
-              title="Admin"
-            >
-              Admin
-            </button>
+            {/* Admin button removed */}
 
             <button
               className="Settings"
@@ -992,47 +987,47 @@ export default function NGOProfile() {
         </div>
       </section>
       <section className="wrap">
-        <div className="card">
-          <h2>Contact & Hours</h2>
-          <div className="contact-info" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            {workingHours && (
-              <p>
-                <Clock size={16} style={{ marginRight: 8 }} />
-                <strong>Working Hours:</strong> {workingHours}
-              </p>
-            )}
-            {social?.website && (
-              <p>
-                <Globe size={16} style={{ marginRight: 8 }} />
-                <a href={social.website.startsWith('http') ? social.website : `https://${social.website}`}
-                  target="_blank" rel="noreferrer">
-                  {social.website.replace(/^https?:\/\//, '')}
-                </a>
-              </p>
-            )}
-            {social?.instagram && (
-              <p>
-                <Instagram size={16} style={{ marginRight: 8 }} />
-                <a href={social.instagram.startsWith('http')
-                  ? social.instagram
-                  : `https://instagram.com/${social.instagram.replace(/^@/, '')}`}
-                  target="_blank" rel="noreferrer">
-                  @{social.instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/^@/, '')}
-                </a>
-              </p>
-            )}
-            {social?.facebook && (
-              <p>
-                <Facebook size={16} style={{ marginRight: 8 }} />
-                <a href={social.facebook.startsWith('http') ? social.facebook : `https://${social.facebook}`}
-                  target="_blank" rel="noreferrer">
-                  {social.facebook.replace(/^https?:\/\//, '')}
-                </a>
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
+  <div className="card">
+    <h2>Contact & Hours</h2>
+    <div className="contact-info" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      {workingHours && (
+        <p>
+          <Clock size={16} style={{ marginRight: 8 }} />
+          <strong>Working Hours:</strong> {workingHours}
+        </p>
+      )}
+      {social?.website && (
+        <p>
+          <Globe size={16} style={{ marginRight: 8 }} />
+          <a href={social.website.startsWith('http') ? social.website : `https://${social.website}`}
+             target="_blank" rel="noreferrer">
+            {social.website.replace(/^https?:\/\//, '')}
+          </a>
+        </p>
+      )}
+      {social?.instagram && (
+        <p>
+          <Instagram size={16} style={{ marginRight: 8 }} />
+          <a href={social.instagram.startsWith('http')
+            ? social.instagram
+            : `https://instagram.com/${social.instagram.replace(/^@/, '')}`}
+            target="_blank" rel="noreferrer">
+            @{social.instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/^@/, '')}
+          </a>
+        </p>
+      )}
+      {social?.facebook && (
+        <p>
+          <Facebook size={16} style={{ marginRight: 8 }} />
+          <a href={social.facebook.startsWith('http') ? social.facebook : `https://${social.facebook}`}
+             target="_blank" rel="noreferrer">
+            {social.facebook.replace(/^https?:\/\//, '')}
+          </a>
+        </p>
+      )}
+    </div>
+  </div>
+</section>
 
 
       {/* Requests */}

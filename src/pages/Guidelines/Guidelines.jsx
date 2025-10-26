@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Hero from '../../components/Hero/Hero.jsx';
 import donationImage from '../../assets/donationBox-img.jpg';
 import './Guidelines.css';
+import Footer from '../../components/Footer/Footer';
 
 export default function Guidelines() {
     const navigate = useNavigate();
@@ -94,6 +95,7 @@ export default function Guidelines() {
                     </div>
                 </div>
             </section>
+            <Footer />
         </div>
     );
 }

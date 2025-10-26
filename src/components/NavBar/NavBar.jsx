@@ -21,6 +21,7 @@ function decodeJwtPayload(token) {
 const ROUTE_FOR_ROLE = {
   ngo: '/ngoprofile',      // ensure this EXACTLY matches your Route path (case-sensitive)
   donor: '/donorprofile',
+  admin: '/admin',
 };
 
 export default function NavBar() {

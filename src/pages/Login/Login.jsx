@@ -81,7 +81,7 @@ export default function Login() {
     const userJson = sp.get('user');
     const mightBeJwt = tokenFromOAuth && tokenFromOAuth.split('.').length === 3;
 
-    if (mightBeJwt) {
+        if (mightBeJwt) {
       try {
         localStorage.setItem('token', tokenFromOAuth);
         const decoded = decodeJwt(tokenFromOAuth);
@@ -97,7 +97,7 @@ export default function Login() {
         const to =
           role === 'ngo'   ? '/ngoprofile' :
           role === 'donor' ? '/donorprofile' :
-          role === 'admin' ? '/adminngo'    : '/';
+          role === 'admin' ? '/admin'    : '/';
         navigate(to, { replace: true });
       } catch {
         localStorage.removeItem('token');
@@ -114,9 +114,9 @@ export default function Login() {
     const decoded = decodeJwt(token);
     let role = (decoded?.role || localStorage.getItem('role') || '').toLowerCase();
     if (role === 'user') role = 'donor';
-    if (role === 'ngo') navigate('/ngoprofile', { replace: true });
-    else if (role === 'donor') navigate('/donorprofile', { replace: true });
-    else if (role === 'admin') navigate('/adminngo', { replace: true });
+  if (role === 'ngo') navigate('/ngoprofile', { replace: true });
+  else if (role === 'donor') navigate('/donorprofile', { replace: true });
+  else if (role === 'admin') navigate('/admin', { replace: true });
   }, [navigate]);
 
   async function loginTo(url, payload) {
@@ -203,8 +203,8 @@ export default function Login() {
 
       let r = await loginTo(`${API_BASE}/ngo/login`, payload);
 
-      // If bad creds against NGO, transparently try ADMIN login
-      if (!r.ok && r.status === 401 && r.body?.error === 'Invalid credentials.') {
+      // If NGO login returns 401 for ANY reason, transparently try ADMIN login
+      if (!r.ok && r.status === 401) {
         const admin = await loginTo(`${API_BASE}/ngo/admin/login`, {
           email: identifier.trim().toLowerCase(),
           password
@@ -215,7 +215,7 @@ export default function Login() {
           if (!token) throw new Error('No token returned from server.');
           localStorage.setItem('token', token);
           localStorage.setItem('role', 'admin');
-          navigate('/adminngo');
+          navigate('/admin');
           return;
         }
 
@@ -473,3 +473,4 @@ export default function Login() {
     </div>
   );
 }
+
