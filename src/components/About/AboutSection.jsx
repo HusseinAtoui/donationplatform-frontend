@@ -1,8 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AboutSection.css';
 import AboutIllustration from '../../assets/login-illustration.jpg';
 
 const AboutSection = () => {
+    const navigate = useNavigate();
+
+    const handleLearnMore = () => {
+        navigate('/about');
+    };
+
     return (
         <section className="about-section" id="about-us">
             <div className="about-content">
@@ -17,6 +24,10 @@ const AboutSection = () => {
                         Every donation tells someone: you matter. Our mission is simple: make giving easier,
                         more personal, and deeply human.
                     </p>
+
+                    <button className="about-button" onClick={handleLearnMore}>
+                        Learn More
+                    </button>
                 </div>
 
                 <div className="about-image">
@@ -25,9 +36,7 @@ const AboutSection = () => {
             </div>
 
             <div className="about-separator-bar"></div>
-
         </section>
-
     );
 };
 

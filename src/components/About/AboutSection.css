@@ -49,19 +49,38 @@
 }
 
 .about-separator-bar {
-  width: 100vw;               /* full viewport width */
+  width: 100vw;
+  /* full viewport width */
   height: 6px;
   background-color: #5FAB7D;
   display: block;
-  margin: 2rem 0 0;           /* top spacing, no horizontal margin */
+  margin: 2rem 0 0;
+  /* top spacing, no horizontal margin */
   border-radius: 3px;
-  position: relative;          /* ensures it sits below section content */
+  position: relative;
+  /* ensures it sits below section content */
   left: 50%;
   transform: translateX(-50%);
 }
 
+.about-button {
+  margin-top: 2rem;
+  padding: 0.9rem 2rem;
+  background-color: #5FAB7D;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
-
+.about-button:hover {
+  background-color: #4b936b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(95, 171, 125, 0.3);
+}
 
 /* ------------------- Responsive ------------------- */
 @media (max-width: 900px) {
