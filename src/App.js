@@ -46,7 +46,7 @@ function AppContent() {
         <Route path="/donation-test" element={<DonationRequestDetailTest />} />
         <Route path="/guide" element={<Guidelines />} />
         <Route path="/adminngo" element={<AdminNGO />} />
-  <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="/ngo/:id" element={<NGOPublicProfile />} />
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/map" element={<Map />} />

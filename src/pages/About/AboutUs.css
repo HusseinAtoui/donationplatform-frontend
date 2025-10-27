@@ -1,5 +1,4 @@
-/* AboutUs.css */
-
+/* ------------------- Global Reset ------------------- */
 * {
   margin: 0;
   padding: 0;
@@ -18,7 +17,7 @@
   padding: 0 24px;
 }
 
-/* Hero Section */
+/* ------------------- Hero Section ------------------- */
 .hero-section {
   background: linear-gradient(135deg, #5FAB7D 0%, #71c191 100%);
   padding: 100px 24px 80px;
@@ -56,7 +55,7 @@
   line-height: 1.7;
 }
 
-/* Story Section */
+/* ------------------- Story Section ------------------- */
 .story-section {
   padding: 80px 24px;
   background: white;
@@ -133,103 +132,12 @@
   font-size: 120px;
 }
 
-/* How It Works Section */
-.how-section {
-  padding: 80px 24px;
-  background: #fafafa;
-}
-
-.how-section h2 {
-  font-size: 36px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.how-steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 32px;
-}
-
-.step {
-  text-align: center;
-}
-
-.step-num {
-  width: 60px;
-  height: 60px;
-  background: #5FAB7D;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: 700;
-  margin: 0 auto 16px;
-}
-
-.step p {
-  font-size: 16px;
-  color: #4a4a4a;
-  line-height: 1.5;
-}
-
-/* Why Different Section */
-.why-section {
-  padding: 80px 24px;
-  background: white;
-}
-
-.why-section h2 {
-  font-size: 36px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.why-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 32px;
-}
-
-.why-card {
-  padding: 32px;
-  background: #fafafa;
-  border-radius: 12px;
-  transition: transform 0.2s ease;
-}
-
-.why-card:hover {
-  transform: translateY(-4px);
-}
-
-.why-icon {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 16px;
-}
-
-.why-card h3 {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: #1a1a1a;
-}
-
-.why-card p {
-  font-size: 16px;
-  color: #4a4a4a;
-  line-height: 1.6;
-}
-
-/* Philosophy Section */
+/* ------------------- Philosophy Section ------------------- */
 .philosophy-section {
   padding: 80px 24px;
   background: linear-gradient(135deg, #5FAB7D 0%, #71c191 100%);
   color: white;
+  margin-bottom: 50px;
 }
 
 .philosophy-content {
@@ -251,10 +159,11 @@
   line-height: 1.7;
 }
 
-/* Connect Section */
+/* ------------------- Connect Section ------------------- */
 .connect-section {
-  padding: 80px 24px;
+  padding: 0px 24px;
   background: white;
+  margin-bottom: 40px;
 }
 
 .connect-section h2 {
@@ -304,65 +213,7 @@
   opacity: 0.8;
 }
 
-/* CTA Section */
-.cta-section {
-  padding: 80px 24px;
-  background: #1a1a1a;
-  color: white;
-  text-align: center;
-}
-
-.cta-section h2 {
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 16px;
-}
-
-.cta-section p {
-  font-size: 18px;
-  margin-bottom: 32px;
-  opacity: 0.9;
-}
-
-.cta-buttons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.cta-section button {
-  padding: 14px 32px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-}
-
-.btn-primary {
-  background: #5FAB7D;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #4d9568;
-  transform: translateY(-2px);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: white;
-  border: 2px solid white;
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-/* Responsive */
+/* ------------------- Responsive ------------------- */
 @media (max-width: 768px) {
   .hero-section {
     padding: 60px 24px 50px;
@@ -374,28 +225,14 @@
   }
 
   .story-section,
-  .how-section,
-  .why-section,
   .philosophy-section,
-  .connect-section,
-  .cta-section {
+  .connect-section {
     padding: 60px 24px;
   }
 
   .story-text h2,
-  .how-section h2,
-  .why-section h2,
   .philosophy-section h2,
-  .connect-section h2,
-  .cta-section h2 {
+  .connect-section h2 {
     font-size: 28px;
-  }
-
-  .how-steps {
-    grid-template-columns: 1fr;
-  }
-
-  .why-grid {
-    grid-template-columns: 1fr;
   }
 }
