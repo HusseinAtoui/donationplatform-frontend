@@ -19,7 +19,7 @@
 
 /* ------------------- Hero Section ------------------- */
 .hero-section {
-  background: linear-gradient(135deg, #5FAB7D 0%, #71c191 100%);
+  background: #5FAB7D;
   padding: 100px 24px 80px;
   color: white;
 }
@@ -135,7 +135,7 @@
 /* ------------------- Philosophy Section ------------------- */
 .philosophy-section {
   padding: 80px 24px;
-  background: linear-gradient(135deg, #5FAB7D 0%, #71c191 100%);
+  background: #5FAB7D;
   color: white;
   margin-bottom: 50px;
 }
@@ -157,6 +157,118 @@
   margin-bottom: 20px;
   opacity: 0.95;
   line-height: 1.7;
+}
+
+/* ------------------- SWC Sections ------------------- */
+.swc-section {
+  padding: 60px 24px;
+  background: #5FAB7D;
+  color: white;
+  margin-bottom: 40px;
+}
+
+/* SWC Intro Section - white background */
+.swc-section.intro {
+  background: white;
+  color: #1a1a1a;
+}
+
+.swc-section.intro .swc-text p {
+  color: #4a4a4a;
+}
+
+.swc-section.intro .swc-image .image-placeholder {
+  width: 100%;
+  max-width: 400px;
+  /* same as story image */
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #f0f9f4 0%, #e8f5ed 100%);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 70px;
+}
+
+.swc-section.intro .emoji {
+  font-size: 120px;
+}
+
+
+.swc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.swc-text h2 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.swc-text p {
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.swc-image .image-placeholder {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swc-image .emoji {
+  font-size: 100px;
+}
+
+/* Mission, Projects, Connection Cards */
+.swc-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.swc-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 32px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.swc-card h3 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.swc-card p,
+.swc-card li {
+  font-size: 16px;
+  line-height: 1.7;
+  color: white;
+}
+
+.swc-card ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 16px;
+}
+
+.swc-card li {
+  margin-bottom: 12px;
+}
+
+.swc-card li strong {
+  color: #ffeaa7;
 }
 
 /* ------------------- Connect Section ------------------- */
@@ -234,5 +346,16 @@
   .philosophy-section h2,
   .connect-section h2 {
     font-size: 28px;
+  }
+}
+
+@media (max-width: 992px) {
+  .swc-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .swc-cards {
+    grid-template-columns: 1fr;
   }
 }

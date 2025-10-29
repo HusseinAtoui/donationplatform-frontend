@@ -1,4 +1,3 @@
-// AboutUs.jsx
 import React from 'react';
 import './AboutUs.css';
 import Footer from '../../components/Footer/Footer';
@@ -69,6 +68,58 @@ export default function AboutUs() {
               Every line of code, every design decision, every feature exists to make
               giving easier and more transparent. Because when donations work the way
               they should, communities thrive.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- SWC Sections ---------------- */}
+
+      {/* SWC Intro */}
+      <section className="swc-section intro">
+        <div className="content-wrapper swc-grid">
+          <div className="swc-text">
+            <h2>About the AUB Social Work Club (SWC)</h2>
+            <p>
+              A student-led club at AUB, SWC turns empathy into action by supporting
+              communities on and off campus.
+            </p>
+          </div>
+          <div className="swc-image">
+            <div className="image-placeholder">
+              <span className="emoji">🤝</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mission & Goals */}
+      <section className="swc-section mission">
+        <div className="content-wrapper swc-cards">
+          <div className="swc-card">
+            <h3>Mission & Goals</h3>
+            <ul>
+              <li><strong>Collaboration:</strong> Partnering with clubs, NGOs, and student initiatives.</li>
+              <li><strong>Creation:</strong> Organizing projects and events that uplift communities.</li>
+            </ul>
+            <p>
+              SWC encourages civic engagement, compassion, and leadership among students.
+            </p>
+          </div>
+
+          <div className="swc-card">
+            <h3>Activities & Projects</h3>
+            <p>
+              Fundraising, volunteering, and awareness campaigns that make real impact
+              locally and internationally.
+            </p>
+          </div>
+
+          <div className="swc-card">
+            <h3>Connection to Tyebe Tyebak</h3>
+            <p>
+              Tyebe Tyebak operates under SWC, with student volunteers supporting its
+              field initiatives each semester.
             </p>
           </div>
         </div>
