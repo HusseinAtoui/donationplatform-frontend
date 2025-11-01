@@ -95,7 +95,6 @@ export default function Guidelines() {
                     </div>
                 </div>
             </section>
-            <Footer />
         </div>
     );
 }
