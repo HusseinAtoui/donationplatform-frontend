@@ -2,6 +2,8 @@ import React from 'react';
 import './AboutUs.css';
 import Footer from '../../components/Footer/Footer';
 import ContactSection from '../../components/ContactSection/ContactSection';
+import AboutIllustration from '../../assets/SWC.png';
+
 
 export default function AboutUs() {
   return (
@@ -87,7 +89,7 @@ export default function AboutUs() {
           </div>
           <div className="swc-image">
             <div className="image-placeholder">
-              <span className="emoji">🤝</span>
+              <img src={AboutIllustration} alt="About illustration" />
             </div>
           </div>
         </div>
