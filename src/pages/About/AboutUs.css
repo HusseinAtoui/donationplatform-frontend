@@ -132,6 +132,31 @@
   font-size: 120px;
 }
 
+/* ---- Make "How we started" image fill its space ---- */
+.story-image .image-placeholder {
+  width: 100%;
+  max-width: 450px;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  border: 4px solid #5FAB7D; /* same green border as SWC */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.story-image .image-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+  display: block;
+}
+
+
 /* ------------------- Philosophy Section ------------------- */
 .philosophy-section {
   padding: 80px 24px;

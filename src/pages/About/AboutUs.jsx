@@ -3,6 +3,8 @@ import './AboutUs.css';
 import Footer from '../../components/Footer/Footer';
 import ContactSection from '../../components/ContactSection/ContactSection';
 import AboutIllustration from '../../assets/SWC.png';
+import AboutLogo from '../../assets/logoforABOUT.png';
+
 
 
 export default function AboutUs() {
@@ -15,7 +17,7 @@ export default function AboutUs() {
           <h1>Bridging hearts, one donation at a time</h1>
           <p>
             We're students from AUB who built a platform that makes giving transparent,
-            simple, and impactful. No fluff—just real connections between people who want
+            simple, and impactful. No fluff, just real connections between people who want
             to help and organizations that need support.
           </p>
         </div>
@@ -50,7 +52,7 @@ export default function AboutUs() {
             </div>
             <div className="story-image">
               <div className="image-placeholder">
-                <span className="emoji">🎓</span>
+                <img src={AboutLogo} alt="How we started illustration" />
               </div>
             </div>
           </div>
