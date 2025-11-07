@@ -85,8 +85,10 @@ export default function AboutUs() {
           <div className="swc-text">
             <h2>About the AUB Social Work Club (SWC)</h2>
             <p>
-              A student-led club at AUB, SWC turns empathy into action by supporting
-              communities on and off campus.
+              The AUB Social Work Club (SWC) is a student-led organization at the American University of Beirut
+              dedicated to fostering care, collaboration, and community empowerment. Operating at the intersection of
+              student life and social responsibility, SWC encourages young people to transform empathy into tangible
+              social action both within the university and across Lebanon.
             </p>
           </div>
           <div className="swc-image">
@@ -105,26 +107,32 @@ export default function AboutUs() {
             <ul>
               <li><strong>Collaboration:</strong> Partnering with clubs, NGOs, and student initiatives.</li>
               <li><strong>Creation:</strong> Organizing projects and events that uplift communities.</li>
+              <li><strong>SWC</strong> encourages civic engagement, compassion, and leadership among students.</li>
             </ul>
-            <p>
-              SWC encourages civic engagement, compassion, and leadership among students.
-            </p>
           </div>
 
           <div className="swc-card">
             <h3>Activities & Projects</h3>
-            <p>
-              Fundraising, volunteering, and awareness campaigns that make real impact
-              locally and internationally.
-            </p>
+            <ul>
+              <li><strong>Fundraising</strong>, volunteering, and awareness events with AUB clubs & NGOs.</li>
+              <li><strong>Global</strong> collaborations for social causes.</li>
+              <li><strong>Student</strong> opportunities in impactful community projects.</li>
+            </ul>
           </div>
 
           <div className="swc-card">
             <h3>Connection to Tyebe Tyebak</h3>
-            <p>
-              Tyebe Tyebak operates under SWC, with student volunteers supporting its
-              field initiatives each semester.
-            </p>
+            <ul>
+              <li><strong>Operates</strong> under SWC, supporting sustainable, hands-on community work.</li>
+              <li><strong>Semester-based</strong> student volunteers assist in field initiatives.</li>
+              <li><strong>Gives</strong> students practical experience in social impact and humanitarian engagement.</li>
+
+
+
+
+
+
+            </ul>
           </div>
         </div>
       </section>
