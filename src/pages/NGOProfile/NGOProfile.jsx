@@ -895,7 +895,8 @@ export default function NGOProfile() {
   const { name, email, phone, location, logoUrl, bio, summary, social = {}, workingHours } = profile;
   const avatar = avatarSrc || logoUrl || null;
 
-  // NOTE: admin UI removed — do not expose admin shortcut here
+  // determine admin status from the profile returned by /ngo/me (preferred over localStorage)
+  const isAdminUser = (profile && ((profile.role || '').toLowerCase() === 'admin' || profile.isAdmin === true)) || false;
 
   // ---- FIX: always render a string for location ----
   // ---- FIX: always render a trimmed string for location (profile only) ----
@@ -937,7 +938,16 @@ export default function NGOProfile() {
           </div>
 
           <div className="header-actions" style={{ position: "relative" }}>
-            {/* Admin button removed */}
+            {/* Changed: top button now goes to Admin page */}
+            {isAdminUser && (
+              <button
+                className="EDITbtn"
+                onClick={() => navigate('/admin')}
+                title="Admin"
+              >
+                Admin
+              </button>
+            )}
 
             <button
               className="Settings"
