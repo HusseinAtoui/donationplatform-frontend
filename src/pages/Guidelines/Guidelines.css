@@ -96,21 +96,31 @@
 
 /* Why Guidelines Section */
 .why-guidelines {
-    background-color: #f7f7f7;
-    padding: 40px 25px;
-    border-radius: 12px;
     margin-top: 50px;
 }
 
 .why-guidelines h2 {
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
-    font-size: 28px;
-    margin-bottom: 16px;
+    font-size: 32px;
+    margin-bottom: 20px;
     color: #2a2a2a;
+    border-bottom: 2px solid #5FAB7D;
+    display: inline-block;
+    padding-bottom: 8px;
+    padding-left: 50px;
+    margin-left: -50px;
 }
 
-.why-guidelines p {
+.why-guidelines__card {
+    background-color: #ffffff;
+    padding: 42px 36px;
+    border-radius: 16px;
+    border: 1px solid #ebebeb;
+    box-shadow: 0 20px 45px rgba(28, 60, 52, 0.08);
+}
+
+.why-guidelines__card p {
     font-family: 'Inter', sans-serif;
     font-size: 16px;
     line-height: 28px;
@@ -140,7 +150,7 @@
         font-size: 24px;
     }
 
-    .why-guidelines p {
+    .why-guidelines__card p {
         font-size: 15px;
     }
 

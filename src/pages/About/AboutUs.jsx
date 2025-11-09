@@ -1,7 +1,6 @@
 import React from 'react';
 import './AboutUs.css';
 import Footer from '../../components/Footer/Footer';
-import ContactSection from '../../components/ContactSection/ContactSection';
 import AboutIllustration from '../../assets/SWC.png';
 import AboutLogo from '../../assets/logoforABOUT.png';
 
@@ -136,8 +135,6 @@ export default function AboutUs() {
           </div>
         </div>
       </section>
-
-      <ContactSection />
 
       {/* Connect */}
       <section className="connect-section">

@@ -198,22 +198,39 @@
   color: #1a1a1a;
 }
 
+/* Mission cards sit on a white canvas */
+.swc-section.mission {
+  background: white;
+  color: #1a1a1a;
+}
+
+/* Intro section tweaks for better logo presentation */
+.swc-section.intro {
+  background: #f8fbf9;
+  color: #1a1a1a;
+}
+
 .swc-section.intro .swc-text p {
   color: #4a4a4a;
 }
 
+.swc-section.intro .swc-image {
+  display: flex;
+  justify-content: center;
+}
+
 .swc-section.intro .swc-image .image-placeholder {
   width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1;
-  background: linear-gradient(135deg, #f0f9f4 0%, #e8f5ed 100%);
-  border-radius: 20px;
+  max-width: 420px;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 70px;
-  border: 4px solid #1B4D3C; 
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  margin-left: 0;
+  border: 1.5px solid #1B4D3C;
+  box-shadow: 0 24px 55px rgba(27, 77, 60, 0.15);
 }
 
 .swc-section.intro .emoji {
@@ -239,28 +256,26 @@
   line-height: 1.7;
 }
 
-/* ---- FIX: Make SWC image fill its space ---- */
+/* ---- SWC image styling ---- */
 .swc-image .image-placeholder {
   width: 100%;
-  max-width: 450px;
-  aspect-ratio: 1;
-  border-radius: 20px;
-  overflow: hidden;
+  max-width: 420px;
+  border-radius: 28px;
+  padding: 28px;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-left: auto;
   margin-right: auto;
-  border: 1px solid black;
-  /* AUB green tone border */
-
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
 }
 
 .swc-image .image-placeholder img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 20px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0;
   display: block;
 }
 
@@ -281,6 +296,12 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+.swc-section.mission .swc-card {
+  background: #f6fbf7;
+  backdrop-filter: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
 .swc-card h3 {
   font-size: 24px;
   margin-bottom: 16px;
@@ -292,6 +313,11 @@
   font-size: 16px;
   line-height: 1.7;
   color: white;
+}
+
+.swc-section.mission .swc-card p,
+.swc-section.mission .swc-card li {
+  color: #3f3f3f;
 }
 
 .swc-card ul {
@@ -306,6 +332,10 @@
 
 .swc-card li strong {
   color: #ffeaa7;
+}
+
+.swc-section.mission .swc-card li strong {
+  color: #5FAB7D;
 }
 
 /* ------------------- Connect Section ------------------- */

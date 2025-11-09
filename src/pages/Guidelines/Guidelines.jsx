@@ -89,12 +89,15 @@ export default function Guidelines() {
                     {/* Why These Guidelines */}
                     <div className="why-guidelines">
                         <h2>Why These Guidelines?</h2>
-                        <p>
-                            Following these rules ensures donations are usable, safe, and reach those in need efficiently. It helps our NGO partners focus on distributing items to people faster and more effectively.
-                        </p>
+                        <div className="why-guidelines__card">
+                            <p>
+                                Following these rules ensures donations are usable, safe, and reach those in need efficiently. It helps our NGO partners focus on distributing items to people faster and more effectively.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
+            <Footer />
         </div>
     );
 }

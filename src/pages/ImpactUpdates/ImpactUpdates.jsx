@@ -22,7 +22,6 @@ export default function ImpactUpdates() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
-  const [newsletterStatus, setNewsletterStatus] = useState('');
 
   const fetchPosts = useCallback(async (signal) => {
     try {
@@ -65,8 +64,6 @@ export default function ImpactUpdates() {
 
   return (
     <>
-
-
       <main className="updates">
         {/* HERO */}
         <section className="updates__hero">
@@ -184,35 +181,10 @@ export default function ImpactUpdates() {
           })}
         </section>
 
-        {/* NEWSLETTER */}
-        <section className="newsletter">
-          <div className="newsletter__body">
-            <h2>Want the highlights in your inbox?</h2>
-            <p>Get monthly impact notes and see the milestones your generosity unlocks.</p>
-          </div>
-          <form
-            className="newsletter__form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.currentTarget.reset();
-              setNewsletterStatus('Thanks for joining! We’ll keep you posted soon.');
-            }}
-          >
-           <label>
-  <span className="newsletter__label">Your email</span> {/* ← change text here */}
-  <input type="email" placeholder="you@example.com" required />
-</label>
-
-            <button type="submit" className="btn btn-white">Join the list</button>
-          </form>
-          {newsletterStatus && <p className="newsletter__status">{newsletterStatus}</p>}
-        </section>
       </main>
       {/* spacer so page content doesn't collide with footer (if footer is fixed) */}
       <div style={{ height: 0 }} />
       <Footer />
     </>
-    
   );
-  
 }
