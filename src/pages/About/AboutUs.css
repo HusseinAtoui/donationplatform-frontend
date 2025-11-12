@@ -6,7 +6,7 @@
 }
 
 .about-page {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   color: #1a1a1a;
   line-height: 1.6;
 }
@@ -22,11 +22,6 @@
   background: #5FAB7D;
   padding: 100px 24px 80px;
   color: white;
-}
-
-.hero-container {
-  max-width: 800px;
-  margin: 0 auto;
   text-align: center;
 }
 
@@ -38,19 +33,18 @@
   font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: 24px;
 }
 
 .hero-section h1 {
   font-size: clamp(32px, 5vw, 56px);
   font-weight: 700;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   line-height: 1.1;
 }
 
 .hero-section p {
-  font-size: 20px;
+  font-size: 18px;
   opacity: 0.95;
   line-height: 1.7;
 }
@@ -58,21 +52,13 @@
 /* ------------------- Story Section ------------------- */
 .story-section {
   padding: 80px 24px;
-  background: white;
-}
-
-.story-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: center;
+  background: #fff;
 }
 
 .story-text h2 {
   font-size: 36px;
   font-weight: 700;
   margin-bottom: 24px;
-  color: #1a1a1a;
 }
 
 .story-text p {
@@ -112,317 +98,110 @@
   color: #6a6a6a;
 }
 
-.story-image {
-  display: flex;
-  justify-content: center;
-}
-
-.image-placeholder {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1;
-  background: white;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.emoji {
-  font-size: 120px;
-}
-
-.story-image .image-placeholder {
-  width: 100%;
-  max-width: 450px;
-  aspect-ratio: 1;
-  border-radius: 20px;
-  background-color: white; 
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-  margin-right: auto;
-  border: 4px solid #5FAB7D; 
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* smaller centered logo inside */
-.story-image .image-placeholder img {
-  width: 70%; 
-  height: auto;
-  object-fit: contain; 
-  display: block;
-  border-radius: 0; 
-}
-
-/* ------------------- Philosophy Section ------------------- */
-.philosophy-section {
-  padding: 80px 24px;
-  background: #5FAB7D;
-  color: white;
-  margin-bottom: 50px;
-}
-
-.philosophy-content {
-  max-width: 800px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.philosophy-section h2 {
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 24px;
-}
-
-.philosophy-section p {
-  font-size: 18px;
-  margin-bottom: 20px;
-  opacity: 0.95;
-  line-height: 1.7;
-}
-
-/* ------------------- SWC Sections ------------------- */
+/* ------------------- SWC Section (Aligned like Story) ------------------- */
 .swc-section {
-  padding: 60px 24px;
-  background: #5FAB7D;
-  color: white;
-  margin-bottom: 40px;
+  padding: 100px 24px;
+  background: #f6f8f7;
 }
 
-/* SWC Intro Section - white background */
-.swc-section.intro {
-  background: white;
-  color: #1a1a1a;
-}
-
-/* Mission cards sit on a white canvas */
-.swc-section.mission {
-  background: white;
-  color: #1a1a1a;
-}
-
-/* Intro section tweaks for better logo presentation */
-.swc-section.intro {
-  background: #f8fbf9;
-  color: #1a1a1a;
-}
-
-.swc-section.intro .swc-text p {
-  color: #4a4a4a;
-}
-
-.swc-section.intro .swc-image {
-  display: flex;
-  justify-content: center;
-}
-
-.swc-section.intro .swc-image .image-placeholder {
-  width: 100%;
-  max-width: 420px;
-  padding: 32px;
-  background: #ffffff;
-  border-radius: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 0;
-  border: 1.5px solid #1B4D3C;
-  box-shadow: 0 24px 55px rgba(27, 77, 60, 0.15);
-}
-
-.swc-section.intro .emoji {
-  font-size: 120px;
-}
-
-
-.swc-grid {
+.swc-section .content-wrapper {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: center;
+  grid-template-columns: 1fr;
+  gap: 32px;
 }
 
-.swc-text h2 {
+.swc-section h2 {
   font-size: 36px;
   font-weight: 700;
   margin-bottom: 24px;
+  color: #2b2b2b;
+  text-align: left;
 }
 
-.swc-text p {
+.swc-section p {
+  font-size: 17px;
+  color: #4a4a4a;
+  line-height: 1.8;
+  margin-bottom: 20px;
+  text-align: left;
+  max-width: 850px;
+}
+
+.swc-highlight {
+  margin-top: 32px;
+}
+
+.swc-quote {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 750px;
+  margin: 0 0 24px 0;
+  /* Left-aligned instead of centered */
+}
+
+.swc-quote p {
   font-size: 18px;
-  line-height: 1.7;
-}
-
-/* ---- SWC image styling ---- */
-.swc-image .image-placeholder {
-  width: 100%;
-  max-width: 420px;
-  border-radius: 28px;
-  padding: 28px;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-  margin-right: auto;
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
-}
-
-.swc-image .image-placeholder img {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  border-radius: 0;
-  display: block;
-}
-
-
-/* Mission, Projects, Connection Cards */
-.swc-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-  margin-top: 40px;
-}
-
-.swc-card {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 32px;
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-.swc-section.mission .swc-card {
-  background: #f6fbf7;
-  backdrop-filter: none;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-.swc-card h3 {
-  font-size: 24px;
-  margin-bottom: 16px;
-  font-weight: 700;
-}
-
-.swc-card p,
-.swc-card li {
-  font-size: 16px;
-  line-height: 1.7;
-  color: white;
-}
-
-.swc-section.mission .swc-card p,
-.swc-section.mission .swc-card li {
-  color: #3f3f3f;
-}
-
-.swc-card ul {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 16px;
-}
-
-.swc-card li {
+  font-style: italic;
+  color: #3a3a3a;
   margin-bottom: 12px;
 }
 
-.swc-card li strong {
-  color: #ffeaa7;
+.swc-quote span {
+  font-size: 15px;
+  color: #777;
 }
 
-.swc-section.mission .swc-card li strong {
-  color: #5FAB7D;
-}
-
-/* ------------------- Connect Section ------------------- */
-.connect-section {
-  padding: 0px 24px;
-  background: white;
-  margin-bottom: 40px;
-}
-
-.connect-section h2 {
-  font-size: 36px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.connect-links {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.connect-link {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 24px 32px;
-  background: #fafafa;
-  border-radius: 12px;
-  text-decoration: none;
-  color: #1a1a1a;
-  transition: all 0.2s ease;
-}
-
-.connect-link:hover {
+.swc-link {
+  display: inline-block;
   background: #5FAB7D;
   color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.swc-link:hover {
+  background: #51996f;
   transform: translateY(-2px);
 }
 
-.link-icon {
-  font-size: 32px;
-}
+/* Responsive */
+@media (max-width: 768px) {
+  .swc-section {
+    padding: 60px 24px;
+  }
 
-.link-title {
-  font-weight: 700;
-  font-size: 16px;
-  margin-bottom: 4px;
-}
+  .swc-section h2 {
+    font-size: 28px;
+  }
 
-.link-sub {
-  font-size: 14px;
-  opacity: 0.8;
+  .swc-quote {
+    padding: 28px;
+  }
 }
 
 /* ------------------- Responsive ------------------- */
 @media (max-width: 768px) {
   .hero-section {
-    padding: 60px 24px 50px;
-  }
-
-  .story-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
+    padding: 60px 24px;
   }
 
   .story-section,
-  .philosophy-section,
-  .connect-section {
+  .swc-section {
     padding: 60px 24px;
   }
 
   .story-text h2,
-  .philosophy-section h2,
-  .connect-section h2 {
+  .swc-section h2 {
     font-size: 28px;
   }
-}
 
-@media (max-width: 992px) {
-  .swc-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-
-  .swc-cards {
-    grid-template-columns: 1fr;
+  .swc-quote {
+    padding: 28px;
   }
 }
