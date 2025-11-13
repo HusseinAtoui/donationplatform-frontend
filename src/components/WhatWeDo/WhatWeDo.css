@@ -14,7 +14,7 @@
     text-align: center;
     overflow: visible;
     box-sizing: border-box;
-    height: 550px;
+    height: 580px;
 }
 
 .whatwedo__title {
@@ -148,6 +148,7 @@
         align-items: center;
         gap: 24px;
         margin-top: 20px;
+       
     }
 
     .whatwedo__mobile-step {
